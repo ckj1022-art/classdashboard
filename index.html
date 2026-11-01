@@ -9,7 +9,7 @@
      =================================================================== -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ===================================================================
    2. CSS 視覺系統
@@ -20,7 +20,7 @@
   --c-common:#8ECFE8; --c-rare:#B79CF2; --c-epic:#F2CF5B; --c-legend:#F2808F;
   --num:'ClockNum','Bahnschrift','Arial Narrow',Impact,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,'Courier New',monospace;
-  --sans:'Noto Sans TC',system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;
+  --sans:'PingFang TC','Microsoft JhengHei','Noto Sans TC','Noto Sans CJK TC',system-ui,sans-serif;
   --liq:#70D6BD;
 }
 *{box-sizing:border-box}
@@ -94,8 +94,8 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 /* 直式版面：中央面板在上、作息與環境音並排在下 */
 #ui.portrait .brand,#ui.portrait #tube{display:none}
 #ui.portrait #topLeft{flex-direction:row;left:40px;top:34px}
-#ui.portrait #coinPill{left:280px;top:30px}
-#ui.portrait #foodPill{left:280px;top:84px}
+#ui.portrait #coinPill{left:130px;top:30px}
+#ui.portrait #foodPill{left:130px;top:84px}
 #ui.portrait #tankChip{right:40px;top:40px}
 #ui.portrait #tabs{left:56px;top:172px;width:968px;gap:8px}
 #ui.portrait #centerPanel{left:40px;top:232px;width:1000px;height:740px}
@@ -121,6 +121,7 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 #ui .screen{position:absolute;inset:0;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .55s ease,visibility .55s,transform .55s ease}
 #ui .screen.active{opacity:1;visibility:visible;transform:none}
 #ui .screen:not(.active) .pe{pointer-events:none}
+#ui .screen:not(.active){content-visibility:hidden}
 #ui.hide-ui .chrome,#ui.hide-ui .screen{opacity:0!important}
 #ui.hide-ui .pe{pointer-events:none!important}
 #uiHint{position:fixed;left:50%;bottom:28px;z-index:11;transform:translate(-50%,10px);opacity:0;pointer-events:none;transition:all .6s ease;
@@ -149,7 +150,7 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 .feed-time{display:inline-flex;align-items:center;font:400 86px var(--num);color:rgba(255,255,255,.9);-webkit-font-smoothing:antialiased;line-height:1;padding:.06em .14em;border-radius:16px;background:rgba(2,7,12,.8)}
 .feed-time .c{display:flex;flex-direction:column;justify-content:space-between;width:.3em;height:.38em;align-items:center}.feed-time .c i{display:block;width:.1em;height:.1em;background:currentColor}
 .brand .mini{font:400 44px var(--num);letter-spacing:.08em;color:rgba(241,245,244,.85);margin-top:4px;font-variant-numeric:tabular-nums}
-#tankChip{position:absolute;right:44px;top:36px;height:60px;display:flex;align-items:center;gap:14px;padding:0 10px 0 26px;border-radius:30px;
+#tankChip{position:absolute;right:44px;top:36px;height:60px;display:flex;align-items:center;gap:14px;padding:0 26px;cursor:pointer;border-radius:30px;
   background:linear-gradient(90deg,rgba(124,220,197,.92),rgba(84,184,165,.92));color:#06262a;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 #tankChip .nm{font:500 20px var(--sans);letter-spacing:.14em}
 #tankChip .ct{display:flex;align-items:center;gap:8px;font:500 21px var(--mono);padding-left:14px;border-left:1px solid rgba(6,38,42,.25)}
@@ -511,6 +512,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 .roster-title{font:500 15px var(--mono);letter-spacing:.3em;color:rgba(241,245,244,.5)}
 .roster-title span{font:500 26px var(--sans);letter-spacing:.16em;margin-left:14px;color:var(--energy);vertical-align:-3px}
 .roster-count{display:flex;align-items:center;gap:22px}
+.clear-task{height:46px;padding:0 20px;border-radius:14px;border:1px solid rgba(232,115,90,.55);background:rgba(232,115,90,.12);color:#ffb3a3;font:500 18px var(--sans);letter-spacing:.1em;transition:background .2s}
+.clear-task:hover{background:rgba(232,115,90,.24)}
 #countText{font:400 40px var(--num);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;letter-spacing:.04em}
 #countText small{font:500 18px var(--sans);letter-spacing:.2em;opacity:.7;margin-left:10px}
 #pctText{font:400 26px var(--mono);color:var(--energy);min-width:80px;text-align:right}
@@ -670,7 +673,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 .dr-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px 10px}
 .dr-head h2{margin:0;font:500 20px var(--sans);letter-spacing:.2em}
 .dr-head small{display:block;font:400 11px var(--mono);letter-spacing:.3em;color:rgba(112,214,189,.7);margin-top:4px}
-.dr-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 24px 14px}
+.dr-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 24px 14px}
 .dr-tab{padding:10px 0;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(241,245,244,.7);font-size:14px;letter-spacing:.1em}
 .dr-tab.active{background:rgba(112,214,189,.16);border-color:rgba(112,214,189,.5);color:var(--ink)}
 #drBody{flex:1;overflow-y:auto;padding:4px 24px 40px}
@@ -771,16 +774,13 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
   <div class="brand chrome"><div class="en">CLASS DASHBOARD</div><div class="zh">班級儀表板</div><div class="mini" id="miniClock"></div></div>
 
   <div id="topLeft" class="chrome">
-    <button class="icon-btn pe" id="btnBack" title="回到首頁" aria-label="回到首頁"><i data-ic="back"></i></button>
     <button class="icon-btn pe" id="btnEye" title="觀賞模式：隱藏介面，只看水族箱" aria-label="觀賞模式"><i data-ic="eye"></i></button>
-    <button class="icon-btn pe" id="btnMemo" title="任務打卡" aria-label="任務打卡"><i data-ic="memo"></i></button>
   </div>
   <div id="coinPill" class="chrome" title="賣魚得到的金幣"><span class="ic">$</span><span id="coinTotal">0</span><small>金幣</small></div>
   <div id="foodPill" class="chrome" title="全班累積飼料"><span class="ic"><i data-ic="food"></i></span><span id="foodTotal">0</span><small>份飼料</small></div>
   <div id="tankChip" class="chrome pe">
     <span class="nm">班級水族箱</span>
     <span class="ct" title="全班圖鑑：已發現魚種"><i data-ic="book"></i><span id="tankCount">0/12</span></span>
-    <button class="plus" id="btnTankPlus" title="任務完成登記" aria-label="任務完成登記"><i data-ic="plus"></i></button>
   </div>
 
   <div id="tube" class="chrome">
@@ -852,6 +852,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
           <div id="countText">0<small>COMPLETED</small></div>
           <div class="pbar"><i id="countBar"></i></div>
           <div id="pctText">0%</div>
+          <button class="clear-task" id="clearTask" title="清除全部打卡，任務魚從 0 份重新餵食">清除任務</button>
         </div>
       </div>
       <div id="seatGrid"></div>
@@ -911,7 +912,6 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
     <button class="btn" data-act="closeDrawer" aria-label="關閉">✕</button>
   </div>
   <div class="dr-tabs">
-    <button class="dr-tab" data-tab="time">時間</button>
     <button class="dr-tab" data-tab="students">學生</button>
     <button class="dr-tab" data-tab="fish">任務魚</button>
     <button class="dr-tab" data-tab="special">特殊</button>
@@ -1572,7 +1572,7 @@ const Timer = {
     this.after();
     if (!silent) { Sound.chime(); $('#tube').classList.add('full'); toast(t.kind === 'pomodoro' ? '番茄鐘完成一輪！' : '倒數時間到！', 'gold'); }
   },
-  after() { save(); renderCenter(); updateTimeViews(); if (drawerOpen && drawerTab === 'time') renderDrawer(); }
+  after() { save(); renderCenter(); updateTimeViews();  }
 };
 
 /* ---------- 中央面板 ---------- */
@@ -1751,6 +1751,17 @@ function newHwRound(auto) {
   state.students.forEach(s => s.checked = false); state.round.achieved = false;
   save(); renderHwTank(); renderRoster(); if (drawerOpen) renderDrawer();
 }
+// 清除任務：全部座號取消打卡，任務魚的飼料歸零重新餵食（已進化收藏的魚不受影響）
+async function clearTask() {
+  if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候再清除'); return; }
+  const done = doneCount(), food = state.homework.fish.food;
+  if (!done && !food) { toast('目前沒有需要清除的打卡'); return; }
+  if (!(await confirmBox('清除這次任務？', `${done} 位同學的打卡會全部取消，任務魚吃到的 ${food} 份飼料歸零，重新開始餵食。水族箱和圖鑑裡的魚不受影響。`, '清除任務'))) return;
+  state.students.forEach(s => { if (s.checked) { s.checked = false; s.records.pop(); } });
+  state.totalFood = Math.max(0, state.totalFood - food);
+  state.homework.fish = freshHwFish(state.homework.fish.target); state.round.achieved = false;
+  save(); renderHwTank(); renderRoster(); if (drawerOpen) renderDrawer(); toast('已清除任務，任務魚從頭開始餵食');
+}
 function unfeedHwFish() { const f = state.homework.fish; state.totalFood = Math.max(0, state.totalFood - 1); if (!f.evolved && f.food > 0) { f.food--; save(); renderHwTank(); } }
 function setHwTarget(n) {
   const f = state.homework.fish; f.target = clamp(parseInt(n) || 30, 1, 999);
@@ -1884,7 +1895,7 @@ function initPicker() {
       const lbl = $('#startLbl'); if (lbl) lbl.textContent = fmtMS(v * 60000);
       document.querySelectorAll('#centerBody .qchip').forEach(b => b.classList.toggle('on', +b.dataset.min === v));
       centerKey = centerKey.replace(/\|\d+\|/, `|${v}|`);
-      if (drawerOpen && drawerTab === 'time') renderDrawer();
+      
     }, 140);
   }, { passive: true });
   p.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { e.preventDefault(); p.scrollLeft += e.deltaY > 0 ? PK_W : -PK_W; } }, { passive: false });
@@ -2022,7 +2033,7 @@ function focusFromSchedule(i) {
   if (state.mode !== 'focus') setMode('focus');
   Timer.syncIdle(); save(); renderCenter(true); syncPicker(true);
   toast(`已依「${it.name}」設定專注 ${min} 分鐘`);
-  if (drawerOpen && drawerTab === 'time') renderDrawer();
+  
 }
 
 /* ---------- 環境音（Web Audio 即時合成，不需外部音檔） ---------- */
@@ -2260,7 +2271,7 @@ function spawnBubble(x, y) {
   if (bubbles.length > 46) return;
   bubbles.push({ x: x ?? rand(0, W), y: y ?? H * rand(.88, 1.02), r: rand(1.5, 5) * Math.max(.6, S), vy: rand(22, 55), ph: rand(0, 6), wob: rand(4, 12) });
 }
-function initMotes() { motes.length = 0; for (let i = 0; i < 60; i++) motes.push({ x: rand(0, W), y: rand(0, H), r: rand(.6, 1.8), vx: rand(-4, 4), vy: rand(-3, 3), a: rand(.1, .35) }); }
+function initMotes() { motes.length = 0; for (let i = 0; i < 30; i++) motes.push({ x: rand(0, W), y: rand(0, H), r: rand(.6, 1.8), vx: rand(-4, 4), vy: rand(-3, 3), a: rand(.1, .35) }); }
 const VENTS = [.12, .31, .52, .7, .88];
 function drawBg(dt, t) {
   bgX.clearRect(0, 0, W, H);
@@ -2515,7 +2526,12 @@ function renderStats() {
 }
 function onSeatClick(seat, btn) {
   Sound.init();
-  if (state.students[seat - 1].checked) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
+  // 已打卡的座號再點一次＝取消（按錯時可以改回來），任務魚也會退回一份飼料
+  if (state.students[seat - 1].checked) {
+    if (hwRevealPending || state.homework.fish.evolved) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); toast('任務魚正在進化，請稍候再修改'); return; }
+    uncheck(seat); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake');
+    Sound.note(440, 0, .15, .06); toast(`已取消 ${pad(seat)} 號的打卡`); return;
+  }
   checkIn(seat);
 }
 function checkIn(seat, opts = {}) {
@@ -2630,7 +2646,7 @@ document.addEventListener('click', e => { if (!e.target.closest('#fishCard') && 
 /* ===================================================================
    10. 教師控制台
    =================================================================== */
-let drawerOpen = false, drawerTab = 'time', openRecords = null;
+let drawerOpen = false, drawerTab = 'students', openRecords = null;
 function openDrawer(v = !drawerOpen) { drawerOpen = v; $('#drawer').classList.toggle('open', v); if (v) renderDrawer(); }
 const MODE_LABEL = { clock: '現在時間', focus: '倒數', pomodoro: '番茄鐘', homework: '任務', picker: '抽號' };
 const STATUS_LABEL = { idle: '待開始', running: '進行中', paused: '暫停中', done: '已結束' };
@@ -2643,32 +2659,12 @@ function renderDrawer() {
   document.querySelectorAll('.dr-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === drawerTab));
   const body = $('#drBody'), top = body.scrollTop, t = state.timer, st = t.status;
   let h = '';
-  if (drawerTab === 'time') {
-    h += `<div class="sec"><h3>DISPLAY MODE · 模式</h3><div class="grid grid-cols-4 gap-2">
-      ${Object.entries(MODE_LABEL).map(([k, v]) => `<button class="btn ${state.mode === k ? 'on' : ''}" data-act="mode" data-v="${k}">${v}</button>`).join('')}</div></div>
-      <div class="sec"><h3>FOCUS TIMER · 專注計時</h3><div class="info-box" id="drTimerInfo">${timerInfoHTML()}</div>
-      <div class="grid grid-cols-4 gap-2 mt-3">${[5, 10, 15, 30].map(m => `<button class="btn ${state.focusMin === m ? 'on' : ''}" data-act="preset" data-v="${m}">${m} 分鐘</button>`).join('')}</div>
-      <div class="flex gap-2 mt-2 items-center"><input class="field" id="customMin" type="number" min="1" max="600" placeholder="自訂分鐘數" style="flex:1"><button class="btn" data-act="customMin">套用</button></div>
-      <div class="grid grid-cols-4 gap-2 mt-3">
-        <button class="btn primary" data-act="tStart" ${st === 'running' || st === 'paused' ? 'disabled' : ''}>開始</button>
-        <button class="btn" data-act="tPause" ${st !== 'running' ? 'disabled' : ''}>暫停</button>
-        <button class="btn" data-act="tResume" ${st !== 'paused' ? 'disabled' : ''}>繼續</button>
-        <button class="btn" data-act="tReset">重設</button></div>
-      <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn" data-act="tAdj" data-v="-1">− 1 分鐘</button><button class="btn" data-act="tAdj" data-v="1">＋ 1 分鐘</button></div></div>
-      <div class="sec"><h3>MISSION · 任務打卡</h3>
-      <label class="lbl">任務名稱</label><input class="field" id="hwTitle" maxlength="40" placeholder="例如：今日任務" value="${escapeHTML(state.homework.title)}">
-      <label class="lbl">任務魚進化所需飼料（每完成 1 份 = 1 份飼料）</label><input class="field" id="hwTarget" type="number" min="1" max="999" value="${state.homework.fish.target}">
-      <div class="info-box mt-2">任務魚：${hwRevealed() ? `<b style="color:${RARITY[state.homework.fish.rarity].hex}">${SPECIES_BY_ID[state.homework.fish.species].name}</b>（已進化）` : `已吃 <span class="m">${state.homework.fish.food}</span> / ${state.homework.fish.target} 份`}</div>
-      <button class="btn primary w-full mt-3" data-act="hwSave">儲存並顯示任務</button>
-      <button class="btn w-full mt-2" data-act="hwNew">開始新任務（清除完成狀態，換一隻新的任務魚）</button>
-      <p class="note mt-2">任務模式下，座號即為完成登記：每位同學完成，自己的小魚和全班的任務魚各得一份飼料。任務魚吃滿後會進化成稀有或傳說的特殊魚種，並收進魚種圖鑑。</p></div>`;
-  } else if (drawerTab === 'students') {
+  if (drawerTab === 'students') {
     const c = doneCount();
     h += `<div class="sec"><h3>CLASS SIZE · 班級人數</h3><div class="flex gap-2"><input class="field" id="classSizeIn" type="number" min="1" max="40" value="${N}" style="flex:1"><button class="btn primary" data-act="classSize">套用</button></div>
       <p class="note mt-2">目前 ${N} 人（最多 40 人）。任務魚進化所需飼料會一起改成人數。</p></div>
       <div class="sec"><h3>STUDENTS · 學生管理</h3><div class="info-box">本輪已完成 <b class="m">${c}</b> / ${N}　·　未完成 <b class="m">${N - c}</b></div>
-      <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn primary" data-act="newRound">開始新一輪任務</button><button class="btn" data-act="mode" data-v="homework">切換任務模式</button></div>
-      <p class="note mt-2">「新一輪任務」只清除本輪打卡狀態，小魚成長與完成紀錄都會保留。</p></div><div class="sec">`;
+      <p class="note mt-2">在任務打卡畫面，已打卡的座號再點一次可以取消；右上角「清除任務」可以全部重來。</p></div><div class="sec">`;
     state.students.forEach((s, i) => {
       h += `<div class="row"><span class="no">${pad(i + 1)}</span><span class="st">${s.checked ? '<span class="tag ok">已完成</span>' : '<span class="tag">未完成</span>'}　紀錄 ${s.records.length} 次</span>
         <button class="btn sm" data-act="check" data-v="${i + 1}" ${s.checked ? 'disabled' : ''}>打卡</button>
@@ -2681,10 +2677,10 @@ function renderDrawer() {
     const f = state.homework.fish, rv = hwRevealed(), list = shownCollection(), cnt = r => list.filter(c => c.rarity === r).length;
     h += `<div class="sec"><h3>HOMEWORK FISH · 任務魚</h3><div class="info-box">${escapeHTML(state.homework.title || '今日任務')}　·　${rv ? `<b style="color:${RARITY[f.rarity].hex}">${SPECIES_BY_ID[f.species].name}</b>（已進化）` : f.evolved ? '進化中…' : STAGE_NAMES[hwStage()]}　·　已吃 <b class="m">${f.evolved ? f.target : f.food}</b> / ${f.target} 份
       <div class="mini-bar"><i style="width:${(f.evolved ? 1 : f.food / f.target) * 100}%"></i></div></div>
+      <label class="lbl">任務名稱</label><div class="flex gap-2"><input class="field" id="hwTitle" maxlength="40" placeholder="例如：今日任務" value="${escapeHTML(state.homework.title)}" style="flex:1"><button class="btn primary" data-act="hwTitleSave">儲存</button></div>
       <label class="lbl">進化所需飼料（每位同學完成＝1 份）</label>
       <div class="grid grid-cols-4 gap-2">${[...new Set([10, 20, Math.max(1, N - 5), N])].sort((a, b) => a - b).map(n => `<button class="btn ${f.target === n ? 'on' : ''}" data-act="hwTargetSet" data-v="${n}">${n === N ? '全班 ' : ''}${n} 份</button>`).join('')}</div>
-      <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn" data-act="hwFeedOne" ${f.evolved ? 'disabled' : ''}>手動餵食 ＋1</button><button class="btn" data-act="hwResetFish" ${f.evolved ? 'disabled' : ''}>重設目前任務魚</button></div>
-      <button class="btn w-full mt-2" data-act="hwNew">開始新任務（清除完成狀態，換一隻新的任務魚）</button>
+      <button class="btn w-full mt-2" data-act="hwFeedOne" ${f.evolved ? 'disabled' : ''}>手動餵食 ＋1</button>
       <p class="note mt-2">為保留驚喜，進化前不會顯示最終魚種。進化後的任務魚會游進水族箱並收進全班圖鑑，接著飼料自動清空、打卡重設，換一隻新的任務魚。</p></div>
       <div class="sec"><h3>COLLECTION · 全班圖鑑</h3><div class="info-box">已發現 <b class="m">${discoveredIds().size}</b> / ${SPECIES.length} 種　·　魚群 <b class="m">${list.length}</b> 隻<br>
       ${RARITY_ORDER.map(r => `<span style="color:${RARITY[r].hex}">${RARITY[r].name} ${cnt(r)}</span>`).join('　·　')}<br>水族箱 <b class="m">${tankCollection().length}</b> 條　·　金幣 <b class="m">${state.coins}</b></div>
@@ -2695,7 +2691,6 @@ function renderDrawer() {
     const se = state.settings;
     h += `<div class="sec"><h3>SPECIAL · 特殊控制</h3>
       <button class="btn gold w-full" data-act="golden">✦ 黃金飼料：一鍵補齊所有未完成任務</button>
-      <button class="btn w-full mt-2" data-act="forceAch">強制全班達標（寶箱與巨鯨動畫）</button>
       <div class="grid grid-cols-2 gap-2 mt-2">
         <button class="btn ${se.bgPaused ? 'on' : ''}" data-act="toggleBg">${se.bgPaused ? '背景動畫：已暫停' : '背景動畫：播放中'}</button>
         <button class="btn ${se.sound ? 'on' : ''}" data-act="toggleSound">${se.sound ? '音效：開啟' : '音效：關閉'}</button></div>
@@ -2769,6 +2764,7 @@ async function onDrawerAction(act, v, el) {
     case 'uncheck': uncheck(+v); break;
     case 'classSize': setClassSize($('#classSizeIn').value); break;
     case 'sellAll': sellAll(); break;
+    case 'hwTitleSave': state.homework.title = $('#hwTitle').value.trim() || '今日任務'; save(); updateTimeViews(); renderRoster(); renderDrawer(); toast('任務名稱已儲存'); break;
     case 'records': openRecords = openRecords === +v ? null : +v; renderDrawer(); break;
     case 'feedTotal': setFeedTotal(v); break;
     case 'customFeed': setFeedTotal($('#customFeed').value); break;
@@ -2790,7 +2786,6 @@ async function onDrawerAction(act, v, el) {
       toast(`黃金飼料！補齊 ${list.length} 位同學`, 'gold');
       list.forEach((seat, j) => setTimeout(() => checkIn(seat, { silent: j > 0, achDelay: (list.length - j) * 110 + 1800 }), j * 110));
       break; }
-    case 'forceAch': openDrawer(false); Shows.push(playAchievement); break;
     case 'toggleBg': state.settings.bgPaused = !state.settings.bgPaused; applySettings(); save(); renderDrawer(); break;
     case 'toggleSound': state.settings.sound = !state.settings.sound; save(); renderDrawer(); if (state.settings.sound) { Sound.plink(); Ambient.play(state.ambient.id); } else Ambient.stop(); break;
     case 'fullscreen': toggleFullscreen(); break;
@@ -2842,14 +2837,15 @@ function layout() {
   fishes.forEach(f => { f.x = clamp(f.x, LY.xMin, LY.xMax); f.baseY = f.targetY = clamp(f.baseY, LY.yMin, LY.yMax); });
   initMotes();
 }
-let lastT = performance.now(), lastSec = -1, hiddenAcc = 0;
+let lastT = performance.now(), lastSec = -1, hiddenAcc = 0, frameNo = 0, bgAcc = 0;
 function frame(now) {
   requestAnimationFrame(frame);
   let dt = (now - lastT) / 1000;
   if (document.hidden) { hiddenAcc += dt; if (hiddenAcc < .25) return; dt = hiddenAcc; hiddenAcc = 0; }  // 背景分頁降頻
   lastT = now; dt = Math.min(dt, .05);
   const t = now / 1000;
-  drawBg(dt, t); updateSchools(dt, t);
+  bgAcc += dt; if ((frameNo++ & 1) === 0) { drawBg(bgAcc, t); bgAcc = 0; }
+  updateSchools(dt, t);
   for (const f of fishes) f.update(dt, t);
   updateHwFish(dt, t);
   FX.update(dt); FX.draw();
@@ -2891,7 +2887,7 @@ function init() {
   // 若飼料已滿但尚未進化（例如調整設定前的舊資料），補上進化
   { const hf = state.homework.fish; if (hf.evolved) newHwRound(false); else if (hf.food > 0 && hf.food >= hf.target) { rollHwSpecies(); hwRevealPending = true; Shows.push(playHwEvolution); } }
   setInterval(() => loadWeather(), 5 * 60000); loadWeather();
-  setInterval(() => { const p = Math.floor(Date.now() / 1000); if (p !== lastSec) { lastSec = p; updateTimeViews(); } }, 200);
+  setInterval(() => { const p = Math.floor(Date.now() / 1000); if (p !== lastSec) { lastSec = p; updateTimeViews(); } }, 250);
   requestAnimationFrame(t => { lastT = t; requestAnimationFrame(frame); });
 
   // 首頁面板
@@ -2915,6 +2911,7 @@ function init() {
   $('#daysList').addEventListener('click', e => { const b = e.target.closest('[data-cddel]'); if (b) { state.countdowns.splice(+b.dataset.cddel, 1); save(); renderDays(); } });
   renderDays();
   setLeftTab(state.leftTab);
+  $('#clearTask').addEventListener('click', () => { Sound.init(); clearTask(); });
   $('#schedList').addEventListener('click', e => { const r = e.target.closest('.srow'); if (r) { Sound.init(); focusFromSchedule(+r.dataset.i); } });
   $('#ambList').addEventListener('click', e => { const a = e.target.closest('[data-amb]'); if (!a) return; Sound.init(); state.ambient.id = a.dataset.amb; save(); Ambient.play(a.dataset.amb); renderAmbient(); });
   $('#fishSheet').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { sellFish(+b.dataset.sell); return; } if (e.target.closest('[data-act=sellAll]')) sellAll(); });
@@ -2922,10 +2919,8 @@ function init() {
   // 導覽
   document.querySelectorAll('#bottomNav [data-nav]').forEach(b => b.addEventListener('click', () => { Sound.init(); setScreen(b.dataset.nav); }));
   $('#gearBtn').addEventListener('click', () => { Sound.init(); openDrawer(); });
-  $('#btnBack').addEventListener('click', () => setScreen('home'));
   $('#btnEye').addEventListener('click', () => setHidden(true));
-  $('#btnMemo').addEventListener('click', () => setMode('homework'));
-  $('#btnTankPlus').addEventListener('click', () => setScreen('feed'));
+  $('#tankChip').addEventListener('click', () => setScreen('dex'));
   $('#hourBtn').addEventListener('click', () => setZoom(!zoomed));
   document.addEventListener('click', e => { if (uiHidden && !e.target.closest('.fish') && !e.target.closest('#btnEye')) setHidden(false); });
   // 教師控制台
