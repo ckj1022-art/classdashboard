@@ -170,3 +170,4 @@
 - 只連線兩個外部服務：Google Fonts（字型，離線時改用系統字型）、Open-Meteo（天氣）。
 - 資料儲存於瀏覽器的 localStorage（鍵名 `aquarium-classroom-v1`）。
 - 建議瀏覽器：Chrome、Edge 最新版；建議螢幕比例 16:9。
+
