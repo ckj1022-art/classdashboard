@@ -728,6 +728,18 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 }
 #modal{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:rgba(2,8,14,.6)}
 #modal.show{display:grid}
+#schedEd{position:fixed;inset:0;z-index:58;display:none;place-items:center;background:rgba(2,8,14,.6);overflow-y:auto;padding:12px}
+#schedEd.show{display:grid}
+.se-card{width:min(620px,94vw)}
+.se-hint{font-size:15px}
+.se-hint code{font-family:var(--mono);color:var(--energy);background:rgba(112,214,189,.1);padding:1px 6px;border-radius:6px}
+#seText{width:100%;height:min(46vh,380px);resize:vertical;padding:14px 16px;border-radius:14px;border:1px solid rgba(170,220,230,.25);background:rgba(2,14,24,.7);color:#eef6f6;font:16px/1.7 var(--mono);outline:none}
+#seText:focus{border-color:rgba(112,214,189,.6)}
+#seInfo{min-height:24px;margin:10px 2px 16px;font-size:14px;color:rgba(241,245,244,.7)}
+#seInfo b{color:var(--energy)} #seInfo .warn{color:var(--gold)}
+.se-btns{display:flex;gap:8px;align-items:center}
+#schedEdit.hint{border-color:rgba(242,182,93,.6);color:var(--gold)}
+.sched-demo{margin:14px 18px 6px;padding:12px 14px;border-radius:12px;border:1px dashed rgba(242,182,93,.45);color:rgba(242,214,160,.9);font-size:14px;line-height:1.7;text-align:center}
 .modal-card{width:min(440px,90vw);padding:28px;border-radius:24px;background:linear-gradient(170deg,rgba(22,56,76,.97),rgba(8,24,38,.98));border:1px solid rgba(170,220,230,.2);box-shadow:0 30px 80px rgba(0,0,0,.6)}
 .modal-card h3{margin:0 0 10px;font:500 22px var(--sans);letter-spacing:.1em}
 .modal-card p{margin:0 0 22px;color:rgba(241,245,244,.72);line-height:1.7}
@@ -803,8 +815,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
     <div id="taskPanel" class="panel pe">
       <div class="lp-tabs"><button class="lp-tab" data-lp="sched">作息表</button><button class="lp-tab" data-lp="notes">聯絡簿</button><button class="lp-tab" data-lp="days">倒數日</button></div>
       <div class="lp-view" id="lpSched">
-        <div class="sched-top"><div class="p-head">SCHEDULE<span>今日作息</span></div><span class="day-tag" id="dayTag">上課日</span></div>
-        <div class="daybar"><div class="lbls"><span>07:10</span><b id="dayLbl">今日進度 <em>0%</em></b><span>16:00</span></div><div class="track"><i id="dayFill"></i><s id="dayKnob"></s></div></div>
+        <div class="sched-top"><div class="p-head">SCHEDULE<span>今日作息</span></div><div class="flex items-center gap-2"><span class="day-tag" id="dayTag">上課日</span><button class="nb-clear" id="schedEdit" title="改成自己學校的作息">編輯</button></div></div>
+        <div class="daybar"><div class="lbls"><span id="dayS">07:10</span><b id="dayLbl">今日進度 <em>0%</em></b><span id="dayE">16:00</span></div><div class="track"><i id="dayFill"></i><s id="dayKnob"></s></div></div>
         <div id="schedList"></div>
       </div>
       <div class="lp-view" id="lpNotes">
@@ -922,6 +934,13 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 <div id="fishCard"></div>
 <div id="modal"><div class="modal-card"><h3 id="mTitle"></h3><p id="mMsg"></p>
   <div class="flex gap-2" style="justify-content:flex-end"><button class="btn" id="mCancel">取消</button><button class="btn danger" id="mOk">確定</button></div></div></div>
+<div id="schedEd"><div class="modal-card se-card">
+  <h3>編輯作息表</h3>
+  <p class="se-hint">一行一節，例如 <code>08:40-09:20 第一節</code>。可以直接從學校的作息表複製貼上。<br>「上午」「中午」「下午」單獨一行，會當作分段標題（可省略）。</p>
+  <textarea id="seText" spellcheck="false"></textarea>
+  <div id="seInfo"></div>
+  <div class="se-btns"><button class="btn" id="seDefault">換回範例</button><span style="flex:1"></span><button class="btn" id="seCancel">取消</button><button class="btn primary" id="seSave">儲存</button></div>
+</div></div>
 <div id="setup"><div class="modal-card setup-card">
   <div class="kicker" style="justify-content:center"><span class="dot"></span>開始使用</div>
   <h3>班上有幾位同學？</h3>
@@ -978,7 +997,7 @@ function defaultState() {
     classFish: freshClassFish(1), collection: [], totalFood: 0, dexDone: false,
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
-    taskSel: 't2', ambient: { id: 'none', vol: .5 }, picker: { noRepeat: true, drawn: [] }, weather: { place: 0, data: null, at: 0, dataPlace: -1, err: false }, leftTab: 'sched', notes: [], countdowns: [],
+    taskSel: 't2', ambient: { id: 'none', vol: .5 }, picker: { noRepeat: true, drawn: [] }, weather: { place: 0, data: null, at: 0, dataPlace: -1, err: false }, leftTab: 'notes', schedText: '', notes: [], countdowns: [],
     timer: { duration: 20 * 60000, remaining: 20 * 60000, endAt: null, status: 'idle', kind: 'focus', phase: 'work', round: 1 },
     homework: { title: '今日任務', deadline: Date.now() + 60 * 60000, fish: freshHwFish() },
     hwHistory: [],
@@ -1023,7 +1042,8 @@ function sanitize(d) {
   s.hwHistory = Array.isArray(d.hwHistory) ? d.hwHistory : [];
   s.round = Object.assign({ achieved: false }, d.round || {});
   if (!['focus', 'pomodoro', 'clock', 'homework', 'picker'].includes(s.mode)) s.mode = 'clock';
-  s.leftTab = ['notes', 'days'].includes(d.leftTab) ? d.leftTab : 'sched';
+  s.leftTab = ['sched', 'notes', 'days'].includes(d.leftTab) ? d.leftTab : 'notes';
+  s.schedText = typeof d.schedText === 'string' ? d.schedText.slice(0, 4000) : '';
   s.countdowns = Array.isArray(d.countdowns) ? d.countdowns.filter(c => c && c.name && /^\d{4}-\d{2}-\d{2}$/.test(c.date)).slice(0, 10) : [];
   s.notes = Array.isArray(d.notes) ? d.notes.filter(n => n && typeof n.t === 'string').slice(0, 30) : [];
   s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = clamp(parseInt(s.weather.place) || 0, 0, 11);
@@ -1498,14 +1518,55 @@ const TASK_ICONS = { calc: '#3f8fb0', book: '#bd654f', pencil: '#3f8fb0', broom:
 const taskIcon = (key, size = 56) => `<span class="t-ic" style="background:${TASK_ICONS[key] || '#3f8fb0'};width:${size}px;height:${size}px">${ic(key)}</span>`;
 /* ---------- 每日作息表（開瑄國小） ---------- */
 const toMin = hm => { const [h, m] = hm.split(':').map(Number); return h * 60 + m; };
-const SCHEDULE = [
-  ['07:10', '07:50', '早餐時間', 'meal', '上午'], ['07:50', '08:00', '預備鐘', 'bell', '上午'], ['08:00', '08:35', '早自習', 'book', '上午'],
-  ['08:40', '09:20', '第一節', 'pencil', '上午'], ['09:30', '10:10', '第二節', 'pencil', '上午'], ['10:10', '10:30', '運動時間', 'run', '上午'],
-  ['10:30', '11:10', '第三節', 'pencil', '上午'], ['11:20', '12:00', '第四節', 'pencil', '上午'],
-  ['12:00', '12:40', '午餐', 'meal', '中午'], ['12:40', '13:10', '午休', 'moon', '中午'],
-  ['13:20', '14:00', '第五節', 'pencil', '下午'], ['14:10', '14:50', '第六節', 'pencil', '下午'], ['14:50', '15:20', '清掃學習', 'broom', '下午'], ['15:20', '16:00', '第七節', 'pencil', '下午']
-].map(([a, b, name, icon, part], i) => ({ id: 's' + i, ss: a, ee: b, s: toMin(a), e: toMin(b), name, icon, part }));
-const DAY_S = SCHEDULE[0].s, DAY_E = SCHEDULE[SCHEDULE.length - 1].e;
+// 預設範例（開瑄國小）。老師可在作息表右上角「編輯」貼上自己學校的作息。
+const DEFAULT_SCHED = `上午
+07:10-07:50 早餐時間
+07:50-08:00 預備鐘
+08:00-08:35 早自習
+08:40-09:20 第一節
+09:30-10:10 第二節
+10:10-10:30 運動時間
+10:30-11:10 第三節
+11:20-12:00 第四節
+中午
+12:00-12:40 午餐
+12:40-13:10 午休
+下午
+13:20-14:00 第五節
+14:10-14:50 第六節
+14:50-15:20 清掃學習
+15:20-16:00 第七節`;
+const PARTS = ['早上', '上午', '中午', '下午', '傍晚', '晚上'];
+const guessIcon = n => /餐|點心/.test(n) ? 'meal' : /午休|休息|睡/.test(n) ? 'moon' : /掃/.test(n) ? 'broom' : /運動|體育|升旗|跑|操/.test(n) ? 'run'
+  : /自習|閱讀|晨讀|讀/.test(n) ? 'book' : /預備|鐘/.test(n) ? 'bell' : /社團|音樂|藝/.test(n) ? 'music' : /放學|回家/.test(n) ? 'home' : /下課/.test(n) ? 'clock' : /自然|實驗/.test(n) ? 'flask' : 'pencil';
+// 解析作息文字：一行一節「08:40-09:20 第一節」，全形數字、冒號、波浪號都可以；「上午／中午／下午」單獨一行當分段標題
+function parseSchedule(text) {
+  const rows = [], bad = []; let part = '';
+  String(text || '').split(/\r?\n/).forEach((raw, ln) => {
+    const line = raw.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 65248)).replace(/[：]/g, ':').replace(/[～〜~–—－−]|到|至/g, '-').replace(/\t/g, ' ').trim();
+    if (!line) return;
+    if (PARTS.includes(line.replace(/[\s:：]/g, ''))) { part = line.replace(/[\s:：]/g, ''); return; }
+    const m = line.match(/^(\d{1,2})[:.](\d{2})\s*-\s*(\d{1,2})[:.](\d{2})\s*(.*)$/);
+    if (!m) { bad.push(ln + 1); return; }
+    const a = +m[1] * 60 + +m[2], b = +m[3] * 60 + +m[4];
+    if (+m[1] > 23 || +m[3] > 23 || +m[2] > 59 || +m[4] > 59 || b <= a) { bad.push(ln + 1); return; }
+    const name = (m[5] || '').replace(/^[\s、,，.。:]+/, '').trim().slice(0, 14) || '未命名';
+    rows.push({ a, b, name, part });
+  });
+  rows.sort((x, y) => x.a - y.a);
+  const hm = v => pad(Math.floor(v / 60)) + ':' + pad(v % 60);
+  const useHead = new Set(rows.map(r => r.part).filter(Boolean)).size >= 2;   // 只有一個標題時改依時間自動分段
+  const list = rows.map((r, i) => ({ id: 's' + i, ss: hm(r.a), ee: hm(r.b), s: r.a, e: r.b, name: r.name, icon: guessIcon(r.name),
+    part: (useHead && r.part) || (r.a < 720 ? '上午' : r.a < 790 ? '中午' : '下午') }));
+  return { list, bad };
+}
+let SCHEDULE = [], DAY_S = 0, DAY_E = 1;
+function applySchedule(text) {
+  let { list } = parseSchedule(text || DEFAULT_SCHED);
+  if (!list.length) list = parseSchedule(DEFAULT_SCHED).list;
+  SCHEDULE = list; DAY_S = list[0].s; DAY_E = list[list.length - 1].e;
+}
+applySchedule('');
 function schedNow() {
   const p = nowParts(), m = +p.h * 60 + +p.mi + +p.s / 60;
   const cur = SCHEDULE.findIndex(it => m >= it.s && m < it.e);
@@ -2008,7 +2069,10 @@ function renderSchedule(force) {
       const cls = st.cur === i ? 'cur' : past ? 'past' : st.next === i ? 'next' : '';
       h += `<div class="srow ${cls}" data-i="${i}" ${st.cur === i ? 'id="sNow"' : ''} title="點一下：以「${it.name}」的時間設定專注計時">${st.cur === i ? '<i class="sfill" id="sFill"></i>' : ''}<span class="sdot"></span><span class="stime">${it.ss}–${it.ee}</span><span class="sname">${it.name}</span><span class="sstat" ${st.cur === i ? 'id="sLeft"' : ''}>${past ? '✓' : (it.e - it.s) + ' 分'}</span></div>`;
     });
+    if (!state.schedText) h += `<div class="sched-demo">這是開瑄國小的範例作息。<br>按右上角「編輯」，貼上自己學校的作息。</div>`;
     $('#schedList').innerHTML = h;
+    $('#schedEdit').classList.toggle('hint', !state.schedText);
+    $('#dayS').textContent = SCHEDULE[0].ss; $('#dayE').textContent = SCHEDULE[SCHEDULE.length - 1].ee;
     const tag = $('#dayTag'); tag.textContent = st.weekend ? '假日' : '上課日'; tag.classList.toggle('off', st.weekend);
     const nowEl = document.getElementById('sNow'), list = $('#schedList');
     requestAnimationFrame(() => { list.scrollTop = nowEl ? Math.max(0, nowEl.offsetTop - list.offsetTop - list.clientHeight / 2 + nowEl.offsetHeight / 2) : (st.next === 0 ? 0 : list.scrollHeight); });
@@ -2921,6 +2985,24 @@ function init() {
   $('#gearBtn').addEventListener('click', () => { Sound.init(); openDrawer(); });
   $('#btnEye').addEventListener('click', () => setHidden(true));
   $('#tankChip').addEventListener('click', () => setScreen('dex'));
+  // 作息表編輯
+  const seInfo = () => {
+    const { list, bad } = parseSchedule($('#seText').value);
+    $('#seInfo').innerHTML = (list.length ? `可辨識 <b>${list.length}</b> 個時段（${list[0].ss}–${list[list.length - 1].ee}）` : '<span class="warn">還沒有可辨識的時段</span>')
+      + (bad.length ? `<span class="warn">　第 ${bad.slice(0, 6).join('、')}${bad.length > 6 ? '…' : ''} 行看不懂，會略過</span>` : '');
+  };
+  const seClose = () => $('#schedEd').classList.remove('show');
+  $('#schedEdit').addEventListener('click', () => { $('#seText').value = state.schedText || DEFAULT_SCHED; seInfo(); $('#schedEd').classList.add('show'); setTimeout(() => $('#seText').focus(), 50); });
+  $('#seText').addEventListener('input', seInfo);
+  $('#seDefault').addEventListener('click', () => { $('#seText').value = DEFAULT_SCHED; seInfo(); });
+  $('#seCancel').addEventListener('click', seClose);
+  $('#schedEd').addEventListener('click', e => { if (e.target.id === 'schedEd') seClose(); });
+  $('#seSave').addEventListener('click', () => {
+    const txt = $('#seText').value.trim(), { list } = parseSchedule(txt);
+    if (!list.length) { toast('沒有可辨識的時段，請用「08:40-09:20 第一節」的格式'); return; }
+    state.schedText = txt === DEFAULT_SCHED.trim() ? '' : txt; applySchedule(state.schedText); save();
+    schedKey = ''; renderSchedule(true); renderCenter(); seClose(); toast(`作息表已更新，共 ${list.length} 個時段`);
+  });
   $('#hourBtn').addEventListener('click', () => setZoom(!zoomed));
   document.addEventListener('click', e => { if (uiHidden && !e.target.closest('.fish') && !e.target.closest('#btnEye')) setHidden(false); });
   // 教師控制台
@@ -2934,7 +3016,7 @@ function init() {
   window.addEventListener('beforeunload', saveNow);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); else updateTimeViews(); });
   document.addEventListener('keydown', e => {
-    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#setup').classList.contains('show')) return;
+    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#setup').classList.contains('show')) return;
     const k = e.key.toLowerCase();
     if (k >= '1' && k <= '5') setMode(TAB_IDS[+k - 1]);
     else if (k === ' ' && state.mode === 'picker') { e.preventDefault(); Sound.init(); drawNumber(); }
@@ -2943,6 +3025,7 @@ function init() {
     else if (k === 'escape') { if (zoomed) setZoom(false); else if (uiHidden) setHidden(false); else if (drawerOpen) openDrawer(false); else setScreen('home'); closeFishCard(); }
   });
 }
+applySchedule(state.schedText);
 init();
 </script>
 </body>
