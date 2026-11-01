@@ -727,6 +727,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 /* 彈窗、提示 */
 .setup-card{width:min(520px,92vw);text-align:center}.setup-card h3{font-size:30px!important;margin:14px 0 8px!important}
 .setup-chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.setup-hint{margin:8px 0 0!important;min-height:22px;font-size:15px;color:rgba(241,245,244,.7)}
+.setup-hint b{color:var(--energy)}
 #setup,#modal{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
 #setup{position:fixed;inset:0;z-index:65;display:none;place-items:center;background:rgba(2,8,14,.7)}#setup.show{display:grid}
 .setup-card,.modal-card{margin:auto}
@@ -745,6 +747,27 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 }
 #modal{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:rgba(2,8,14,.6)}
 #modal.show{display:grid}
+#pModal{position:fixed;inset:0;z-index:59;display:none;place-items:center;background:rgba(2,8,14,.6);padding:12px}
+#pModal.show{display:grid}
+#rosterTitle{display:flex;align-items:center;gap:8px;min-width:0;flex:1;margin-right:18px;font:inherit;letter-spacing:normal;overflow:hidden}
+.roster-count{flex:none}
+#roster.multi .pbar,#roster.multi #pctText{display:none}
+#roster.multi .roster-count{gap:16px}
+.m-tab{height:48px;max-width:250px;flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:14px;border:1px solid rgba(170,220,230,.2);background:rgba(255,255,255,.04);color:rgba(241,245,244,.7);transition:background .2s,border-color .2s}
+.m-tab .mt-name{font:500 19px var(--sans);letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.m-tab .mt-ct{font:500 16px var(--mono);opacity:.75;flex:none}
+.m-tab .mt-ed{font-size:14px;opacity:.6;flex:none}
+.m-tab.on{background:rgba(112,214,189,.16);border-color:rgba(112,214,189,.6);color:#dffbf3}
+.m-tab.on .mt-name{color:var(--energy);font-weight:700}
+.m-tab.all .mt-ct{color:var(--gold);opacity:1}
+.m-add{height:48px;padding:0 16px;border-radius:14px;border:1px dashed rgba(112,214,189,.5);background:transparent;color:#a9f0dc;font:500 17px var(--sans);letter-spacing:.08em;flex:none}
+.seat.empty{background:transparent!important;border:2px dashed rgba(160,210,225,.25);color:rgba(241,245,244,.22);box-shadow:none;cursor:default}
+.seat.empty .chk,.seat.empty .ring{display:none}
+.seat.empty:hover{transform:none}
+#seatGrid.m-swap .seat{animation:mSwap .35s ease}
+@keyframes mSwap{from{opacity:.35;transform:scale(.94)}to{opacity:1;transform:none}}
+.row.is-empty .no{opacity:.4;text-decoration:line-through}
+#ui.portrait #rosterTitle{flex-basis:100%;margin-right:0;overflow-x:auto}
 #schedEd{position:fixed;inset:0;z-index:58;display:none;place-items:center;background:rgba(2,8,14,.6);overflow-y:auto;padding:12px}
 #schedEd.show{display:grid}
 .se-card{width:min(620px,94vw)}
@@ -959,12 +982,15 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
   <div id="seInfo"></div>
   <div class="se-btns"><button class="btn" id="seDefault">換回範例</button><span style="flex:1"></span><button class="btn" id="seCancel">取消</button><button class="btn primary" id="seSave">儲存</button></div>
 </div></div>
+<div id="pModal"><div class="modal-card"><h3 id="pTitle"></h3><input class="field" id="pInput" maxlength="40" style="width:100%;font-size:20px">
+  <div class="flex gap-2 items-center" style="margin-top:20px"><button class="btn danger" id="pDel">刪除這個任務</button><span style="flex:1"></span><button class="btn" id="pCancel">取消</button><button class="btn primary" id="pOk">確定</button></div></div></div>
 <div id="setup"><div class="modal-card setup-card">
   <div class="kicker" style="justify-content:center"><span class="dot"></span>開始使用</div>
-  <h3>班上有幾位同學？</h3>
-  <p>座號按鈕和任務魚進化所需的飼料，都會依人數自動設定。之後可以在教師控制台修改。</p>
-  <div class="setup-chips"><button class="btn" data-size="20">20 人</button><button class="btn" data-size="22">22 人</button><button class="btn" data-size="24">24 人</button><button class="btn" data-size="25">25 人</button><button class="btn" data-size="26">26 人</button><button class="btn" data-size="28">28 人</button><button class="btn" data-size="30">30 人</button><button class="btn" data-size="32">32 人</button><button class="btn" data-size="35">35 人</button><button class="btn" data-size="40">40 人</button><button class="btn" data-size="45">45 人</button><button class="btn" data-size="50">50 人</button></div>
-  <div class="setup-row"><div class="flex gap-2 items-center mt-3"><input class="field" id="setupSize" type="number" min="1" max="50" inputmode="numeric" style="flex:1;font-size:22px;text-align:center"><span style="font-size:18px">人</span></div>
+  <h3>班上最大的座號是幾號？</h3>
+  <p>座號按鈕會從 01 排到這個號碼。中間有跳號（例如有人轉出），在下面填上空號，就不會算進人數。之後都可以在教師控制台修改。</p>
+  <div class="setup-chips"><button class="btn" data-size="20">20 號</button><button class="btn" data-size="22">22 號</button><button class="btn" data-size="24">24 號</button><button class="btn" data-size="25">25 號</button><button class="btn" data-size="26">26 號</button><button class="btn" data-size="28">28 號</button><button class="btn" data-size="30">30 號</button><button class="btn" data-size="32">32 號</button><button class="btn" data-size="35">35 號</button><button class="btn" data-size="40">40 號</button><button class="btn" data-size="45">45 號</button><button class="btn" data-size="50">50 號</button></div>
+  <div class="setup-row"><div class="flex gap-2 items-center mt-3"><input class="field" id="setupSize" type="number" min="1" max="50" inputmode="numeric" style="flex:1;font-size:22px;text-align:center"><span style="font-size:18px">號</span></div>
+  <input class="field mt-2" id="setupEmpty" placeholder="空號（沒有就不用填），例如：7、15" style="width:100%;font-size:17px"><p class="setup-hint" id="setupHint"></p>
   <button class="btn primary w-full mt-3" id="setupOk" style="padding:14px;font-size:18px">開始使用</button></div>
 </div></div>
 <div id="toast"></div>
@@ -1066,6 +1092,8 @@ function sanitize(d) {
   s.countdowns = Array.isArray(d.countdowns) ? d.countdowns.filter(c => c && c.name && /^\d{4}-\d{2}-\d{2}$/.test(c.date)).slice(0, 10) : [];
   s.notes = Array.isArray(d.notes) ? d.notes.filter(n => n && typeof n.t === 'string').slice(0, 30) : [];
   s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = clamp(parseInt(s.weather.place) || 0, 0, 11);
+  s.missions = d.missions; s.missionIdx = d.missionIdx;
+  s.emptySeats = Array.isArray(d.emptySeats) ? [...new Set(d.emptySeats.filter(n => Number.isInteger(n) && n >= 1 && n <= 50))].sort((a, b) => a - b) : [];
   s.picker = Object.assign({ noRepeat: true, drawn: [] }, d.picker || {}); if (!Array.isArray(s.picker.drawn)) s.picker.drawn = [];
   s.pomo = Object.assign(defaultState().pomo, d.pomo || {});
   s.ambient = Object.assign(defaultState().ambient, d.ambient || {});
@@ -1115,6 +1143,7 @@ function sanitize(d) {
     st.fish = Object.assign(freshFish(), src.fish || {});
     return st;
   });
+  ensureMissions(s);
   return s;
 }
 function loadState() {
@@ -1123,7 +1152,7 @@ function loadState() {
 }
 let saveTimer = null;
 let saveLocked = false;
-function saveNow() { if (saveLocked) return; try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { console.warn('儲存失敗', e); } }
+function saveNow() { if (saveLocked) return; syncMission(); try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { console.warn('儲存失敗', e); } }
 function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 150); }
 let state = loadState();
 const feedTotal = () => state.settings.feedTotal;
@@ -1842,7 +1871,7 @@ function newHwRound(auto) {
 async function checkAllTask() {
 
   if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候'); return; }
-  const list = state.students.filter(s => !s.checked).map(s => s.seat);
+  const list = state.students.map((s, i) => (!s.checked && !isEmptySeat(i + 1)) ? i + 1 : 0).filter(Boolean);
   if (!list.length) { toast('全班都已完成任務'); return; }
   if (!(await confirmBox('全部打卡？', `把還沒打卡的 ${list.length} 位同學全部標示完成。按錯的話，點座號可以個別取消。`, '全部打卡'))) return;
   if (hwRevealPending || state.homework.fish.evolved) return;
@@ -1915,18 +1944,18 @@ async function playHwEvolution() {
 
 /* ---------- 抽號器：從 1～班級人數隨機抽出座號 ---------- */
 let picking = false, pkLast = null;
-const pickerHTML = () => `<div class="kicker mt"><span class="dot"></span>隨機抽號　·　全班 <span id="pkSize">${N}</span> 人</div>
+const pickerHTML = () => `<div class="kicker mt"><span class="dot"></span>隨機抽號　·　全班 <span id="pkSize">${activeN()}</span> 人</div>
   <div class="pk-num" id="pkNum">--</div>
   <div class="pk-lbl" id="pkLbl">按下「抽號」開始</div>
   <div class="pk-row"><button class="pk-toggle" data-act="pkRepeat" id="pkRepeat"></button><span id="pkLeft"></span></div>
   <div class="pk-hist" id="pkHist"></div>
   <div class="ctrl-row"><button class="start-btn txt sm" data-act="pkDraw" id="pkBtn"><span class="pi">${ic('dice')}</span><span>抽號</span></button><button class="cbtn" data-act="pkReset">${ic('reset')}重新開始</button></div>`;
-const pkPool = () => { const d = new Set(state.picker.drawn); return Array.from({ length: N }, (_, i) => i + 1).filter(n => !state.picker.noRepeat || !d.has(n)); };
+const pkPool = () => { const d = new Set(state.picker.drawn); return Array.from({ length: N }, (_, i) => i + 1).filter(n => !isEmptySeat(n) && (!state.picker.noRepeat || !d.has(n))); };
 function updatePicker() {
   const el = id => document.getElementById(id); if (!el('pkNum')) return;
   state.picker.drawn = state.picker.drawn.filter(n => n >= 1 && n <= N);
   const left = pkPool().length, d = state.picker.drawn;
-  el('pkSize').textContent = N;
+  el('pkSize').textContent = activeN();
   el('pkRepeat').textContent = state.picker.noRepeat ? '✓ 不重複抽號' : '可重複抽號';
   el('pkRepeat').classList.toggle('on', state.picker.noRepeat);
   el('pkLeft').innerHTML = state.picker.noRepeat ? `還有 <b>${left}</b> 位沒被抽到` : `已抽 <b>${d.length}</b> 次`;
@@ -2015,7 +2044,7 @@ function updateTimeViews() {
   el('miniClock').textContent = `${p.h}:${p.mi}`;
   if (el('cClock')) {
     const cz = state.clockTz, q = cz === TZ ? p : nowParts(Date.now(), cz);
-    setTime(el('cClock'), `${q.h}:${q.mi}:${q.s}`); el('cDate').textContent = `${q.y}年${q.mo}月${q.d}日`; el('cWeek').textContent = q.wd; if (el('cDone')) { el('cDone').textContent = doneCount(); el('cTotal').textContent = N; }
+    setTime(el('cClock'), `${q.h}:${q.mi}:${q.s}`); el('cDate').textContent = `${q.y}年${q.mo}月${q.d}日`; el('cWeek').textContent = q.wd; if (el('cDone')) { el('cDone').textContent = doneCount(); el('cTotal').textContent = activeN(); }
     const ref = cz === TZ ? '' : `${tzDiffText(cz)}　·　台灣現在 <b>${p.h}:${p.mi}</b>　<button class="tz-back" data-tz="${TZ}">回到台灣時間</button>`;
     if (el('tzRef')._v !== ref) { el('tzRef')._v = ref; el('tzRef').innerHTML = ref; }
   }
@@ -2028,7 +2057,7 @@ function updateTimeViews() {
     setTime(el('hwClock'), `${p.h}:${p.mi}:${p.s}`); el('hwDate').textContent = `${p.y}年${p.mo}月${p.d}日　${p.wd}`;
     const hw = state.homework, done = doneCount();
     el('hwTitleView').textContent = hw.title || '今日任務';
-    el('hwMeta').innerHTML = `已完成 <b>${done}</b> 人　未完成 <b>${N - done}</b> 人`;
+    el('hwMeta').innerHTML = `已完成 <b>${done}</b> 人　未完成 <b>${activeN() - done}</b> 人`;
   }
   if (curScreen === 'feed') renderFeedHead();
   renderSchedule();
@@ -2086,7 +2115,7 @@ function renderDays() {
 function updateClockCountdown() {
   const el = document.getElementById('cfRight'); if (!el) return;
   const up = sortedCountdowns().find(c => c.n >= 0);
-  el.innerHTML = up ? `<div class="cf-cd">${up.n === 0 ? `今天就是<b style="font-size:34px">${escapeHTML(up.name)}</b>` : `距離${escapeHTML(up.name)}<b>${up.n}</b>天`}</div>` : `<div class="cf-stat"><span id="cDone">${doneCount()}</span><small>　/ <span id="cTotal">${N}</span> 已完成</small></div>`;
+  el.innerHTML = up ? `<div class="cf-cd">${up.n === 0 ? `今天就是<b style="font-size:34px">${escapeHTML(up.name)}</b>` : `距離${escapeHTML(up.name)}<b>${up.n}</b>天`}</div>` : `<div class="cf-stat"><span id="cDone">${doneCount()}</span><small>　/ <span id="cTotal">${activeN()}</span> 已完成</small></div>`;
 }
 function renderNotes() {
   const np = nowParts(); $('#notesDate').textContent = `${np.mo}/${np.d} 聯絡簿`;
@@ -2252,7 +2281,7 @@ function renderFeedHead() {
   $('#feedKicker').innerHTML = '<span class="dot"></span>台灣時間　·　任務完成登記';
   const np = nowParts();
   $('#feedTitle').innerHTML = `<span class="feed-time">${timeHTML(`${np.h}:${np.mi}:${np.s}`)}</span>`;
-  $('#feedSub').innerHTML = `${escapeHTML(state.homework.title || '今日任務')}　·　已完成 <b>${c}</b> 人　·　未完成 <b>${N - c}</b> 人`;
+  $('#feedSub').innerHTML = `${escapeHTML(state.homework.title || '今日任務')}　·　已完成 <b>${c}</b> 人　·　未完成 <b>${activeN() - c}</b> 人`;
 }
 function renderFishSheet() {
   const f = state.homework.fish, rv = hwRevealed(), list = shownCollection(), tank = tankCollection(), st = f.evolved ? 3 : hwStage();
@@ -2284,7 +2313,7 @@ function renderStatsSheet() {
   const times = state.students.map(s => s.records.length), max = Math.max(1, ...times);
   const tile = (lab, val, sub, c) => `<div class="stile"><small>${lab}</small><b style="${c ? `color:${c}` : ''}">${val}</b><span>${sub || ''}</span></div>`;
   $('#statsSheet').innerHTML = `<div class="stiles">
-    ${tile('本次已完成', `${done}<i> / ${N}</i>`, Math.round(done / N * 100) + '%')}${tile('全班圖鑑', `${discoveredIds().size}<i> / ${SPECIES.length}</i>`, '種魚')}
+    ${tile('本次已完成', `${done}<i> / ${activeN()}</i>`, Math.round(done / activeN() * 100) + '%')}${tile('全班圖鑑', `${discoveredIds().size}<i> / ${SPECIES.length}</i>`, '種魚')}
     ${tile('水族箱', tankCollection().length, '條魚')}${tile('金幣', state.coins, '枚', RARITY.epic.hex)}
     ${RARITY_ORDER.map(r => tile(RARITY[r].name + '魚種', cnt(r), '隻', RARITY[r].hex)).join('')}</div>
     <h4 class="sh4">每位同學完成次數</h4>
@@ -2605,7 +2634,100 @@ function drawStar(ctx, x, y, r, rot, big) {
 /* ===================================================================
    6. 學生打卡系統
    =================================================================== */
-const doneCount = () => state.students.filter(s => s.checked).length;
+/* ---------- 空號：轉出或沒有人的座號，不算在人數、完成度、抽號、全選裡 ---------- */
+const parseSeatList = (t, max) => [...new Set(String(t || '').replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 65248)).split(/[^0-9]+/).map(Number).filter(n => n >= 1 && n <= max))].sort((a, b) => a - b);
+const isEmptySeat = n => Array.isArray(state.emptySeats) && state.emptySeats.includes(n);
+const activeN = () => Math.max(1, N - (state.emptySeats || []).filter(n => n <= N).length);
+const doneCount = () => state.students.filter((s, i) => s.checked && !isEmptySeat(i + 1)).length;
+/* ---------- 多任務：最多 3 個任務同時進行，每個任務各養一隻任務魚 ----------
+   目前打開的任務放在 state.homework 與 students[].checked；其他任務存在 state.missions[] 裡，切換時互換 */
+function ensureMissions(st) {
+  const s0 = st || state;
+  if (!Array.isArray(s0.emptySeats)) s0.emptySeats = [];
+  let ms = Array.isArray(s0.missions) ? s0.missions.filter(m => m && typeof m === 'object') : [];
+  ms = ms.slice(0, 3).map((m, i) => ({ id: m.id || ('m' + i + Date.now().toString(36)), title: typeof m.title === 'string' && m.title.trim() ? m.title.slice(0, 40) : '今日任務',
+    fish: m.fish && typeof m.fish === 'object' && m.fish.target > 0 ? m.fish : freshHwFish(N), checked: Array.isArray(m.checked) ? m.checked.filter(n => Number.isInteger(n) && n >= 1 && n <= 50) : [] }));
+  if (!ms.length) ms = [{ id: 'm' + Date.now().toString(36), title: s0.homework.title || '今日任務', fish: s0.homework.fish, checked: s0.students.map((x, i) => x.checked ? i + 1 : 0).filter(Boolean) }];
+  s0.missions = ms; s0.missionIdx = clamp(parseInt(s0.missionIdx) || 0, 0, ms.length - 1);
+  ms[s0.missionIdx].fish = s0.homework.fish; ms[s0.missionIdx].title = s0.homework.title || ms[s0.missionIdx].title;
+  return s0;
+}
+function syncMission() {
+  if (!Array.isArray(state.missions) || !state.missions.length) ensureMissions();
+  const m = state.missions[state.missionIdx];
+  m.title = state.homework.title || '今日任務'; m.fish = state.homework.fish; m.checked = state.students.map((x, i) => x.checked ? i + 1 : 0).filter(Boolean);
+}
+function loadMission() {
+  const m = state.missions[state.missionIdx], set = new Set(m.checked);
+  state.homework.title = m.title; state.homework.fish = m.fish; state.round.achieved = false;
+  state.students.forEach((x, i) => x.checked = set.has(i + 1));
+}
+const missionBusy = () => hwRevealPending || Shows.running || state.homework.fish.evolved;
+function switchMission(k) {
+  ensureMissions(); if (k === state.missionIdx || !state.missions[k]) return;
+  if (missionBusy()) { toast('任務魚正在進化，請稍候再切換任務'); return; }
+  syncMission(); state.missionIdx = k; loadMission(); save();
+  renderHwTank(); renderRoster(); updateTimeViews(); if (drawerOpen) renderDrawer();
+  const sg = $('#seatGrid'); sg.classList.remove('m-swap'); void sg.offsetWidth; sg.classList.add('m-swap');
+}
+async function addMission() {
+  ensureMissions(); if (state.missions.length >= 3) { toast('最多同時進行 3 個任務'); return; }
+  if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
+  const r = await promptBox('新增任務', '', false, '例如：數學習作'); if (!r || !r.value) return;
+  syncMission(); state.missions.push({ id: 'm' + Date.now().toString(36), title: r.value, fish: freshHwFish(state.homework.fish.target || activeN()), checked: [] });
+  switchMission(state.missions.length - 1); toast(`已新增任務「${r.value}」，每個任務各養一隻任務魚`);
+}
+async function editMission(k) {
+  ensureMissions(); const m = state.missions[k]; if (!m) return;
+  const r = await promptBox('任務名稱', k === state.missionIdx ? state.homework.title : m.title, state.missions.length > 1); if (!r) return;
+  if (r.del) {
+    if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
+    syncMission(); const mm = state.missions[k], done = mm.checked.length;
+    if (!(await confirmBox(`刪除任務「${mm.title}」？`, `這個任務的 ${done} 筆打卡和任務魚吃到的 ${mm.fish.food} 份飼料會一起刪除。已經進化、收進水族箱和圖鑑的魚不受影響。`, '刪除任務'))) return;
+    state.missions.splice(k, 1);
+    if (k === state.missionIdx) { state.missionIdx = Math.max(0, k - 1); loadMission(); } else if (k < state.missionIdx) state.missionIdx--;
+    save(); renderHwTank(); renderRoster(); updateTimeViews(); if (drawerOpen) renderDrawer(); toast('任務已刪除'); return;
+  }
+  if (!r.value) return;
+  if (k === state.missionIdx) state.homework.title = r.value; m.title = r.value;
+  save(); renderRoster(); updateTimeViews(); if (drawerOpen) renderDrawer();
+}
+function renderMissionTabs() {
+  ensureMissions(); const A = activeN(); $('#roster').classList.toggle('multi', state.missions.length > 1);
+  $('#rosterTitle').innerHTML = state.missions.map((m, i) => {
+    const on = i === state.missionIdx, done = on ? doneCount() : m.checked.filter(n => n <= N && !isEmptySeat(n)).length, all = done >= A;
+    return `<button class="m-tab ${on ? 'on' : ''} ${all ? 'all' : ''}" data-mi="${i}" title="${on ? '再點一次可以改名或刪除' : '切換到這個任務'}"><span class="mt-name">${escapeHTML(on ? state.homework.title || m.title : m.title)}</span><span class="mt-ct">${done}/${A}</span>${on ? '<span class="mt-ed">✎</span>' : ''}</button>`;
+  }).join('') + (state.missions.length < 3 ? `<button class="m-add" data-madd="1" title="新增任務（最多 3 個）">＋ 任務</button>` : '');
+}
+// 小視窗：輸入文字（可選刪除）
+function promptBox(title, value, canDel, ph) {
+  return new Promise(res => {
+    const m = $('#pModal'), inp = $('#pInput'); $('#pTitle').textContent = title; inp.value = value || ''; inp.placeholder = ph || '';
+    $('#pDel').style.display = canDel ? '' : 'none'; m.classList.add('show'); setTimeout(() => { inp.focus(); inp.select(); }, 50);
+    const done = v => { m.classList.remove('show'); $('#pOk').onclick = $('#pCancel').onclick = $('#pDel').onclick = inp.onkeydown = null; res(v); };
+    $('#pOk').onclick = () => done({ value: inp.value.trim().slice(0, 40) });
+    $('#pCancel').onclick = () => done(null);
+    $('#pDel').onclick = () => done({ del: true });
+    inp.onkeydown = e => { if (e.key === 'Enter') $('#pOk').click(); if (e.key === 'Escape') done(null); };
+  });
+}
+// 空號切換（教師控制台）
+function toggleEmptySeat(n) {
+  if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
+  ensureMissions(); const oldA = activeN(), st = state.students[n - 1]; if (!st) return;
+  if (isEmptySeat(n)) state.emptySeats = state.emptySeats.filter(x => x !== n);
+  else {
+    if (activeN() <= 1) { toast('至少要保留一位同學'); return; }
+    if (st.checked) { st.checked = false; st.records.pop(); unfeedHwFish(); }
+    state.missions.forEach((m, i) => { if (i !== state.missionIdx && m.checked.includes(n)) { m.checked = m.checked.filter(x => x !== n); if (!m.fish.evolved && m.fish.food > 0) m.fish.food--; } });
+    state.emptySeats.push(n); state.emptySeats.sort((a, b) => a - b);
+  }
+  const newA = activeN();
+  state.missions.forEach((m, i) => { const f = i === state.missionIdx ? state.homework.fish : m.fish; if (!f.evolved && f.target === oldA) f.target = newA; });
+  const hf = state.homework.fish; if (!hf.evolved && hf.food > 0 && hf.food >= hf.target) { rollHwSpecies(); hwRevealPending = true; Shows.push(playHwEvolution); }
+  save(); renderRoster(); renderHwTank(); updatePicker(); updateTimeViews(); if (drawerOpen) renderDrawer();
+  toast(isEmptySeat(n) ? `${pad(n)} 號設為空號，不列入人數（現在 ${newA} 人）` : `${pad(n)} 號已恢復（現在 ${newA} 人）`);
+}
 function buildRoster() {
   const g = $('#seatGrid'); g.innerHTML = ''; $('#roster').classList.toggle('rows4', N > 30); $('#roster').classList.toggle('big', N > 40); $('#roster').classList.toggle('big-p', N > 36);
   for (let i = 0; i < N; i++) {
@@ -2619,13 +2741,13 @@ function buildRoster() {
 function renderRoster() {
   const btns = $('#seatGrid').children, total = feedTotal(), C = 2 * Math.PI * 43;
   state.students.forEach((s, i) => {
-    const b = btns[i]; b.classList.toggle('done', s.checked);
+    const b = btns[i]; b.classList.toggle('done', s.checked); b.classList.toggle('empty', isEmptySeat(i + 1));
     b.title = `座號 ${pad(i + 1)}｜${s.checked ? '已完成' : '未完成'}`;
   });
-  const c = doneCount(), pct = Math.round(c / N * 100), hw = state.mode === 'homework';
-  $('#countText').innerHTML = `${c} / ${N}<small>人完成</small>`;
+  const c = doneCount(), pct = Math.round(c / activeN() * 100), hw = state.mode === 'homework';
+  $('#countText').innerHTML = `${c} / ${activeN()}<small>人完成</small>`;
   $('#countBar').style.width = pct + '%'; $('#pctText').textContent = pct + '%';
-  $('#rosterTitle').innerHTML = `MISSION<span>任務完成登記</span>`;
+  renderMissionTabs();
   renderFeedHead(); renderStats(); refreshSheets();
   const cd = document.getElementById('cDone'); if (cd) cd.textContent = c;
 }
@@ -2636,6 +2758,7 @@ function renderStats() {
 }
 function onSeatClick(seat, btn) {
   Sound.init();
+  if (isEmptySeat(seat)) { toast(`${pad(seat)} 號是空號（可在教師控制台的「學生」分頁恢復）`); return; }
   // 已打卡的座號再點一次＝取消（按錯時可以改回來），任務魚也會退回一份飼料
   if (state.students[seat - 1].checked) {
     if (hwRevealPending || state.homework.fish.evolved) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); toast('任務魚正在進化，請稍候再修改'); return; }
@@ -2657,7 +2780,7 @@ function checkIn(seat, opts = {}) {
 function uncheck(seat) {
   const s = state.students[seat - 1]; if (!s.checked) return;
   s.checked = false; s.records.pop();
-  if (doneCount() < N) state.round.achieved = false;
+  if (doneCount() < activeN()) state.round.achieved = false;
   unfeedHwFish();
   renderRoster(); save(); if (drawerOpen) renderDrawer();
 }
@@ -2771,14 +2894,16 @@ function renderDrawer() {
   let h = '';
   if (drawerTab === 'students') {
     const c = doneCount();
-    h += `<div class="sec"><h3>CLASS SIZE · 班級人數</h3><div class="flex gap-2"><input class="field" id="classSizeIn" type="number" min="1" max="50" value="${N}" style="flex:1"><button class="btn primary" data-act="classSize">套用</button></div>
-      <p class="note mt-2">目前 ${N} 人（最多 50 人）。任務魚進化所需飼料會一起改成人數。</p></div>
-      <div class="sec"><h3>STUDENTS · 學生管理</h3><div class="info-box">本輪已完成 <b class="m">${c}</b> / ${N}　·　未完成 <b class="m">${N - c}</b></div>
-      <p class="note mt-2">在任務打卡畫面，已打卡的座號再點一次可以取消；右上角「清除任務」可以全部重來。</p></div><div class="sec">`;
+    h += `<div class="sec"><h3>SEATS · 最大座號</h3><div class="flex gap-2"><input class="field" id="classSizeIn" type="number" min="1" max="50" value="${N}" style="flex:1"><button class="btn primary" data-act="classSize">套用</button></div>
+      <p class="note mt-2">座號 01～${pad(N)}，實際 ${activeN()} 人（最多 50 號）。有跳號的座號，在下方學生列表按「空號」。</p></div>
+      <div class="sec"><h3>STUDENTS · 學生管理</h3><div class="info-box">本輪已完成 <b class="m">${c}</b> / ${activeN()}　·　未完成 <b class="m">${activeN() - c}</b>${state.emptySeats.length ? `　·　空號 ${state.emptySeats.filter(n => n <= N).map(pad).join('、')}` : ''}</div>
+      <p class="note mt-2">在任務打卡畫面，已打卡的座號再點一次可以取消；右上角「清除任務」可以全部重來。<br>座號跳號（例如有人轉出）時，按該座號的「空號」：不列入人數、完成度、抽號和全選，過去的紀錄會保留。</p></div><div class="sec">`;
     state.students.forEach((s, i) => {
-      h += `<div class="row"><span class="no">${pad(i + 1)}</span><span class="st">${s.checked ? '<span class="tag ok">已完成</span>' : '<span class="tag">未完成</span>'}　紀錄 ${s.records.length} 次</span>
-        <button class="btn sm" data-act="check" data-v="${i + 1}" ${s.checked ? 'disabled' : ''}>打卡</button>
-        <button class="btn sm" data-act="uncheck" data-v="${i + 1}" ${!s.checked ? 'disabled' : ''}>取消</button>
+      const em = isEmptySeat(i + 1);
+      h += `<div class="row ${em ? 'is-empty' : ''}"><span class="no">${pad(i + 1)}</span><span class="st">${em ? '<span class="tag">空號</span>' : s.checked ? '<span class="tag ok">已完成</span>' : '<span class="tag">未完成</span>'}　紀錄 ${s.records.length} 次</span>
+        <button class="btn sm" data-act="check" data-v="${i + 1}" ${s.checked || em ? 'disabled' : ''}>打卡</button>
+        <button class="btn sm" data-act="uncheck" data-v="${i + 1}" ${!s.checked || em ? 'disabled' : ''}>取消</button>
+        <button class="btn sm ${em ? 'on' : ''}" data-act="emptySeat" data-v="${i + 1}" title="轉出或沒有人的座號設為空號">${em ? '恢復' : '空號'}</button>
         <button class="btn sm ${openRecords === i + 1 ? 'on' : ''}" data-act="records" data-v="${i + 1}">紀錄</button></div>`;
       if (openRecords === i + 1) h += `<div class="records">${s.records.length ? s.records.slice().reverse().map((r, j) => `#${s.records.length - j}　${fmtStamp(r)}`).join('<br>') : '尚無完成紀錄'}</div>`;
     });
@@ -2787,9 +2912,10 @@ function renderDrawer() {
     const f = state.homework.fish, rv = hwRevealed(), list = shownCollection(), cnt = r => list.filter(c => c.rarity === r).length;
     h += `<div class="sec"><h3>HOMEWORK FISH · 任務魚</h3><div class="info-box">${escapeHTML(state.homework.title || '今日任務')}　·　${rv ? `<b style="color:${RARITY[f.rarity].hex}">${SPECIES_BY_ID[f.species].name}</b>（已進化）` : f.evolved ? '進化中…' : STAGE_NAMES[hwStage()]}　·　已吃 <b class="m">${f.evolved ? f.target : f.food}</b> / ${f.target} 份
       <div class="mini-bar"><i style="width:${(f.evolved ? 1 : f.food / f.target) * 100}%"></i></div></div>
+      <p class="note" style="margin:8px 0 0">目前任務 ${state.missionIdx + 1} / ${state.missions.length}。最多可同時進行 3 個任務，在任務打卡畫面上方切換或按「＋ 任務」新增，每個任務各養一隻任務魚。</p>
       <label class="lbl">任務名稱</label><div class="flex gap-2"><input class="field" id="hwTitle" maxlength="40" placeholder="例如：今日任務" value="${escapeHTML(state.homework.title)}" style="flex:1"><button class="btn primary" data-act="hwTitleSave">儲存</button></div>
       <label class="lbl">進化所需飼料（每位同學完成＝1 份）</label>
-      <div class="grid grid-cols-4 gap-2">${[...new Set([10, 20, Math.max(1, N - 5), N])].sort((a, b) => a - b).map(n => `<button class="btn ${f.target === n ? 'on' : ''}" data-act="hwTargetSet" data-v="${n}">${n === N ? '全班 ' : ''}${n} 份</button>`).join('')}</div>
+      <div class="grid grid-cols-4 gap-2">${[...new Set([10, 20, Math.max(1, activeN() - 5), activeN()])].sort((a, b) => a - b).map(n => `<button class="btn ${f.target === n ? 'on' : ''}" data-act="hwTargetSet" data-v="${n}">${n === activeN() ? '全班 ' : ''}${n} 份</button>`).join('')}</div>
       <button class="btn w-full mt-2" data-act="hwFeedOne" ${f.evolved ? 'disabled' : ''}>手動餵食 ＋1</button>
       <p class="note mt-2">為保留驚喜，進化前不會顯示最終魚種。進化後的任務魚會游進水族箱並收進全班圖鑑，接著飼料自動清空、打卡重設，換一隻新的任務魚。</p></div>
       <div class="sec"><h3>COLLECTION · 全班圖鑑</h3><div class="info-box">已發現 <b class="m">${discoveredIds().size}</b> / ${SPECIES.length} 種　·　魚群 <b class="m">${list.length}</b> 隻<br>
@@ -2820,20 +2946,31 @@ const escapeHTML = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': 
 
 function setClassSize(n) {
   n = clamp(parseInt(n) || 0, 1, 50); if (!n) return;
-  const old = N; N = n; state.settings.classSize = n; state.settings.classSizeSet = true;
+  const oldA = activeN(), old = N; N = n; state.settings.classSize = n; state.settings.classSizeSet = true;
+  state.emptySeats = (state.emptySeats || []).filter(x => x <= n);
   if (n > state.students.length) for (let i = state.students.length; i < n; i++) state.students.push(freshStudent(i));
   else state.students.length = n;
-  const hf = state.homework.fish; if (!hf.evolved && (hf.target === old || hf.target > n)) { hf.target = n; if (hf.food >= n && hf.food > 0) { rollHwSpecies(); hwRevealPending = true; Shows.push(playHwEvolution); } }
-  if (doneCount() < N) state.round.achieved = false;
+  const hf = state.homework.fish, nA = activeN(); if (!hf.evolved && (hf.target === oldA || hf.target === old || hf.target > nA)) { hf.target = nA; if (hf.food >= nA && hf.food > 0) { rollHwSpecies(); hwRevealPending = true; Shows.push(playHwEvolution); } }
+  if (doneCount() < activeN()) state.round.achieved = false;
   save(); buildRoster(); renderRoster(); renderHwTank(); updatePicker(); updateTimeViews(); if (drawerOpen) renderDrawer();
-  if (n !== old) toast(`班級人數已設定為 ${n} 人`);
+  if (n !== old) toast(`座號已設定為 01～${pad(n)}`);
 }
 function showSetup() {
   const m = $('#setup'); m.classList.add('show');
   const inp = $('#setupSize'); inp.value = state.settings.classSize;
   m.querySelectorAll('[data-size]').forEach(b => b.onclick = () => { inp.value = b.dataset.size; });
   inp.onkeydown = e => { if (e.key === 'Enter') $('#setupOk').click(); };
-  $('#setupOk').onclick = () => { const v = parseInt(inp.value); if (!(v >= 1 && v <= 50)) { toast('請輸入 1～50 人'); return; } setClassSize(v); m.classList.remove('show'); Sound.init(); };
+  const emp = $('#setupEmpty'), hint = () => { const v = parseInt(inp.value) || 0, e = parseSeatList(emp.value, v); $('#setupHint').innerHTML = v >= 1 && v <= 50 ? `座號 01～${pad(v)}${e.length ? `，空號 ${e.map(pad).join('、')}` : ''}，實際 <b>${v - e.length}</b> 人` : ''; };
+  inp.oninput = emp.oninput = hint; m.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', hint)); hint();
+  emp.onkeydown = e => { if (e.key === 'Enter') $('#setupOk').click(); };
+  $('#setupOk').onclick = () => {
+    const v = parseInt(inp.value); if (!(v >= 1 && v <= 50)) { toast('最大座號請輸入 1～50'); return; }
+    const e = parseSeatList(emp.value, v); if (e.length >= v) { toast('空號太多了，至少要有一位同學'); return; }
+    setClassSize(v); state.emptySeats = e;
+    const f = state.homework.fish; if (!f.evolved && f.target === v) f.target = activeN();
+    save(); renderRoster(); renderHwTank(); updatePicker(); updateTimeViews();
+    m.classList.remove('show'); Sound.init(); if (e.length) toast(`座號 01～${pad(v)}，空號 ${e.map(pad).join('、')}，實際 ${activeN()} 人`);
+  };
 }
 function setFeedTotal(n) {
   n = clamp(parseInt(n) || 0, 1, 200); if (!n) return;
@@ -2875,6 +3012,7 @@ async function onDrawerAction(act, v, el) {
     case 'classSize': setClassSize($('#classSizeIn').value); break;
     case 'sellAll': sellAll(); break;
     case 'hwTitleSave': state.homework.title = $('#hwTitle').value.trim() || '今日任務'; save(); updateTimeViews(); renderRoster(); renderDrawer(); toast('任務名稱已儲存'); break;
+    case 'emptySeat': toggleEmptySeat(+v); break;
     case 'records': openRecords = openRecords === +v ? null : +v; renderDrawer(); break;
     case 'feedTotal': setFeedTotal(v); break;
     case 'customFeed': setFeedTotal($('#customFeed').value); break;
@@ -3006,6 +3144,7 @@ function onCenterClick(e) {
 }
 
 function init() {
+  ensureMissions();
   document.querySelectorAll('i[data-ic]').forEach(e => e.outerHTML = ic(e.dataset.ic));
   buildScene(); layout(); buildRoster(); buildFish(); buildSchools();
   // 重新整理時：已到時的計時器直接推進到正確狀態（不重播提示音）
@@ -3044,6 +3183,10 @@ function init() {
   setLeftTab(state.leftTab);
   $('#clearTask').addEventListener('click', () => { Sound.init(); clearTask(); });
   $('#allTask').addEventListener('click', () => { Sound.init(); checkAllTask(); });
+  $('#rosterTitle').addEventListener('click', e => {
+    const t = e.target.closest('[data-mi]'); if (t) { const k = +t.dataset.mi; if (k === state.missionIdx) editMission(k); else switchMission(k); return; }
+    if (e.target.closest('[data-madd]')) addMission();
+  });
   $('#schedList').addEventListener('click', e => { const r = e.target.closest('.srow'); if (r) { Sound.init(); focusFromSchedule(+r.dataset.i); } });
   $('#ambList').addEventListener('click', e => { const a = e.target.closest('[data-amb]'); if (!a) return; Sound.init(); state.ambient.id = a.dataset.amb; save(); Ambient.play(a.dataset.amb); renderAmbient(); });
   $('#fishSheet').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { sellFish(+b.dataset.sell); return; } if (e.target.closest('[data-act=sellAll]')) sellAll(); });
@@ -3086,7 +3229,7 @@ function init() {
   window.addEventListener('beforeunload', saveNow);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); else updateTimeViews(); });
   document.addEventListener('keydown', e => {
-    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#setup').classList.contains('show')) return;
+    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#pModal').classList.contains('show') || $('#setup').classList.contains('show')) return;
     const k = e.key.toLowerCase();
     if (k >= '1' && k <= '5') setMode(TAB_IDS[+k - 1]);
     else if (k === ' ' && state.mode === 'picker') { e.preventDefault(); Sound.init(); drawNumber(); }
