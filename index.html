@@ -524,20 +524,26 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 .roster-count{display:flex;align-items:center;gap:22px}
 .clear-task{height:46px;padding:0 20px;border-radius:14px;border:1px solid rgba(232,115,90,.55);background:rgba(232,115,90,.12);color:#ffb3a3;font:500 18px var(--sans);letter-spacing:.1em;transition:background .2s}
 .clear-task:hover{background:rgba(232,115,90,.24)}
+.all-task{height:46px;padding:0 20px;margin-right:-10px;border-radius:14px;border:1px solid rgba(112,214,189,.55);background:rgba(112,214,189,.12);color:#a9f0dc;font:500 18px var(--sans);letter-spacing:.1em;transition:background .2s}
+.all-task:hover{background:rgba(112,214,189,.24)}
 #countText{font:400 40px var(--num);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;letter-spacing:.04em}
 #countText small{font:500 18px var(--sans);letter-spacing:.2em;opacity:.7;margin-left:10px}
 #pctText{font:400 26px var(--mono);color:var(--energy);min-width:80px;text-align:right}
-#seatGrid{display:grid;grid-template-columns:repeat(10,1fr);row-gap:14px;justify-items:center}
+#seatGrid{display:grid;grid-template-columns:repeat(10,1fr);row-gap:14px;justify-items:center;contain:layout paint;will-change:transform;padding:12px 0;margin:-12px 0}
 #roster.rows4{top:500px;height:452px}
+#roster.big #seatGrid{grid-template-columns:repeat(13,1fr)}
+#ui.portrait #roster{overflow-y:auto}
+#ui.portrait #roster.big-p #seatGrid{grid-template-columns:repeat(8,1fr);row-gap:12px}
+#ui.portrait #roster.big-p .seat{width:68px;height:68px;font-size:24px}
 .seat{position:relative;width:76px;height:76px;border-radius:50%;border:1px solid rgba(160,210,225,.2);
   background:radial-gradient(circle at 34% 28%,rgba(130,180,205,.24),rgba(16,46,67,.6) 58%,rgba(6,20,32,.8));
   color:rgba(241,245,244,.55);font:400 27px var(--mono);font-variant-numeric:tabular-nums;
-  box-shadow:inset 0 2px 6px rgba(255,255,255,.06),0 6px 16px rgba(0,0,0,.3);
-  transition:background .5s,color .5s,border-color .5s,box-shadow .5s,transform .15s}
+  box-shadow:inset 0 2px 6px rgba(255,255,255,.06),0 4px 8px rgba(0,0,0,.28);
+  transition:background .5s,color .5s,border-color .5s,transform .15s}
 .seat:hover{transform:translateY(-2px)}
 .seat:active{transform:scale(.95)}
 .seat.done{background:radial-gradient(circle at 34% 28%,#a6eedd,#43ae9f 52%,#1c6d77);color:#05262b;
-  border-color:rgba(170,245,225,.6);box-shadow:0 0 22px rgba(112,214,189,.35),inset 0 2px 6px rgba(255,255,255,.3);cursor:default}
+  border-color:rgba(170,245,225,.6);box-shadow:0 0 0 3px rgba(112,214,189,.22),inset 0 2px 6px rgba(255,255,255,.3);cursor:default}
 .seat.done:hover{transform:none}
 .seat .ring{display:none;position:absolute;inset:-7px;width:90px;height:90px;pointer-events:none;transform:rotate(-90deg)}
 .seat .ring circle{fill:none;stroke-width:2.2}
@@ -548,8 +554,9 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 .seat .evo-dot{position:absolute;left:50%;bottom:-5px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;opacity:0}
 .seat.shake{animation:shake .4s}
 @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-.seat.pulse{animation:seatPulse .7s ease}
-@keyframes seatPulse{0%{box-shadow:0 0 0 0 rgba(112,214,189,.7)}100%{box-shadow:0 0 0 22px rgba(112,214,189,0)}}
+.seat.pulse::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:3px solid rgba(112,214,189,.8);pointer-events:none;opacity:0;animation:seatRing .7s ease-out both;animation-delay:inherit}
+@keyframes seatRing{0%{transform:scale(1);opacity:1}100%{transform:scale(1.45);opacity:0}}
+#seatGrid.instant .seat{transition:none}
 
 /* 我的小魚／圖鑑／統計 */
 .sheet{left:240px;top:140px;width:1440px;height:800px;padding:30px 44px 30px;display:flex;flex-direction:column}
@@ -729,7 +736,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
   .setup-card{width:min(760px,96vw)}
   .setup-card h3{font-size:22px!important;margin:6px 0 4px!important}
   .setup-card p{margin:0 0 10px!important;font-size:14px;line-height:1.5}
-  .setup-chips{grid-template-columns:repeat(8,1fr);gap:6px}
+  .setup-chips{grid-template-columns:repeat(6,1fr);gap:6px}
   .setup-chips .btn{padding:7px 0;font-size:13px}
   .setup-row{display:flex;gap:8px;align-items:center;margin-top:10px}
   .setup-row .flex{flex:1;margin-top:0!important}
@@ -875,7 +882,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
           <div id="countText">0<small>COMPLETED</small></div>
           <div class="pbar"><i id="countBar"></i></div>
           <div id="pctText">0%</div>
-          <button class="clear-task" id="clearTask" title="清除全部打卡，任務魚從 0 份重新餵食">清除任務</button>
+          <button class="all-task" id="allTask" title="把還沒打卡的同學全部打卡">全選</button><button class="clear-task" id="clearTask" title="清除全部打卡，任務魚從 0 份重新餵食">清除任務</button>
         </div>
       </div>
       <div id="seatGrid"></div>
@@ -956,8 +963,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
   <div class="kicker" style="justify-content:center"><span class="dot"></span>開始使用</div>
   <h3>班上有幾位同學？</h3>
   <p>座號按鈕和任務魚進化所需的飼料，都會依人數自動設定。之後可以在教師控制台修改。</p>
-  <div class="setup-chips"><button class="btn" data-size="20">20 人</button><button class="btn" data-size="24">24 人</button><button class="btn" data-size="25">25 人</button><button class="btn" data-size="26">26 人</button><button class="btn" data-size="28">28 人</button><button class="btn" data-size="30">30 人</button><button class="btn" data-size="32">32 人</button><button class="btn" data-size="35">35 人</button></div>
-  <div class="setup-row"><div class="flex gap-2 items-center mt-3"><input class="field" id="setupSize" type="number" min="1" max="40" inputmode="numeric" style="flex:1;font-size:22px;text-align:center"><span style="font-size:18px">人</span></div>
+  <div class="setup-chips"><button class="btn" data-size="20">20 人</button><button class="btn" data-size="22">22 人</button><button class="btn" data-size="24">24 人</button><button class="btn" data-size="25">25 人</button><button class="btn" data-size="26">26 人</button><button class="btn" data-size="28">28 人</button><button class="btn" data-size="30">30 人</button><button class="btn" data-size="32">32 人</button><button class="btn" data-size="35">35 人</button><button class="btn" data-size="40">40 人</button><button class="btn" data-size="45">45 人</button><button class="btn" data-size="50">50 人</button></div>
+  <div class="setup-row"><div class="flex gap-2 items-center mt-3"><input class="field" id="setupSize" type="number" min="1" max="50" inputmode="numeric" style="flex:1;font-size:22px;text-align:center"><span style="font-size:18px">人</span></div>
   <button class="btn primary w-full mt-3" id="setupOk" style="padding:14px;font-size:18px">開始使用</button></div>
 </div></div>
 <div id="toast"></div>
@@ -1044,7 +1051,7 @@ function sanitize(d) {
   const s = Object.assign(base, d);
   s.settings = Object.assign(defaultState().settings, d.settings || {});
   if (!['auto', 'high', 'eco', 'min'].includes(s.settings.perf)) s.settings.perf = 'auto';
-  s.settings.classSize = clamp(parseInt(s.settings.classSize) || 30, 1, 40); N = s.settings.classSize;
+  s.settings.classSize = clamp(parseInt(s.settings.classSize) || 30, 1, 50); N = s.settings.classSize;
   if (d.settings && d.v && !('classSizeSet' in d.settings)) s.settings.classSizeSet = true;   // 舊資料視為已設定（30 人）
   s.timer = Object.assign(defaultState().timer, d.timer || {});
   s.homework = Object.assign(defaultState().homework, d.homework || {});
@@ -1810,14 +1817,19 @@ function rollHwSpecies() {
   state.collection.push({ no: state.collection.length + 1, species: sp.id, rarity: sp.rarity, at: f.evolvedAt, title: state.homework.title || '今日任務' });
   saveNow();
 }
-function feedHwFish() {
-  state.totalFood++;
+// 餵食 n 份：一次更新資料；畫面最多飛 8 顆星星，最後一顆落下時才進化
+function feedHwFish(n = 1) {
+  state.totalFood += n;
   const f = state.homework.fish; if (f.evolved) { save(); return; }
-  f.food = Math.min(f.food + 1, f.target);
+  f.food = Math.min(f.food + n, f.target);
   const evolve = f.food >= f.target; if (evolve) { rollHwSpecies(); hwRevealPending = true; }
   save();
-  if (document.querySelector('.hw-tank')) FX.star(hwPos, () => { hwGulp(); Sound.plink(); renderHwTank(); if (evolve) Shows.push(playHwEvolution); }, evolve);
-  else { renderHwTank(); if (evolve) Shows.push(playHwEvolution); }
+  let landed = false;
+  const land = () => { if (landed) return; landed = true; hwGulp(); Sound.plink(); renderHwTank(); if (evolve) Shows.push(playHwEvolution); };
+  if (!document.querySelector('.hw-tank')) { land(); return; }
+  const k = Math.min(n, 8), gap = 140;
+  for (let i = 0; i < k; i++) setTimeout(() => FX.star(hwPos, i === k - 1 ? land : () => hwGulp(), evolve && i === k - 1), i * gap);
+  setTimeout(land, (k - 1) * gap + 2500);   // 保險：星星沒落下也一定會餵到、會進化
 }
 // 進化完成：飼料清空、打卡狀態重設，換一隻新的任務魚
 function newHwRound(auto) {
@@ -1826,6 +1838,26 @@ function newHwRound(auto) {
   save(); renderHwTank(); renderRoster(); if (drawerOpen) renderDrawer();
 }
 // 清除任務：全部座號取消打卡，任務魚的飼料歸零重新餵食（已進化收藏的魚不受影響）
+// 一鍵全選：把還沒打卡的同學全部打卡（逐一點亮，任務魚吃滿就照常進化）
+async function checkAllTask() {
+
+  if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候'); return; }
+  const list = state.students.filter(s => !s.checked).map(s => s.seat);
+  if (!list.length) { toast('全班都已完成任務'); return; }
+  if (!(await confirmBox('全部打卡？', `把還沒打卡的 ${list.length} 位同學全部標示完成。按錯的話，點座號可以個別取消。`, '全部打卡'))) return;
+  if (hwRevealPending || state.homework.fish.evolved) return;
+  // 一次完成：資料只寫一次、名單只畫一次，座號依序亮起只是 CSS 動畫
+  const now = Date.now();
+  list.forEach(seat => { const st = state.students[seat - 1]; st.checked = true; st.records.push(now); });
+  const sg = $('#seatGrid'); sg.classList.add('instant'); renderRoster(); void sg.offsetWidth;
+  requestAnimationFrame(() => sg.classList.remove('instant'));
+  const grid = sg.children, step = Math.min(40, 1200 / list.length);
+  list.forEach((seat, j) => { const b = grid[seat - 1]; if (!b) return; b.classList.remove('pulse'); b.style.animationDelay = (j * step).toFixed(0) + 'ms'; void b.offsetWidth; b.classList.add('pulse'); });
+  setTimeout(() => list.forEach(seat => { const b = grid[seat - 1]; if (b) b.style.animationDelay = ''; }), list.length * step + 800);
+  Sound.pop(); feedHwFish(list.length);
+  if (drawerOpen) renderDrawer();
+  toast(`已完成 ${list.length} 位同學的打卡`);
+}
 async function clearTask() {
   if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候再清除'); return; }
   const done = doneCount(), food = state.homework.fish.food;
@@ -2508,7 +2540,7 @@ function discoveredIds() {
 const FX = {
   list: [], orbit: null,
   busy() { return this.list.length > 0 || !!this.orbit || hwRevealPending || (typeof Shows !== 'undefined' && Shows.running); },
-  add(p) { if (this.list.length < 520) this.list.push(p); },
+  add(p) { if (this.list.length < 520 || p.type === 'star') this.list.push(p); },   // 飛向任務魚的星星不受上限影響，避免進化觸發被吃掉
   sparkle(x, y, n, colors) { for (let i = 0; i < n; i++) this.add({ type: 'spark', x, y, vx: rand(-40, 40), vy: rand(-50, 10), life: 0, max: rand(.6, 1.3), r: rand(1, 2.6) * S, c: colors[i % colors.length] }); },
   burst(x, y, n, colors, spd = 160) { for (let i = 0; i < n; i++) { const a = rand(0, 6.283), v = rand(.3, 1) * spd * S; this.add({ type: 'spark', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: rand(.7, 1.6), r: rand(1.2, 3.2) * S, c: colors[i % colors.length], drag: 1.8 }); } },
   bubbles(x, y, n, spread, colorful) { for (let i = 0; i < n; i++) this.add({ type: 'bub', x: x + rand(-spread, spread), y: y + rand(-spread * .4, spread * .6), vy: rand(40, 120) * S, ph: rand(0, 6), life: 0, max: rand(1.6, 3.4), r: rand(2, colorful ? 9 : 5) * S, hue: colorful ? rand(150, 330) : null }); },
@@ -2575,7 +2607,7 @@ function drawStar(ctx, x, y, r, rot, big) {
    =================================================================== */
 const doneCount = () => state.students.filter(s => s.checked).length;
 function buildRoster() {
-  const g = $('#seatGrid'); g.innerHTML = ''; $('#roster').classList.toggle('rows4', N > 30);
+  const g = $('#seatGrid'); g.innerHTML = ''; $('#roster').classList.toggle('rows4', N > 30); $('#roster').classList.toggle('big', N > 40); $('#roster').classList.toggle('big-p', N > 36);
   for (let i = 0; i < N; i++) {
     const b = document.createElement('button'); b.className = 'seat'; b.dataset.seat = i + 1;
     b.innerHTML = `<svg class="ring" viewBox="0 0 90 90"><circle cx="45" cy="45" r="43" stroke="rgba(255,255,255,.06)"/><circle class="rp" cx="45" cy="45" r="43" stroke="rgba(112,214,189,.75)" stroke-dasharray="0 999" stroke-linecap="round"/></svg>
@@ -2739,8 +2771,8 @@ function renderDrawer() {
   let h = '';
   if (drawerTab === 'students') {
     const c = doneCount();
-    h += `<div class="sec"><h3>CLASS SIZE · 班級人數</h3><div class="flex gap-2"><input class="field" id="classSizeIn" type="number" min="1" max="40" value="${N}" style="flex:1"><button class="btn primary" data-act="classSize">套用</button></div>
-      <p class="note mt-2">目前 ${N} 人（最多 40 人）。任務魚進化所需飼料會一起改成人數。</p></div>
+    h += `<div class="sec"><h3>CLASS SIZE · 班級人數</h3><div class="flex gap-2"><input class="field" id="classSizeIn" type="number" min="1" max="50" value="${N}" style="flex:1"><button class="btn primary" data-act="classSize">套用</button></div>
+      <p class="note mt-2">目前 ${N} 人（最多 50 人）。任務魚進化所需飼料會一起改成人數。</p></div>
       <div class="sec"><h3>STUDENTS · 學生管理</h3><div class="info-box">本輪已完成 <b class="m">${c}</b> / ${N}　·　未完成 <b class="m">${N - c}</b></div>
       <p class="note mt-2">在任務打卡畫面，已打卡的座號再點一次可以取消；右上角「清除任務」可以全部重來。</p></div><div class="sec">`;
     state.students.forEach((s, i) => {
@@ -2768,7 +2800,7 @@ function renderDrawer() {
   } else {
     const se = state.settings;
     h += `<div class="sec"><h3>SPECIAL · 特殊控制</h3>
-      <button class="btn gold w-full" data-act="golden">✦ 黃金飼料：一鍵補齊所有未完成任務</button>
+
       <div class="grid grid-cols-2 gap-2 mt-2">
         <button class="btn ${se.bgPaused ? 'on' : ''}" data-act="toggleBg">${se.bgPaused ? '背景動畫：已暫停' : '背景動畫：播放中'}</button>
         <button class="btn ${se.sound ? 'on' : ''}" data-act="toggleSound">${se.sound ? '音效：開啟' : '音效：關閉'}</button></div>
@@ -2787,7 +2819,7 @@ function renderDrawer() {
 const escapeHTML = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function setClassSize(n) {
-  n = clamp(parseInt(n) || 0, 1, 40); if (!n) return;
+  n = clamp(parseInt(n) || 0, 1, 50); if (!n) return;
   const old = N; N = n; state.settings.classSize = n; state.settings.classSizeSet = true;
   if (n > state.students.length) for (let i = state.students.length; i < n; i++) state.students.push(freshStudent(i));
   else state.students.length = n;
@@ -2801,7 +2833,7 @@ function showSetup() {
   const inp = $('#setupSize'); inp.value = state.settings.classSize;
   m.querySelectorAll('[data-size]').forEach(b => b.onclick = () => { inp.value = b.dataset.size; });
   inp.onkeydown = e => { if (e.key === 'Enter') $('#setupOk').click(); };
-  $('#setupOk').onclick = () => { const v = parseInt(inp.value); if (!(v >= 1 && v <= 40)) { toast('請輸入 1～40 人'); return; } setClassSize(v); m.classList.remove('show'); Sound.init(); };
+  $('#setupOk').onclick = () => { const v = parseInt(inp.value); if (!(v >= 1 && v <= 50)) { toast('請輸入 1～50 人'); return; } setClassSize(v); m.classList.remove('show'); Sound.init(); };
 }
 function setFeedTotal(n) {
   n = clamp(parseInt(n) || 0, 1, 200); if (!n) return;
@@ -2858,12 +2890,6 @@ async function onDrawerAction(act, v, el) {
         if (state.homework.fish.evolved) { state.homework.fish = freshHwFish(state.homework.fish.target); hwRevealPending = false; renderHwTank(); }
         buildFish(); save(); renderRoster(); renderDrawer(); toast('全班魚群與圖鑑已重設'); }
       break;
-    case 'golden': {
-      const list = state.students.filter(s => !s.checked).map(s => s.seat);
-      if (!list.length) { toast('全班都已完成任務'); break; }
-      toast(`黃金飼料！補齊 ${list.length} 位同學`, 'gold');
-      list.forEach((seat, j) => setTimeout(() => checkIn(seat, { silent: j > 0, achDelay: (list.length - j) * 110 + 1800 }), j * 110));
-      break; }
     case 'toggleBg': state.settings.bgPaused = !state.settings.bgPaused; applySettings(); save(); renderDrawer(); break;
     case 'toggleSound': state.settings.sound = !state.settings.sound; save(); renderDrawer(); if (state.settings.sound) { Sound.plink(); Ambient.play(state.ambient.id); } else Ambient.stop(); break;
     case 'fullscreen': toggleFullscreen(); break;
@@ -3017,6 +3043,7 @@ function init() {
   renderDays();
   setLeftTab(state.leftTab);
   $('#clearTask').addEventListener('click', () => { Sound.init(); clearTask(); });
+  $('#allTask').addEventListener('click', () => { Sound.init(); checkAllTask(); });
   $('#schedList').addEventListener('click', e => { const r = e.target.closest('.srow'); if (r) { Sound.init(); focusFromSchedule(+r.dataset.i); } });
   $('#ambList').addEventListener('click', e => { const a = e.target.closest('[data-amb]'); if (!a) return; Sound.init(); state.ambient.id = a.dataset.amb; save(); Ambient.play(a.dataset.amb); renderAmbient(); });
   $('#fishSheet').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { sellFish(+b.dataset.sell); return; } if (e.target.closest('[data-act=sellAll]')) sellAll(); });
