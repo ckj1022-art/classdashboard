@@ -94,8 +94,8 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 /* 直式版面：中央面板在上、作息與環境音並排在下 */
 #ui.portrait .brand,#ui.portrait #tube{display:none}
 #ui.portrait #topLeft{flex-direction:row;left:40px;top:34px}
-#ui.portrait #coinPill{left:206px;top:30px}
-#ui.portrait #foodPill{left:206px;top:84px}
+#ui.portrait #coinPill{left:282px;top:30px}
+#ui.portrait #foodPill{left:282px;top:84px}
 #ui.portrait #tankChip{right:40px;top:40px}
 #ui.portrait #tabs{left:56px;top:172px;width:968px;gap:8px}
 #ui.portrait #centerPanel{left:40px;top:232px;width:1000px;height:740px}
@@ -138,6 +138,22 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 /* 頂部 */
 #topLeft{position:absolute;left:44px;top:34px;display:flex;flex-direction:column;gap:16px}
 #btnPerf{grid-template-rows:auto auto;align-content:center;gap:1px}
+#btnBpmf{grid-template-rows:auto auto;align-content:center;gap:0}
+#btnBpmf .bp-ic{font:700 24px/1 'PingFang TC','Microsoft JhengHei',sans-serif}
+#btnBpmf b{font:700 12px var(--sans);letter-spacing:.06em;line-height:1}
+body.bpmf #btnBpmf{color:var(--gold);border-color:rgba(242,182,93,.6);background:rgba(242,182,93,.12)}
+/* 注音模式：只在學生要自己讀的內容加注音（聯絡簿、作息節次、任務名稱、倒數日、星期、抽號結果、魚名、進化卡片）
+   其他按鈕、分頁、天氣、教師控制台都維持原字型，不會跑版 */
+body.bpmf{--bpmf:'Bpmf Huninn','PingFang TC','Microsoft JhengHei',sans-serif}
+body.bpmf.bp-kai{--bpmf:'Bpmf Zihi Kai Std','BiauKai','DFKai-SB','PingFang TC',serif}
+body.bpmf :is(#notesList li span,.srow .sname,.sbreak,.m-tab .mt-name,#hwTitleView,#feedSub,.cd-txt b,.cf-cd,#cWeek,#pkLbl,
+  .dc .nm,.fc-lb,#fishCard h4,#evoTitle,#evoName,#evoBadge,#evoSeat){font-family:var(--bpmf)!important}
+body.bpmf .cf-cd b{font-family:var(--num)!important}
+body.bpmf .m-tab{max-width:270px;padding:0 12px;gap:8px}
+body.bpmf .m-tab .mt-name{font-size:17px;letter-spacing:0}
+body.bpmf .m-tab .mt-ed{display:none}
+body.bpmf .dc .nm{font-size:14px;letter-spacing:0;white-space:normal;line-height:1.25;overflow:visible}
+body.bpmf .dc .dn{display:none}
 #btnPerf svg{width:24px;height:24px}
 #btnPerf b{font:700 12px var(--sans);letter-spacing:.06em;line-height:1}
 #btnPerf.eco{color:#9fe3c6;border-color:rgba(112,214,189,.5)}
@@ -827,6 +843,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 
   <div id="topLeft" class="chrome">
     <button class="icon-btn pe" id="btnEye" title="觀賞模式：隱藏介面，只看水族箱" aria-label="觀賞模式"><i data-ic="eye"></i></button>
+    <button class="icon-btn pe" id="btnBpmf" title="注音：學生看的文字加上注音" aria-label="注音切換"><span class="bp-ic">ㄅ</span><b>注音</b></button>
     <button class="icon-btn pe" id="btnPerf" title="效能切換：流暢／省電／極省電" aria-label="效能切換"><i data-ic="gauge"></i><b id="perfLbl">流暢</b></button>
   </div>
   <div id="coinPill" class="chrome" title="賣魚得到的金幣"><span class="ic">$</span><span id="coinTotal">0</span><small>金幣</small></div>
@@ -1037,7 +1054,7 @@ const freshStudent = i => ({ seat: i + 1, checked: false, records: [], fish: fre
 function defaultState() {
   return {
     v: 5, mode: 'clock', coins: 0,
-    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto' },
+    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn' },
     classFish: freshClassFish(1), collection: [], totalFood: 0, dexDone: false,
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
@@ -1077,6 +1094,7 @@ function sanitize(d) {
   const s = Object.assign(base, d);
   s.settings = Object.assign(defaultState().settings, d.settings || {});
   if (!['auto', 'high', 'eco', 'min'].includes(s.settings.perf)) s.settings.perf = 'auto';
+  s.settings.bpmf = !!s.settings.bpmf; if (!['huninn', 'kai'].includes(s.settings.bpmfFont)) s.settings.bpmfFont = 'huninn';
   s.settings.classSize = clamp(parseInt(s.settings.classSize) || 30, 1, 50); N = s.settings.classSize;
   if (d.settings && d.v && !('classSizeSet' in d.settings)) s.settings.classSizeSet = true;   // 舊資料視為已設定（30 人）
   s.timer = Object.assign(defaultState().timer, d.timer || {});
@@ -2303,7 +2321,7 @@ function renderDex() {
   FISH_GROUPS.forEach((gname, gi) => {
     h += `<div class="dgroup"><div class="dg-label"><b>${pad(gi * 10 + 1)}–${gi === 9 ? 100 : pad(gi * 10 + 10)}</b><span>${gname}</span></div><div class="dg-cards">`;
     SPECIES.filter(x => x.group === gi).forEach(sp => { const o = owners[sp.id] || [], ok = o.length > 0;
-      h += `<div class="dc ${ok ? 'found' : 'unk'}" title="${ok ? `${sp.name}・收集 ${o.length} 次` : '尚未發現'}"><i style="background:${RARITY[sp.rarity].hex}"></i><div class="pic">${speciesSVG(sp)}</div><div class="nm">${pad(sp.no)} ${ok ? sp.name : '？？？'}</div>${ok && o.length > 1 ? `<em>×${o.length}</em>` : ''}</div>`; });
+      h += `<div class="dc ${ok ? 'found' : 'unk'}" title="${ok ? `${sp.name}・收集 ${o.length} 次` : '尚未發現'}"><i style="background:${RARITY[sp.rarity].hex}"></i><div class="pic">${speciesSVG(sp)}</div><div class="nm"><span class="dn">${pad(sp.no)} </span>${ok ? sp.name : '？？？'}</div>${ok && o.length > 1 ? `<em>×${o.length}</em>` : ''}</div>`; });
     h += '</div></div>';
   });
   $('#dexSheet').innerHTML = h;
@@ -2928,6 +2946,7 @@ function renderDrawer() {
     h += `<div class="sec"><h3>SPECIAL · 特殊控制</h3>
 
       <div class="grid grid-cols-2 gap-2 mt-2">
+        <button class="btn ${se.bpmf ? 'on' : ''}" data-act="bpmfFont">注音字型：${BPMF_FONTS[se.bpmfFont || 'huninn'].label}${se.bpmf ? '' : '（未開啟）'}</button>
         <button class="btn ${se.bgPaused ? 'on' : ''}" data-act="toggleBg">${se.bgPaused ? '背景動畫：已暫停' : '背景動畫：播放中'}</button>
         <button class="btn ${se.sound ? 'on' : ''}" data-act="toggleSound">${se.sound ? '音效：開啟' : '音效：關閉'}</button></div>
       <button class="btn w-full mt-2" data-act="fullscreen">${document.fullscreenElement ? '離開全螢幕' : '全螢幕顯示'}</button></div>
@@ -3028,6 +3047,7 @@ async function onDrawerAction(act, v, el) {
         if (state.homework.fish.evolved) { state.homework.fish = freshHwFish(state.homework.fish.target); hwRevealPending = false; renderHwTank(); }
         buildFish(); save(); renderRoster(); renderDrawer(); toast('全班魚群與圖鑑已重設'); }
       break;
+    case 'bpmfFont': state.settings.bpmfFont = state.settings.bpmfFont === 'kai' ? 'huninn' : 'kai'; save(); applyBpmf(state.settings.bpmf); renderDrawer(); break;
     case 'toggleBg': state.settings.bgPaused = !state.settings.bgPaused; applySettings(); save(); renderDrawer(); break;
     case 'toggleSound': state.settings.sound = !state.settings.sound; save(); renderDrawer(); if (state.settings.sound) { Sound.plink(); Ambient.play(state.ambient.id); } else Ambient.stop(); break;
     case 'fullscreen': toggleFullscreen(); break;
@@ -3043,7 +3063,34 @@ async function onDrawerAction(act, v, el) {
       break;
   }
 }
-function applySettings() { document.body.classList.toggle('bg-paused', state.settings.bgPaused); }
+function applySettings() { document.body.classList.toggle('bg-paused', state.settings.bgPaused); applyBpmf(); }
+/* ---------- 注音：用 Google 字型庫的注音字型（Bpmf Huninn 粉圓注音／Bpmf Zihi Kai Std 字嗨楷書注音） ----------
+   只在開啟注音時才載入字型；瀏覽器只下載畫面上用到的字。沒有網路時顯示一般字。 */
+const BPMF_FONTS = { huninn: { family: 'Bpmf Huninn', label: '圓體注音' }, kai: { family: 'Bpmf Zihi Kai Std', label: '楷書注音' } };
+const bpmfCss = {};   // 每種字型的樣式表只載入一次；記住載入結果
+function loadBpmfCss(key) {
+  if (bpmfCss[key]) return bpmfCss[key];
+  const fam = BPMF_FONTS[key].family;
+  bpmfCss[key] = new Promise((ok, fail) => {
+    const l = document.createElement('link'); l.id = 'bpmf-' + key; l.rel = 'stylesheet';
+    l.href = `https://fonts.googleapis.com/css2?family=${fam.replace(/ /g, '+')}&display=swap`;
+    const t = setTimeout(() => fail(new Error('timeout')), 10000);
+    l.onload = () => { clearTimeout(t); ok(); }; l.onerror = () => { clearTimeout(t); fail(new Error('css')); };
+    document.head.appendChild(l);
+  }).catch(e => { delete bpmfCss[key]; document.getElementById('bpmf-' + key)?.remove(); throw e; });   // 失敗了下次可以重試
+  return bpmfCss[key];
+}
+function applyBpmf(announce) {
+  const on = !!state.settings.bpmf, key = state.settings.bpmfFont || 'huninn', fam = BPMF_FONTS[key].family;
+  document.body.classList.toggle('bpmf', on); document.body.classList.toggle('bp-kai', key === 'kai');
+  if (!on) { if (announce) toast('已關閉注音'); return; }
+  // 先等樣式表下載完，再確認字型可以用（只下載畫面上用到的字）
+  if (announce && !bpmfCss[key]) toast('正在載入注音字型…');
+  loadBpmfCss(key)
+    .then(() => document.fonts ? document.fonts.load(`24px "${fam}"`, '注音') : [1])
+    .then(f => { if (!f || !f.length) throw new Error('font'); if (announce) toast(`已開啟注音（${BPMF_FONTS[key].label}）`); })
+    .catch(() => { if (state.settings.bpmf && (state.settings.bpmfFont || 'huninn') === key) toast('注音字型載入失敗，請確認網路連線後再按一次「ㄅ」'); });
+}
 function toggleFullscreen() {
   if (!document.fullscreenElement) (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement).catch?.(() => toast('此瀏覽器無法切換全螢幕'));
   else document.exitFullscreen();
@@ -3197,6 +3244,7 @@ function init() {
   $('#btnEye').addEventListener('click', () => setHidden(true));
   $('#tankChip').addEventListener('click', () => setScreen('dex'));
   $('#btnPerf').addEventListener('click', e => { e.stopPropagation(); cyclePerf(); });
+  $('#btnBpmf').addEventListener('click', e => { e.stopPropagation(); state.settings.bpmf = !state.settings.bpmf; save(); applyBpmf(true); });
   document.addEventListener('pointerdown', () => { if (PERF !== 'min') return; perfBoost = performance.now() + 12000; if (perfIdle) { clearTimeout(perfIdleTimer); perfIdle = false; lastT = performance.now(); requestAnimationFrame(frame); } }, true);
   // 作息表編輯
   const seInfo = () => {
