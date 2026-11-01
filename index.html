@@ -94,8 +94,8 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 /* 直式版面：中央面板在上、作息與環境音並排在下 */
 #ui.portrait .brand,#ui.portrait #tube{display:none}
 #ui.portrait #topLeft{flex-direction:row;left:40px;top:34px}
-#ui.portrait #coinPill{left:130px;top:30px}
-#ui.portrait #foodPill{left:130px;top:84px}
+#ui.portrait #coinPill{left:206px;top:30px}
+#ui.portrait #foodPill{left:206px;top:84px}
 #ui.portrait #tankChip{right:40px;top:40px}
 #ui.portrait #tabs{left:56px;top:172px;width:968px;gap:8px}
 #ui.portrait #centerPanel{left:40px;top:232px;width:1000px;height:740px}
@@ -137,6 +137,16 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 
 /* 頂部 */
 #topLeft{position:absolute;left:44px;top:34px;display:flex;flex-direction:column;gap:16px}
+#btnPerf{grid-template-rows:auto auto;align-content:center;gap:1px}
+#btnPerf svg{width:24px;height:24px}
+#btnPerf b{font:700 12px var(--sans);letter-spacing:.06em;line-height:1}
+#btnPerf.eco{color:#9fe3c6;border-color:rgba(112,214,189,.5)}
+#btnPerf.min{color:var(--gold);border-color:rgba(242,182,93,.55)}
+/* 省電／極省電：暫停裝飾性的循環動畫 */
+.perf-eco .ray,.perf-min .ray,.perf-eco .tube-bub,.perf-min .tube-bub,.perf-eco .hw-tank .tb,.perf-min .hw-tank .tb,.perf-eco .wx-sun,.perf-min .wx-sun,
+.perf-eco .tail,.perf-min .tail,.perf-eco .tube-liquid .wave,.perf-min .tube-liquid .wave,.perf-min .srow.cur .sdot,.perf-min .sbreak .sdot,
+.perf-min .eq i,.perf-min [class*="shimmer"]{animation-play-state:paused!important}
+.perf-min #schools{display:none}
 #coinPill{text-shadow:0 2px 8px rgba(3,20,34,.7);position:absolute;left:128px;top:44px;display:flex;align-items:center;gap:12px;font:400 28px var(--mono);color:var(--ink)}
 #coinPill .ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:700 20px var(--mono);color:#3a2a06;background:linear-gradient(180deg,#ffe08a,#e8b23a);box-shadow:0 0 12px rgba(242,207,91,.4)}
 #coinPill small{font:400 15px var(--sans);letter-spacing:.2em;color:rgba(241,245,244,.55)}
@@ -787,6 +797,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 
   <div id="topLeft" class="chrome">
     <button class="icon-btn pe" id="btnEye" title="觀賞模式：隱藏介面，只看水族箱" aria-label="觀賞模式"><i data-ic="eye"></i></button>
+    <button class="icon-btn pe" id="btnPerf" title="效能切換：流暢／省電／極省電" aria-label="效能切換"><i data-ic="gauge"></i><b id="perfLbl">流暢</b></button>
   </div>
   <div id="coinPill" class="chrome" title="賣魚得到的金幣"><span class="ic">$</span><span id="coinTotal">0</span><small>金幣</small></div>
   <div id="foodPill" class="chrome" title="全班累積飼料"><span class="ic"><i data-ic="food"></i></span><span id="foodTotal">0</span><small>份飼料</small></div>
@@ -993,7 +1004,7 @@ const freshStudent = i => ({ seat: i + 1, checked: false, records: [], fish: fre
 function defaultState() {
   return {
     v: 5, mode: 'clock', coins: 0,
-    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false },
+    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto' },
     classFish: freshClassFish(1), collection: [], totalFood: 0, dexDone: false,
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
@@ -1032,6 +1043,7 @@ function sanitize(d) {
   if (!d || typeof d !== 'object') return base;
   const s = Object.assign(base, d);
   s.settings = Object.assign(defaultState().settings, d.settings || {});
+  if (!['auto', 'high', 'eco', 'min'].includes(s.settings.perf)) s.settings.perf = 'auto';
   s.settings.classSize = clamp(parseInt(s.settings.classSize) || 30, 1, 40); N = s.settings.classSize;
   if (d.settings && d.v && !('classSizeSet' in d.settings)) s.settings.classSizeSet = true;   // 舊資料視為已設定（30 人）
   s.timer = Object.assign(defaultState().timer, d.timer || {});
@@ -1476,6 +1488,7 @@ const fmtStamp = ts => { const p = nowParts(ts); return `${p.mo}/${p.d} ${p.h}:$
 
 /* ---------- 介面圖示（線條 SVG） ---------- */
 const ICONS = {
+  gauge: '<path d="M3.5 17a9 9 0 1 1 17 0"/><path d="M12 15l4.5-5"/><circle cx="12" cy="15.5" r="1.4"/>',
   back: '<path d="M10 6l-6 6 6 6M4 12h11a5 5 0 0 1 5 5v1"/>',
   eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   memo: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>',
@@ -2340,7 +2353,7 @@ const VENTS = [.12, .31, .52, .7, .88];
 function drawBg(dt, t) {
   bgX.clearRect(0, 0, W, H);
   const paused = state.settings.bgPaused;
-  if (!paused && Math.random() < dt * 7) { const v = VENTS[Math.floor(Math.random() * VENTS.length)]; spawnBubble(W * v + rand(-12, 12)); }
+  if (!paused && Math.random() < dt * (PERF === 'eco' ? 3 : 7)) { const v = VENTS[Math.floor(Math.random() * VENTS.length)]; spawnBubble(W * v + rand(-12, 12)); }
   for (const m of motes) {
     if (!paused) { m.x += m.vx * dt; m.y += m.vy * dt; if (m.x < 0) m.x += W; if (m.x > W) m.x -= W; if (m.y < 0) m.y += H; if (m.y > H) m.y -= H; }
     bgX.globalAlpha = m.a * (.6 + .4 * Math.sin(t * .8 + m.x)); bgX.fillStyle = '#cfeff2';
@@ -2494,6 +2507,7 @@ function discoveredIds() {
 /* ---------- 特效粒子系統（星星、飼料、火花、氣泡、軌道、水波） ---------- */
 const FX = {
   list: [], orbit: null,
+  busy() { return this.list.length > 0 || !!this.orbit || hwRevealPending || (typeof Shows !== 'undefined' && Shows.running); },
   add(p) { if (this.list.length < 520) this.list.push(p); },
   sparkle(x, y, n, colors) { for (let i = 0; i < n; i++) this.add({ type: 'spark', x, y, vx: rand(-40, 40), vy: rand(-50, 10), life: 0, max: rand(.6, 1.3), r: rand(1, 2.6) * S, c: colors[i % colors.length] }); },
   burst(x, y, n, colors, spd = 160) { for (let i = 0; i < n; i++) { const a = rand(0, 6.283), v = rand(.3, 1) * spd * S; this.add({ type: 'spark', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: rand(.7, 1.6), r: rand(1.2, 3.2) * S, c: colors[i % colors.length], drag: 1.8 }); } },
@@ -2896,18 +2910,45 @@ function layout() {
   $('#ui').style.transform = `translate(${ox}px,${oy}px) scale(${S})`;
   Object.assign(LY, { s: S, ox, oy, xMin: W * .05, xMax: W * .95 });
   updateBand();
-  DPR = Math.min(window.devicePixelRatio || 1, 1.25);
+  DPR = PERF === 'high' ? Math.min(window.devicePixelRatio || 1, 1.25) : 1;
   for (const [c, x] of [[bgC, bgX], [fxC, fxX]]) { c.width = W * DPR; c.height = H * DPR; c.style.width = W + 'px'; c.style.height = H + 'px'; x.setTransform(DPR, 0, 0, DPR, 0, 0); }
   fishes.forEach(f => { f.x = clamp(f.x, LY.xMin, LY.xMax); f.baseY = f.targetY = clamp(f.baseY, LY.yMin, LY.yMax); });
   initMotes();
 }
 let lastT = performance.now(), lastSec = -1, hiddenAcc = 0, frameNo = 0, bgAcc = 0;
+/* ---------- 效能模式 ----------
+   流暢：每秒約 60 格。省電：每秒約 24 格、背景粒子 12 格、關閉裝飾動畫。
+   極省電：畫面靜止，只有時鐘每秒更新；點畫面或打卡時，動畫暫時恢復 12 秒。 */
+const PERF_LABEL = { high: '流暢', eco: '省電', min: '極省電' };
+const PERF_TIP = { high: '流暢模式：完整動畫', eco: '省電模式：動畫降速，適合舊電腦', min: '極省電模式：畫面靜止，只更新時鐘（點畫面時動畫暫時恢復）' };
+function autoPerf() { const c = navigator.hardwareConcurrency || 4, m = navigator.deviceMemory || 8; return (c <= 4 || m <= 4) ? 'eco' : 'high'; }
+let PERF = 'high', perfBoost = 0;
+const perfNow = () => (PERF === 'min' && performance.now() < perfBoost) ? 'eco' : PERF;
+function applyPerf(announce) {
+  PERF = state.settings.perf === 'auto' ? autoPerf() : state.settings.perf;
+  document.body.classList.toggle('perf-eco', PERF === 'eco'); document.body.classList.toggle('perf-min', PERF === 'min');
+  const b = document.getElementById('btnPerf'); if (b) { b.classList.toggle('eco', PERF === 'eco'); b.classList.toggle('min', PERF === 'min'); b.title = PERF_TIP[PERF] + '（點一下切換）'; $('#perfLbl').textContent = PERF_LABEL[PERF]; }
+  if (typeof layout === 'function' && W) layout();
+  if (PERF === 'min') { schools.forEach(sc => { sc.active = false; sc.members.forEach(m => m.el.style.opacity = 0); }); bubbles.length = 0; drawBg(0, 0); }
+  if (announce) toast(PERF_TIP[PERF]);
+}
+function cyclePerf() { const order = ['high', 'eco', 'min']; state.settings.perf = order[(order.indexOf(PERF) + 1) % 3]; save(); applyPerf(true); }
+let perfIdleTimer = 0, perfIdle = false;
+function nextFrame() {
+  if (perfNow() === 'min' && !FX.busy()) { perfIdle = true; perfIdleTimer = setTimeout(() => { perfIdle = false; requestAnimationFrame(frame); }, 1000); }
+  else requestAnimationFrame(frame);
+}
+let perfSkip = 0;
 function frame(now) {
-  requestAnimationFrame(frame);
+  const pm = perfNow();
+  if (pm === 'eco' && now - perfSkip < 40) { requestAnimationFrame(frame); return; }   // 約每秒 24 格
+  perfSkip = now;
+  nextFrame();
   let dt = (now - lastT) / 1000;
   if (document.hidden) { hiddenAcc += dt; if (hiddenAcc < .25) return; dt = hiddenAcc; hiddenAcc = 0; }  // 背景分頁降頻
-  lastT = now; dt = Math.min(dt, .05);
+  lastT = now; dt = Math.min(dt, pm === 'high' ? .05 : .1);
   const t = now / 1000;
+  if (pm === 'min') { FX.update(dt); FX.draw(); return; }   // 靜止：只處理特效（進化等）
   bgAcc += dt; if ((frameNo++ & 1) === 0) { drawBg(bgAcc, t); bgAcc = 0; }
   updateSchools(dt, t);
   for (const f of fishes) f.update(dt, t);
@@ -2943,7 +2984,7 @@ function init() {
   buildScene(); layout(); buildRoster(); buildFish(); buildSchools();
   // 重新整理時：已到時的計時器直接推進到正確狀態（不重播提示音）
   for (let g = 0; g < 4 && state.timer.status === 'running' && state.timer.endAt <= Date.now(); g++) Timer.finish(true);
-  applySettings(); renderSchedule(true); renderAmbient();
+  applySettings(); applyPerf(false); renderSchedule(true); renderAmbient();
   let view = null; try { view = JSON.parse(sessionStorage.getItem('cd-view') || 'null'); } catch (e) {}
   setMode(view && TAB_IDS.includes(view.mode) ? view.mode : 'clock'); setScreen(view && SCREENS.includes(view.screen) ? view.screen : 'home');
   if (view && view.zoom && curScreen === 'home') setZoom(true);
@@ -2985,6 +3026,8 @@ function init() {
   $('#gearBtn').addEventListener('click', () => { Sound.init(); openDrawer(); });
   $('#btnEye').addEventListener('click', () => setHidden(true));
   $('#tankChip').addEventListener('click', () => setScreen('dex'));
+  $('#btnPerf').addEventListener('click', e => { e.stopPropagation(); cyclePerf(); });
+  document.addEventListener('pointerdown', () => { if (PERF !== 'min') return; perfBoost = performance.now() + 12000; if (perfIdle) { clearTimeout(perfIdleTimer); perfIdle = false; lastT = performance.now(); requestAnimationFrame(frame); } }, true);
   // 作息表編輯
   const seInfo = () => {
     const { list, bad } = parseSchedule($('#seText').value);
