@@ -97,8 +97,7 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 #ui.portrait #coinPill{left:280px;top:30px}
 #ui.portrait #foodPill{left:280px;top:84px}
 #ui.portrait #tankChip{right:40px;top:40px}
-#ui.portrait #tabs{left:40px;top:172px;gap:8px}
-#ui.portrait #tabs .tab{padding:0 20px}
+#ui.portrait #tabs{left:56px;top:172px;width:968px;gap:8px}
 #ui.portrait #centerPanel{left:40px;top:232px;width:1000px;height:740px}
 #ui.portrait #taskPanel{left:40px;top:1000px;width:490px;height:calc(var(--sh) - 1160px)}
 #ui.portrait #ambPanel{left:550px;top:1000px;width:490px;height:calc(var(--sh) - 1160px)}
@@ -289,8 +288,9 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 .task-add button{width:50px;border-radius:14px;border:1px solid rgba(112,214,189,.5);background:rgba(112,214,189,.18);color:var(--ink);font-size:24px}
 
 /* 分頁 */
-#tabs{position:absolute;left:628px;top:158px;display:flex;gap:8px}
-.tab{height:62px;padding:0 24px;border-radius:20px 20px 0 0;display:flex;align-items:center;gap:10px;font:500 21px var(--sans);letter-spacing:.08em;color:rgba(241,245,244,.8);
+/* 分頁列與中央面板同寬，五個分頁平均分配，不會超出面板 */
+#tabs{position:absolute;left:636px;top:158px;width:728px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.tab{height:62px;padding:0 8px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;font:500 21px var(--sans);letter-spacing:.08em;color:rgba(241,245,244,.8);
   background:rgba(10,32,48,.75);border:1px solid rgba(170,220,230,.14);border-bottom:none;transition:background .3s,color .3s}
 .tab:hover{color:#fff}
 .tab svg{width:26px;height:26px}
