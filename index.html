@@ -99,15 +99,15 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 #ui.portrait #tankChip{right:40px;top:40px}
 #ui.portrait #tabs{left:56px;top:172px;width:968px;gap:8px}
 #ui.portrait #centerPanel{left:40px;top:232px;width:1000px;height:740px}
-#ui.portrait #taskPanel{left:40px;top:1000px;width:490px;height:calc(var(--sh) - 1160px)}
-#ui.portrait #ambPanel{left:550px;top:1000px;width:490px;height:calc(var(--sh) - 1160px)}
+#ui.portrait #taskPanel{left:40px;top:1000px;width:490px;height:calc(var(--sh) - 1226px)}
+#ui.portrait #ambPanel{left:550px;top:1000px;width:490px;height:calc(var(--sh) - 1226px)}
 #ui.portrait.zoom #centerPanel{transform:translate(0,calc(var(--sh) / 2 - 602px)) scale(1.04)}
 #ui.portrait #feedHead,#ui.portrait #scr-feed.hwmode #feedHead{left:40px;top:140px;width:1000px}
 #ui.portrait #feedTankPanel{left:40px;top:390px;width:1000px;height:230px}
-#ui.portrait #roster,#ui.portrait #roster.rows4{left:40px;top:1070px;width:1000px;height:calc(var(--sh) - 1230px);padding:22px 30px}
+#ui.portrait #roster,#ui.portrait #roster.rows4{left:40px;top:1070px;width:1000px;height:calc(var(--sh) - 1296px);padding:22px 30px}
 #ui.portrait #seatGrid{grid-template-columns:repeat(6,1fr)}
 #ui.portrait .roster-head{flex-wrap:wrap;gap:10px}
-#ui.portrait .sheet{left:40px;top:140px;width:1000px;height:calc(var(--sh) - 300px);padding:30px 32px}
+#ui.portrait .sheet{left:40px;top:140px;width:1000px;height:calc(var(--sh) - 366px);padding:30px 32px}
 #ui.portrait .fgrid{grid-template-columns:repeat(5,1fr)}
 #ui.portrait .stiles{grid-template-columns:repeat(2,1fr)}
 #ui.portrait .dgroup{grid-template-columns:120px 1fr}
@@ -121,7 +121,6 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 #ui .screen{position:absolute;inset:0;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .55s ease,visibility .55s,transform .55s ease}
 #ui .screen.active{opacity:1;visibility:visible;transform:none}
 #ui .screen:not(.active) .pe{pointer-events:none}
-#ui .screen:not(.active){content-visibility:hidden}
 #ui.hide-ui .chrome,#ui.hide-ui .screen{opacity:0!important}
 #ui.hide-ui .pe{pointer-events:none!important}
 #uiHint{position:fixed;left:50%;bottom:28px;z-index:11;transform:translate(-50%,10px);opacity:0;pointer-events:none;transition:all .6s ease;
@@ -137,6 +136,30 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 
 /* 頂部 */
 #topLeft{position:absolute;left:44px;top:34px;display:flex;flex-direction:column;gap:16px}
+/* 跑馬燈（公告欄）：橫式放在底部功能列右邊、放大鍵左邊；直式放在底部功能列上方 */
+#marquee{position:absolute;left:646px;right:212px;bottom:36px;height:64px;display:flex;align-items:center;gap:12px;padding:0 10px 0 12px;overflow:hidden;
+  border-radius:22px;background:linear-gradient(180deg,rgba(14,48,70,.8),rgba(6,24,40,.88));border:1px solid rgba(170,220,230,.16);box-shadow:0 10px 28px rgba(0,0,0,.25)}
+#marquee.off{display:none}
+.mq-lbl{flex:none;display:flex;align-items:center;gap:6px;height:42px;padding:0 14px 0 10px;border-radius:14px;background:rgba(242,182,93,.16);border:1px solid rgba(242,182,93,.45);color:#FFD9A0;font:600 18px var(--sans);letter-spacing:.12em}
+.mq-lbl svg{width:22px;height:22px}
+.mq-track{flex:1;min-width:0;height:100%;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+#mqText{display:inline-block;padding-left:100%;font:500 25px/64px var(--sans);letter-spacing:.12em;color:#FFF3D6;text-shadow:0 1px 6px rgba(0,0,0,.45);
+  animation:mq var(--mqd,20s) linear infinite;will-change:transform}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.perf-min #mqText{animation:none;padding-left:0;display:block;text-align:center}
+.mq-track{cursor:text}
+#marquee.empty #mqText{animation:none;padding-left:0;display:block;text-align:center;font-size:19px;letter-spacing:.08em;color:rgba(241,245,244,.4);text-shadow:none}
+.mq-ed{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid rgba(170,220,230,.22);background:rgba(255,255,255,.05);color:rgba(241,245,244,.75);font-size:20px;cursor:pointer}
+.mq-ed:hover{color:var(--energy);border-color:rgba(112,214,189,.5)}
+.mq-form{display:none;flex:1;min-width:0;gap:8px;align-items:center}
+.mq-form input{flex:1;min-width:0;height:46px;padding:0 16px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid rgba(112,214,189,.55);color:#fff;font:500 21px var(--sans);letter-spacing:.06em;outline:none}
+.mq-form button{flex:none;height:46px;padding:0 18px;border-radius:14px;font:500 17px var(--sans);letter-spacing:.08em;cursor:pointer}
+.mq-ok{border:1px solid rgba(112,214,189,.6);background:rgba(112,214,189,.2);color:#cff7ec}
+.mq-x{border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(241,245,244,.7)}
+#marquee.editing .mq-form{display:flex}
+#marquee.editing .mq-track,#marquee.editing .mq-ed{display:none}
+#ui.portrait #marquee{left:40px;right:212px;bottom:140px;height:56px}
+#ui.portrait #mqText{font-size:23px;line-height:56px}
 #btnPerf{grid-template-rows:auto auto;align-content:center;gap:1px}
 #btnBpmf{grid-template-rows:auto auto;align-content:center;gap:0}
 #btnBpmf .bp-ic{font:700 24px/1 'PingFang TC','Microsoft JhengHei',sans-serif}
@@ -147,7 +170,7 @@ body.bpmf #btnBpmf{color:var(--gold);border-color:rgba(242,182,93,.6);background
 body.bpmf{--bpmf:'Bpmf Huninn','PingFang TC','Microsoft JhengHei',sans-serif}
 body.bpmf.bp-kai{--bpmf:'Bpmf Zihi Kai Std','BiauKai','DFKai-SB','PingFang TC',serif}
 body.bpmf :is(#notesList li span,.srow .sname,.sbreak,.m-tab .mt-name,#hwTitleView,#feedSub,.cd-txt b,.cf-cd,#cWeek,#pkLbl,
-  .dc .nm,.fc-lb,#fishCard h4,#evoTitle,#evoName,#evoBadge,#evoSeat){font-family:var(--bpmf)!important}
+  .dc .nm,.fc-lb,#fishCard h4,#evoTitle,#evoName,#evoBadge,#evoSeat,#mqText){font-family:var(--bpmf)!important}
 body.bpmf .cf-cd b{font-family:var(--num)!important}
 body.bpmf .m-tab{max-width:270px;padding:0 12px;gap:8px}
 body.bpmf .m-tab .mt-name{font-size:17px;letter-spacing:0}
@@ -419,10 +442,21 @@ body.bpmf .dc .dn{display:none}
 .wx-r b{font:500 34px var(--sans);letter-spacing:.1em}.wx-r small{font-size:16px;color:rgba(241,245,244,.6);letter-spacing:.06em}
 .wx-place{border:none;background:none;color:rgba(241,245,244,.82);font:400 21px var(--sans);letter-spacing:.08em;padding:0}
 .wx-place:hover{color:var(--energy)}
+.wx-sel{position:relative;display:inline-block}
+.wx-sel::after{content:"▾";position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:16px;color:rgba(241,245,244,.7);pointer-events:none}
+.wx-select{appearance:none;-webkit-appearance:none;border:none;background:transparent;color:rgba(241,245,244,.85);font:400 21px var(--sans);letter-spacing:.06em;padding:2px 22px 2px 4px;cursor:pointer;color-scheme:dark;text-align:right;text-align-last:right;max-width:300px}
+.wx-select:hover,.wx-select:focus{color:var(--energy);outline:none}
+.wx-select option,.wx-select optgroup{background:#0e2c3e;color:#eef6f6;font-size:18px}
 .wx-menu{position:absolute;right:0;bottom:112px;width:460px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px;border-radius:20px;z-index:6;
   background:rgba(8,26,40,.97);border:1px solid rgba(170,220,230,.2);box-shadow:0 20px 50px rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:all .25s ease}
 .wx-menu.open{opacity:1;visibility:visible}
 .tz-ref:empty{display:none}
+.mq-slot{width:100%;height:60px;margin-top:16px;flex:none;pointer-events:none}
+body.mq-hide .mq-slot{display:none}
+#marquee{z-index:12}
+#marquee.in-clock{height:60px;bottom:auto;right:auto}
+#marquee.in-clock #mqText{font-size:26px;line-height:60px}
+#marquee.in-clock .mq-lbl{height:40px}
 .tz-ref{margin-top:12px;min-height:34px;font-size:19px;color:rgba(241,245,244,.65);letter-spacing:.06em;display:flex;align-items:center;gap:6px}
 .tz-ref b{font-family:var(--mono);color:var(--gold);font-weight:600}
 .tz-back{margin-left:8px;height:34px;padding:0 14px;border-radius:17px;border:1px solid rgba(112,214,189,.5);background:rgba(112,214,189,.12);color:var(--energy);font-size:15px}
@@ -763,6 +797,21 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 }
 #modal{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:rgba(2,8,14,.6)}
 #modal.show{display:grid}
+#rdModal{position:fixed;inset:0;z-index:59;display:none;place-items:center;background:rgba(2,8,14,.6);padding:12px;overflow-y:auto}
+#rdModal.show{display:grid}
+.rd-card{width:min(520px,94vw)}
+.rd-info{font-size:15px}.rd-info b{color:var(--gold);font-size:22px}
+.rd-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.rd-chips .btn{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left}
+.rd-chips .btn small{color:var(--gold);font-size:13px;flex:none}
+.rd-chips .btn.dis{opacity:.4}
+.row .st .pt{color:var(--gold);font-weight:500}
+.btn.gold-sm{border-color:rgba(242,182,93,.5);color:#FFD9A0}
+.rd-undo{border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(241,245,244,.7);border-radius:8px;font-size:11px;padding:1px 8px;margin-left:6px;cursor:pointer}
+.rd-h{margin:6px 0 2px;color:rgba(242,214,160,.85);font-family:var(--sans)}
+.rw-list{display:flex;flex-direction:column;gap:6px}
+.rw-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04);font-size:14px}
+.rw-row span{flex:1}.rw-row b{color:var(--gold);font-weight:500}
 #pModal{position:fixed;inset:0;z-index:59;display:none;place-items:center;background:rgba(2,8,14,.6);padding:12px}
 #pModal.show{display:grid}
 #rosterTitle{display:flex;align-items:center;gap:8px;min-width:0;flex:1;margin-right:18px;font:inherit;letter-spacing:normal;overflow:hidden}
@@ -839,6 +888,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 
 <!-- UI 舞台（介面參考：上方模式分頁、左側任務清單、中央計時面板、右側環境音、底部功能列） -->
 <div id="ui">
+  <div id="marquee" class="chrome pe" aria-live="off"><span class="mq-lbl"><i data-ic="bell"></i>公告</span><div class="mq-track" id="mqTrack" title="點一下修改公告"><span id="mqText"></span></div><form class="mq-form" id="mqForm" autocomplete="off"><input id="mqEdit" maxlength="120" placeholder="輸入公告，按 Enter 儲存；清空就不顯示文字"><button type="submit" class="mq-ok">儲存</button><button type="button" class="mq-x" id="mqCancel">取消</button></form><button type="button" class="mq-ed" id="mqEditBtn" title="修改公告" aria-label="修改公告">✎</button></div>
   <div class="brand chrome"><div class="en">CLASS DASHBOARD</div><div class="zh">班級儀表板</div><div class="mini" id="miniClock"></div></div>
 
   <div id="topLeft" class="chrome">
@@ -999,6 +1049,11 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
   <div id="seInfo"></div>
   <div class="se-btns"><button class="btn" id="seDefault">換回範例</button><span style="flex:1"></span><button class="btn" id="seCancel">取消</button><button class="btn primary" id="seSave">儲存</button></div>
 </div></div>
+<div id="rdModal"><div class="modal-card rd-card"><h3 id="rdTitle">兌換點數</h3><p class="rd-info" id="rdInfo"></p>
+  <div class="rd-chips" id="rdChips"></div>
+  <label class="lbl" style="display:block;margin:16px 0 6px;font-size:14px;color:rgba(241,245,244,.7)">或自己輸入</label>
+  <div class="flex gap-2"><input class="field" id="rdItem" maxlength="20" placeholder="兌換什麼（可不填）" style="flex:1"><input class="field" id="rdPts" type="number" min="1" max="999" placeholder="扣幾點" style="width:100px"></div>
+  <div class="flex gap-2" style="justify-content:flex-end;margin-top:18px"><button class="btn" id="rdCancel">取消</button><button class="btn primary" id="rdOk">確定兌換</button></div></div></div>
 <div id="pModal"><div class="modal-card"><h3 id="pTitle"></h3><input class="field" id="pInput" maxlength="40" style="width:100%;font-size:20px">
   <div class="flex gap-2 items-center" style="margin-top:20px"><button class="btn danger" id="pDel">刪除這個任務</button><span style="flex:1"></span><button class="btn" id="pCancel">取消</button><button class="btn primary" id="pOk">確定</button></div></div></div>
 <div id="setup"><div class="modal-card setup-card">
@@ -1041,6 +1096,8 @@ function secureRandom() {            // 進化抽獎使用加密等級亂數
 /* ===================================================================
    11. localStorage 資料管理
    =================================================================== */
+const DEFAULT_REWARDS = [{ name: '選一首下課音樂', cost: 5 }, { name: '換座位一天', cost: 10 }, { name: '當一天小老師', cost: 15 }];
+const MARQUEE_DEFAULT = '歡迎蒞臨金門縣開瑄國民小學';
 const STORE_KEY = 'aquarium-classroom-v1';
 const SP_RARITY = { clown: 'common', tang: 'common', butterfly: 'common', angel: 'common', zebra: 'common', flame: 'rare', mandarin: 'rare', moon: 'rare', sapphire: 'rare', aurora: 'legend', dragon: 'legend', dream: 'legend' };
 const tierOf = n => n <= 20 ? 'common' : n <= 38 ? 'rare' : n <= 40 ? 'epic' : n <= 55 ? 'rare' : n <= 86 ? 'epic' : 'legend';
@@ -1050,15 +1107,15 @@ const validSp = id => isNewSp(id) || !!SP_RARITY[id];
 const freshClassFish = (no = 1) => ({ no, food: 0, eaten: 0, evolved: false, species: null, rarity: null, evolvedAt: null, born: Date.now(), carry: 0 });
 const freshFish = () => ({ hatched: false, hatchedAt: null, food: 0, eaten: 0, evolved: false, species: null, rarity: null, evolvedAt: null });
 const freshHwFish = (target = N) => ({ food: 0, target, evolved: false, species: null, rarity: null, evolvedAt: null });
-const freshStudent = i => ({ seat: i + 1, checked: false, records: [], fish: freshFish() });
+const freshStudent = i => ({ seat: i + 1, checked: false, records: [], spent: 0, redeems: [], fish: freshFish() });
 function defaultState() {
   return {
     v: 5, mode: 'clock', coins: 0,
-    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn' },
+    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn', marquee: MARQUEE_DEFAULT, mqHide: false },
     classFish: freshClassFish(1), collection: [], totalFood: 0, dexDone: false,
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
-    taskSel: 't2', ambient: { id: 'none', vol: .5 }, picker: { noRepeat: true, drawn: [] }, weather: { place: 0, data: null, at: 0, dataPlace: -1, err: false }, leftTab: 'notes', schedText: '', notes: [], countdowns: [],
+    taskSel: 't2', ambient: { id: 'none', vol: .5 }, picker: { noRepeat: true, drawn: [] }, weather: { place: 0, data: null, at: 0, dataPlace: -1, err: false }, leftTab: 'notes', schedText: '', rewards: DEFAULT_REWARDS.map(r => ({ ...r })), notes: [], countdowns: [],
     timer: { duration: 20 * 60000, remaining: 20 * 60000, endAt: null, status: 'idle', kind: 'focus', phase: 'work', round: 1 },
     homework: { title: '今日任務', deadline: Date.now() + 60 * 60000, fish: freshHwFish() },
     hwHistory: [],
@@ -1094,6 +1151,8 @@ function sanitize(d) {
   const s = Object.assign(base, d);
   s.settings = Object.assign(defaultState().settings, d.settings || {});
   if (!['auto', 'high', 'eco', 'min'].includes(s.settings.perf)) s.settings.perf = 'auto';
+  s.settings.marquee = typeof s.settings.marquee === 'string' ? s.settings.marquee.slice(0, 120) : MARQUEE_DEFAULT;
+  s.settings.mqHide = !!s.settings.mqHide;
   s.settings.bpmf = !!s.settings.bpmf; if (!['huninn', 'kai'].includes(s.settings.bpmfFont)) s.settings.bpmfFont = 'huninn';
   s.settings.classSize = clamp(parseInt(s.settings.classSize) || 30, 1, 50); N = s.settings.classSize;
   if (d.settings && d.v && !('classSizeSet' in d.settings)) s.settings.classSizeSet = true;   // 舊資料視為已設定（30 人）
@@ -1109,9 +1168,10 @@ function sanitize(d) {
   s.schedText = typeof d.schedText === 'string' ? d.schedText.slice(0, 4000) : '';
   s.countdowns = Array.isArray(d.countdowns) ? d.countdowns.filter(c => c && c.name && /^\d{4}-\d{2}-\d{2}$/.test(c.date)).slice(0, 10) : [];
   s.notes = Array.isArray(d.notes) ? d.notes.filter(n => n && typeof n.t === 'string').slice(0, 30) : [];
-  s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = clamp(parseInt(s.weather.place) || 0, 0, 11);
+  s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = parseInt(s.weather.place) || 0;   // 地點清單的對應在 init 時處理（migrateWxPlace）
   s.missions = d.missions; s.missionIdx = d.missionIdx;
   s.emptySeats = Array.isArray(d.emptySeats) ? [...new Set(d.emptySeats.filter(n => Number.isInteger(n) && n >= 1 && n <= 50))].sort((a, b) => a - b) : [];
+  s.rewards = Array.isArray(d.rewards) ? d.rewards.filter(r => r && typeof r.name === 'string' && r.name.trim() && r.cost > 0).slice(0, 20).map(r => ({ name: r.name.slice(0, 20), cost: Math.min(999, r.cost | 0) })) : DEFAULT_REWARDS.map(r => ({ ...r }));
   s.picker = Object.assign({ noRepeat: true, drawn: [] }, d.picker || {}); if (!Array.isArray(s.picker.drawn)) s.picker.drawn = [];
   s.pomo = Object.assign(defaultState().pomo, d.pomo || {});
   s.ambient = Object.assign(defaultState().ambient, d.ambient || {});
@@ -1158,6 +1218,8 @@ function sanitize(d) {
     const src = arr[i] || {};
     const st = Object.assign(freshStudent(i), src, { seat: i + 1 });
     st.records = Array.isArray(src.records) ? src.records : [];
+    st.redeems = Array.isArray(src.redeems) ? src.redeems.filter(r => r && r.pts > 0).slice(-200) : [];
+    st.spent = st.redeems.reduce((a, r) => a + (r.pts | 0), 0);
     st.fish = Object.assign(freshFish(), src.fish || {});
     return st;
   });
@@ -1755,8 +1817,24 @@ const tzBtnHTML = () => { const tz = state.clockTz;
   return `<div class="tz-wrap"><button class="tz-btn ${tz === TZ ? '' : 'away'}" data-act="tzMenu" title="切換時區">${ic('globe')}<span>${zoneName(tz)}時間</span><i>▾</i></button>
     <div class="tz-menu ${tzMenuOpen ? 'open' : ''}">${ZONES.map(([z, n]) => `<button class="tz-item ${z === tz ? 'on' : ''}" data-tz="${z}">${n}</button>`).join('')}</div></div>`; };
 /* ---------- 當地天氣（Open-Meteo 免金鑰天氣資料，每 20 分鐘更新） ---------- */
-const WX_PLACES = [['金門 金湖鎮', 24.44, 118.42], ['金門 金城鎮', 24.43, 118.32], ['金門 金沙鎮', 24.49, 118.41], ['台北市', 25.04, 121.56], ['新北市', 25.01, 121.46], ['桃園市', 24.99, 121.30],
-  ['台中市', 24.15, 120.67], ['台南市', 22.99, 120.21], ['高雄市', 22.63, 120.30], ['花蓮市', 23.98, 121.61], ['台東市', 22.76, 121.15], ['澎湖 馬公', 23.57, 119.58]];
+// [顯示名稱, 緯度, 經度, 分區]；第一個是預設（金門金湖鎮）
+const WX_PLACES = [
+  ['金門縣 金湖鎮', 24.44, 118.42, '離島'], ['金門縣 金城鎮', 24.43, 118.32, '離島'], ['金門縣 金沙鎮', 24.49, 118.41, '離島'], ['金門縣 金寧鄉', 24.45, 118.33, '離島'], ['金門縣 烈嶼鄉', 24.43, 118.25, '離島'],
+  ['連江縣 南竿鄉', 26.15, 119.94, '離島'], ['連江縣 北竿鄉', 26.22, 119.99, '離島'], ['連江縣 東引鄉', 26.37, 120.49, '離島'], ['澎湖縣 馬公市', 23.57, 119.58, '離島'],
+  ['臺東縣 綠島鄉', 22.66, 121.49, '離島'], ['臺東縣 蘭嶼鄉', 22.04, 121.55, '離島'], ['屏東縣 琉球鄉', 22.34, 120.37, '離島'],
+  ['臺北市', 25.04, 121.56, '北部'], ['新北市', 25.01, 121.46, '北部'], ['基隆市', 25.13, 121.74, '北部'], ['桃園市', 24.99, 121.30, '北部'], ['新竹市', 24.81, 120.97, '北部'], ['新竹縣', 24.84, 121.01, '北部'], ['宜蘭縣', 24.75, 121.75, '北部'],
+  ['苗栗縣', 24.56, 120.82, '中部'], ['臺中市', 24.15, 120.67, '中部'], ['彰化縣', 24.08, 120.54, '中部'], ['南投縣', 23.91, 120.68, '中部'], ['雲林縣', 23.71, 120.54, '中部'],
+  ['嘉義市', 23.48, 120.45, '南部'], ['嘉義縣', 23.46, 120.33, '南部'], ['臺南市', 22.99, 120.21, '南部'], ['高雄市', 22.63, 120.30, '南部'], ['屏東縣', 22.67, 120.49, '南部'],
+  ['花蓮縣', 23.98, 121.61, '東部'], ['臺東縣', 22.76, 121.15, '東部']];
+const WX_GROUPS = ['離島', '北部', '中部', '南部', '東部'];
+// 舊版的 12 個地點 → 新清單（更新後不用重選）
+const WX_OLD = ['金門縣 金湖鎮', '金門縣 金城鎮', '金門縣 金沙鎮', '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市', '花蓮縣', '臺東縣', '澎湖縣 馬公市'];
+function migrateWxPlace() {
+  const w = state.weather;
+  if (w.pv !== 2) { const idx = WX_PLACES.findIndex(x => x[0] === WX_OLD[parseInt(w.place) || 0]); w.place = Math.max(0, idx); w.pv = 2; w.dataPlace = -1; w.at = 0; }
+  w.place = clamp(parseInt(w.place) || 0, 0, WX_PLACES.length - 1);
+}
+const wxSelectHTML = () => `<span class="wx-sel"><select class="wx-select" aria-label="天氣地點">${WX_GROUPS.map(g => `<optgroup label="${g}">${WX_PLACES.map((x, i) => x[3] === g ? `<option value="${i}" ${i === state.weather.place ? 'selected' : ''}>${x[0]}</option>` : '').join('')}</optgroup>`).join('')}</select></span>`;
 const WX_TEXT = c => c === 0 ? '晴' : c === 1 ? '晴時多雲' : c === 2 ? '多雲' : c === 3 ? '陰' : c <= 48 ? '霧' : c <= 57 ? '毛毛雨' : c <= 67 ? '雨' : c <= 77 ? '雪' : c <= 82 ? '陣雨' : c <= 86 ? '陣雪' : '雷雨';
 const WX_KIND = c => c === 0 ? 'sun' : c <= 2 ? 'partly' : c === 3 ? 'cloud' : c <= 48 ? 'fog' : c <= 67 || (c >= 80 && c <= 82) ? 'rain' : c <= 86 ? 'snow' : 'storm';
 function wxIcon(kind, day) {
@@ -1780,11 +1858,10 @@ function wxInner() {
   const w = state.weather, pl = WX_PLACES[state.weather.place] || WX_PLACES[0], np = nowParts();
   const date = `${np.wd.replace('星期', '週')}　${np.mo}/${np.d}`;
   if (!w.data) return `<div class="wx-ic">${wxIcon('partly', true)}</div><div class="wx-l"><span>${date}</span><b class="wx-t">--°C</b></div>
-    <div class="wx-r"><button class="wx-place" data-act="wxPlace">${pl[0]} ▾</button><b>${w.err ? '暫時無法取得天氣' : '天氣讀取中…'}</b></div>`;
+    <div class="wx-r">${wxSelectHTML()}<b>${w.err ? '暫時無法取得天氣' : '天氣讀取中…'}</b></div>`;
   const d = w.data;
   return `<div class="wx-ic">${wxIcon(WX_KIND(d.code), d.day)}</div><div class="wx-l"><span>${date}</span><b class="wx-t">${Math.round(d.temp)}°C<small>　${Math.round(d.lo)}° / ${Math.round(d.hi)}°</small></b></div>
-    <div class="wx-r"><button class="wx-place" data-act="wxPlace">${pl[0]} ▾</button><b>${WX_TEXT(d.code)}</b><small>降雨機率 ${d.rain ?? '--'}%</small></div>
-    <div class="wx-menu" id="wxMenu">${WX_PLACES.map((x, i) => `<button class="tz-item ${i === state.weather.place ? 'on' : ''}" data-wx="${i}">${x[0]}</button>`).join('')}</div>`;
+    <div class="wx-r">${wxSelectHTML()}<b>${WX_TEXT(d.code)}</b><small>降雨機率 ${d.rain ?? '--'}%</small></div>`;
 }
 function renderWx() { const el = document.getElementById('wx'); if (el) { const open = el.querySelector('.wx-menu.open'); el.innerHTML = wxInner(); if (open) el.querySelector('.wx-menu')?.classList.add('open'); } }
 async function loadWeather(force) {
@@ -1800,7 +1877,7 @@ async function loadWeather(force) {
   } catch (e) { w.err = true; if (w.dataPlace !== w.place) w.data = null; }
   wxBusy = false; renderWx();
 }
-const clockViewHTML = () => `${tzBtnHTML()}
+const clockViewHTML = () => `<div class="mq-slot" id="mqSlot"></div>
   <div class="big-time" id="cClock"></div>
   <div class="sub-line"><span id="cDate"></span><b id="cWeek"></b></div>
   <div class="tz-ref" id="tzRef"></div>
@@ -1909,8 +1986,8 @@ async function clearTask() {
   if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候再清除'); return; }
   const done = doneCount(), food = state.homework.fish.food;
   if (!done && !food) { toast('目前沒有需要清除的打卡'); return; }
-  if (!(await confirmBox('清除這次任務？', `${done} 位同學的打卡會全部取消，任務魚吃到的 ${food} 份飼料歸零，重新開始餵食。水族箱和圖鑑裡的魚不受影響。`, '清除任務'))) return;
-  state.students.forEach(s => { if (s.checked) { s.checked = false; s.records.pop(); } });
+  if (!(await confirmBox('清除這次任務？', `${done} 位同學的打卡會歸零，任務魚吃到的 ${food} 份飼料也歸零，重新開始餵食。已完成同學的個人完成次數會保留，水族箱和圖鑑裡的魚不受影響。`, '清除任務'))) return;
+  state.students.forEach(s => { s.checked = false; });   // 已完成同學的個人完成次數保留，只把這一輪的打卡歸零
   state.totalFood = Math.max(0, state.totalFood - food);
   state.homework.fish = freshHwFish(state.homework.fish.target); state.round.achieved = false;
   save(); renderHwTank(); renderRoster(); if (drawerOpen) renderDrawer(); toast('已清除任務，任務魚從頭開始餵食');
@@ -2023,7 +2100,7 @@ function renderCenter(force) {
   if (m === 'homework') renderHwTank();
   if (m === 'picker') updatePicker();
   if (m === 'clock') { loadWeather(); updateClockCountdown(); }
-  updateTimeViews();
+  updateTimeViews(); if (typeof placeMarqueeSoon === 'function') placeMarqueeSoon();
 }
 
 /* 分鐘滾輪選擇器 */
@@ -2273,7 +2350,7 @@ let curScreen = 'home', uiHidden = false;
 const SCREENS = ['home', 'feed', 'fish', 'dex', 'stats'];
 function rememberView() { try { sessionStorage.setItem('cd-view', JSON.stringify({ mode: state.mode, screen: curScreen, zoom: zoomed })); } catch (e) {} }
 function setScreen(s) {
-  curScreen = s; setTimeout(rememberView, 0); if (s !== 'home' && zoomed) setZoom(false);
+  curScreen = s; setTimeout(rememberView, 0); setTimeout(placeMarqueeSoon, 0); if (s !== 'home' && zoomed) setZoom(false);
   SCREENS.forEach(k => document.getElementById('scr-' + k).classList.toggle('active', k === s));
   document.querySelectorAll('#bottomNav [data-nav]').forEach(b => b.classList.toggle('on', b.dataset.nav === s));
   closeFishCard();
@@ -2284,7 +2361,7 @@ function refreshSheets() { if (curScreen === 'fish') renderFishSheet(); else if 
 let zoomed = false;
 function setZoom(v) {
   zoomed = v; if (v && curScreen !== 'home') setScreen('home');
-  $('#ui').classList.toggle('zoom', v); closeFishCard(); rememberView();
+  $('#ui').classList.toggle('zoom', v); closeFishCard(); rememberView(); placeMarqueeSoon();
   document.querySelectorAll('.tz-menu.open,.wx-menu.open').forEach(m => m.classList.remove('open'));
 }
 function setHidden(v) { uiHidden = v; $('#ui').classList.toggle('hide-ui', v); $('#uiHint').classList.toggle('show', v); closeFishCard(); }
@@ -2468,7 +2545,7 @@ function buildSchools() {
     for (let i = 0; i < d.n; i++) {
       const el = document.createElement('div'); el.className = 'school-fish';
       const sz = d.size * rand(.8, 1.15);
-      el.style.cssText = `width:${sz}px;height:${sz / 2}px;opacity:0;${d.blur ? `filter:blur(${d.blur}px);z-index:3;pointer-events:none` : ''}`;
+      el.style.cssText = `width:${sz}px;height:${sz / 2}px;opacity:0;transform:translate3d(-9999px,-9999px,0);${d.blur ? `filter:blur(${d.blur}px);z-index:3;pointer-events:none` : ''}`;
       el.innerHTML = silhouette(d.color); container.appendChild(el);
       sc.members.push({ el, ox: rand(-1, 1) * d.size * 3, oy: rand(-1, 1) * d.size * 1.5, ph: rand(0, 6), sz });
     }
@@ -2481,14 +2558,15 @@ function updateSchools(dt, t) {
     if (!sc.active) {
       sc.wait -= dt;
       if (sc.wait <= 0) { sc.active = true; sc.dir = Math.random() < .5 ? 1 : -1; sc.x = sc.dir > 0 ? -300 : W + 300;
-        sc.y = sc.d.depth === 'fore' ? H * rand(.55, .8) : H * rand(.18, .72); sc.members.forEach(m => m.el.style.opacity = sc.d.op); }
-      continue;
+        sc.y = sc.d.depth === 'fore' ? H * rand(.55, .8) : H * rand(.18, .72); sc.reveal = true; }
+      if (!sc.active) continue;
     }
     sc.x += sc.dir * sc.d.speed * S * dt;
     for (const m of sc.members) {
       const x = sc.x + m.ox * S + Math.sin(t * .7 + m.ph) * 10, y = sc.y + m.oy * S + Math.sin(t * 1.3 + m.ph) * 6;
       m.el.style.transform = `translate3d(${x}px,${y}px,0) scale(${sc.dir * S},${S})`;
     }
+    if (sc.reveal) { sc.reveal = false; sc.members.forEach(m => m.el.style.opacity = sc.d.op); }   // 位置已就緒才顯示
     if ((sc.dir > 0 && sc.x > W + 400) || (sc.dir < 0 && sc.x < -400)) {
       sc.active = false; sc.wait = sc.d.depth === 'fore' ? rand(25, 50) : rand(4, 16); sc.members.forEach(m => m.el.style.opacity = 0);
     }
@@ -2718,6 +2796,30 @@ function renderMissionTabs() {
   }).join('') + (state.missions.length < 3 ? `<button class="m-add" data-madd="1" title="新增任務（最多 3 個）">＋ 任務</button>` : '');
 }
 // 小視窗：輸入文字（可選刪除）
+/* ---------- 個人點數兌換：每完成一次任務 1 點；兌換扣「可用點數」，累計完成次數不變 ---------- */
+const ptsTotal = st => st.records.length;
+const ptsLeft = st => Math.max(0, st.records.length - (st.spent || 0));
+let rdSeat = 0;
+function openRedeem(seat) {
+  rdSeat = seat; const st = state.students[seat - 1]; if (!st) return;
+  const left = ptsLeft(st);
+  $('#rdTitle').textContent = `${pad(seat)} 號兌換點數`;
+  $('#rdInfo').innerHTML = `可用 <b>${left}</b> 點　·　累計完成 ${ptsTotal(st)} 次　·　已兌換 ${st.spent || 0} 點`;
+  $('#rdChips').innerHTML = state.rewards.length ? state.rewards.map((r, i) => `<button class="btn ${r.cost > left ? 'dis' : ''}" data-rw="${i}" ${r.cost > left ? 'disabled' : ''}>${escapeHTML(r.name)}<small>${r.cost} 點</small></button>`).join('') : '<p class="note">還沒有兌換品，可以在下方自己輸入。</p>';
+  $('#rdItem').value = ''; $('#rdPts').value = ''; $('#rdModal').classList.add('show'); setTimeout(() => $('#rdItem').focus(), 60);
+}
+function doRedeem(item, pts) {
+  const st = state.students[rdSeat - 1]; pts = parseInt(pts); item = (item || '').trim().slice(0, 20) || '兌換';
+  if (!(pts >= 1 && pts <= 999)) { toast('請輸入要扣的點數（1～999）'); return; }
+  if (pts > ptsLeft(st)) { toast(`點數不夠：可用 ${ptsLeft(st)} 點`); return; }
+  st.redeems.push({ at: Date.now(), pts, item }); st.spent = (st.spent || 0) + pts;
+  save(); $('#rdModal').classList.remove('show'); if (drawerOpen) renderDrawer();
+  Sound.init(); Sound.plink && Sound.plink(); toast(`${pad(rdSeat)} 號兌換「${item}」，扣 ${pts} 點，剩 ${ptsLeft(st)} 點`);
+}
+function undoRedeem(seat, idx) {
+  const st = state.students[seat - 1], r = st && st.redeems[idx]; if (!r) return;
+  st.redeems.splice(idx, 1); st.spent = Math.max(0, (st.spent || 0) - r.pts); save(); renderDrawer(); toast(`已撤銷「${r.item}」，退回 ${r.pts} 點`);
+}
 function promptBox(title, value, canDel, ph) {
   return new Promise(res => {
     const m = $('#pModal'), inp = $('#pInput'); $('#pTitle').textContent = title; inp.value = value || ''; inp.placeholder = ph || '';
@@ -2914,16 +3016,21 @@ function renderDrawer() {
     const c = doneCount();
     h += `<div class="sec"><h3>SEATS · 最大座號</h3><div class="flex gap-2"><input class="field" id="classSizeIn" type="number" min="1" max="50" value="${N}" style="flex:1"><button class="btn primary" data-act="classSize">套用</button></div>
       <p class="note mt-2">座號 01～${pad(N)}，實際 ${activeN()} 人（最多 50 號）。有跳號的座號，在下方學生列表按「空號」。</p></div>
+      <div class="sec"><h3>REWARDS · 點數兌換品</h3>
+      <p class="note" style="margin-top:0">每完成一次任務得 1 點。在下方學生列表按「兌換」扣點；累計完成次數不會減少。按錯可以在「紀錄」裡撤銷。</p>
+      <div class="rw-list">${state.rewards.map((r, i) => `<div class="rw-row"><span>${escapeHTML(r.name)}</span><b>${r.cost} 點</b><button class="rd-undo" data-act="rwDel" data-v="${i}">刪除</button></div>`).join('') || '<p class="note">還沒有兌換品</p>'}</div>
+      <div class="flex gap-2 mt-2"><input class="field" id="rwName" maxlength="20" placeholder="兌換品，例如：換座位一天" style="flex:1"><input class="field" id="rwCost" type="number" min="1" max="999" placeholder="點數" style="width:90px"><button class="btn primary" data-act="rwAdd">新增</button></div></div>
       <div class="sec"><h3>STUDENTS · 學生管理</h3><div class="info-box">本輪已完成 <b class="m">${c}</b> / ${activeN()}　·　未完成 <b class="m">${activeN() - c}</b>${state.emptySeats.length ? `　·　空號 ${state.emptySeats.filter(n => n <= N).map(pad).join('、')}` : ''}</div>
       <p class="note mt-2">在任務打卡畫面，已打卡的座號再點一次可以取消；右上角「清除任務」可以全部重來。<br>座號跳號（例如有人轉出）時，按該座號的「空號」：不列入人數、完成度、抽號和全選，過去的紀錄會保留。</p></div><div class="sec">`;
     state.students.forEach((s, i) => {
       const em = isEmptySeat(i + 1);
-      h += `<div class="row ${em ? 'is-empty' : ''}"><span class="no">${pad(i + 1)}</span><span class="st">${em ? '<span class="tag">空號</span>' : s.checked ? '<span class="tag ok">已完成</span>' : '<span class="tag">未完成</span>'}　紀錄 ${s.records.length} 次</span>
+      h += `<div class="row ${em ? 'is-empty' : ''}"><span class="no">${pad(i + 1)}</span><span class="st">${em ? '<span class="tag">空號</span>' : s.checked ? '<span class="tag ok">已完成</span>' : '<span class="tag">未完成</span>'}　完成 ${ptsTotal(s)}・<b class="pt">可用 ${ptsLeft(s)} 點</b></span>
         <button class="btn sm" data-act="check" data-v="${i + 1}" ${s.checked || em ? 'disabled' : ''}>打卡</button>
         <button class="btn sm" data-act="uncheck" data-v="${i + 1}" ${!s.checked || em ? 'disabled' : ''}>取消</button>
         <button class="btn sm ${em ? 'on' : ''}" data-act="emptySeat" data-v="${i + 1}" title="轉出或沒有人的座號設為空號">${em ? '恢復' : '空號'}</button>
+        <button class="btn sm gold-sm" data-act="redeem" data-v="${i + 1}" ${em ? 'disabled' : ''}>兌換</button>
         <button class="btn sm ${openRecords === i + 1 ? 'on' : ''}" data-act="records" data-v="${i + 1}">紀錄</button></div>`;
-      if (openRecords === i + 1) h += `<div class="records">${s.records.length ? s.records.slice().reverse().map((r, j) => `#${s.records.length - j}　${fmtStamp(r)}`).join('<br>') : '尚無完成紀錄'}</div>`;
+      if (openRecords === i + 1) h += `<div class="records">${s.redeems.length ? `<div class="rd-h">兌換紀錄</div>${s.redeems.map((r, j) => ({ r, j })).reverse().map(({ r, j }) => `${fmtStamp(r.at)}　${escapeHTML(r.item)}　−${r.pts} 點 <button class="rd-undo" data-act="rdUndo" data-v="${i + 1}" data-i="${j}">撤銷</button>`).join('<br>')}<div class="rd-h">完成紀錄</div>` : ''}${s.records.length ? s.records.slice().reverse().map((r, j) => `#${s.records.length - j}　${fmtStamp(r)}`).join('<br>') : '尚無完成紀錄'}</div>`;
     });
     h += '</div>';
   } else if (drawerTab === 'fish') {
@@ -2943,7 +3050,14 @@ function renderDrawer() {
       <div class="sec"><button class="btn danger w-full" data-act="resetAllFish">重設全班魚群與圖鑑</button></div>`;
   } else {
     const se = state.settings;
-    h += `<div class="sec"><h3>SPECIAL · 特殊控制</h3>
+    h += `<div class="sec"><h3>MARQUEE · 跑馬燈</h3>
+      <div class="flex gap-2"><input class="field" id="mqInput" maxlength="120" placeholder="輸入要顯示的文字；留空就不顯示" value="${escapeHTML(se.marquee || '')}" style="flex:1"><button class="btn primary" data-act="mqSave">儲存</button></div>
+      <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn ${se.mqHide ? 'on' : ''}" data-act="mqToggle">${se.mqHide ? '顯示公告欄' : '隱藏公告欄'}</button><button class="btn" data-act="mqDefault">恢復預設文字</button></div>
+      <p class="note mt-2">公告在「現在時間」頁顯示在大時鐘上方，其他頁顯示在畫面下方。也可以直接點公告欄右邊的 ✎ 修改，最多 120 字。</p></div>
+      <div class="sec"><h3>TIME ZONE · 時鐘時區</h3>
+      <select class="field" id="tzSelect" style="width:100%;font-size:18px;color-scheme:dark">${ZONES.map(([z, n]) => `<option value="${z}" ${z === state.clockTz ? 'selected' : ''}>${n}時間${z === TZ ? '（預設）' : ''}</option>`).join('')}</select>
+      <p class="note mt-2">大時鐘預設是台灣時間。選其他時區時，時鐘下方會顯示和台灣的時差，以及「回到台灣時間」按鈕。</p></div>
+      <div class="sec"><h3>SPECIAL · 特殊控制</h3>
 
       <div class="grid grid-cols-2 gap-2 mt-2">
         <button class="btn ${se.bpmf ? 'on' : ''}" data-act="bpmfFont">注音字型：${BPMF_FONTS[se.bpmfFont || 'huninn'].label}${se.bpmf ? '' : '（未開啟）'}</button>
@@ -3032,6 +3146,13 @@ async function onDrawerAction(act, v, el) {
     case 'sellAll': sellAll(); break;
     case 'hwTitleSave': state.homework.title = $('#hwTitle').value.trim() || '今日任務'; save(); updateTimeViews(); renderRoster(); renderDrawer(); toast('任務名稱已儲存'); break;
     case 'emptySeat': toggleEmptySeat(+v); break;
+    case 'redeem': openRedeem(+v); break;
+    case 'rdUndo': if (await confirmBox('撤銷這筆兌換？', '點數會退回給這位同學。', '撤銷')) undoRedeem(+v, +el.dataset.i); break;
+    case 'rwAdd': { const n = ($('#rwName').value || '').trim(), c = parseInt($('#rwCost').value);
+      if (!n) { toast('請輸入兌換品名稱'); break; } if (!(c >= 1 && c <= 999)) { toast('點數請輸入 1～999'); break; }
+      if (state.rewards.length >= 20) { toast('兌換品最多 20 項'); break; }
+      state.rewards.push({ name: n.slice(0, 20), cost: c }); save(); renderDrawer(); toast(`已新增兌換品「${n}」`); break; }
+    case 'rwDel': state.rewards.splice(+v, 1); save(); renderDrawer(); break;
     case 'records': openRecords = openRecords === +v ? null : +v; renderDrawer(); break;
     case 'feedTotal': setFeedTotal(v); break;
     case 'customFeed': setFeedTotal($('#customFeed').value); break;
@@ -3048,6 +3169,9 @@ async function onDrawerAction(act, v, el) {
         buildFish(); save(); renderRoster(); renderDrawer(); toast('全班魚群與圖鑑已重設'); }
       break;
     case 'bpmfFont': state.settings.bpmfFont = state.settings.bpmfFont === 'kai' ? 'huninn' : 'kai'; save(); applyBpmf(state.settings.bpmf); renderDrawer(); break;
+    case 'mqSave': state.settings.marquee = ($('#mqInput').value || '').trim().slice(0, 120); save(); renderMarquee(); renderDrawer(); toast(state.settings.marquee ? '公告已更新' : '公告已清空'); break;
+    case 'mqToggle': state.settings.mqHide = !state.settings.mqHide; save(); renderMarquee(); renderDrawer(); toast(state.settings.mqHide ? '公告欄已隱藏' : '公告欄已顯示'); break;
+    case 'mqDefault': state.settings.marquee = MARQUEE_DEFAULT; save(); renderMarquee(); renderDrawer(); toast('已恢復預設跑馬燈'); break;
     case 'toggleBg': state.settings.bgPaused = !state.settings.bgPaused; applySettings(); save(); renderDrawer(); break;
     case 'toggleSound': state.settings.sound = !state.settings.sound; save(); renderDrawer(); if (state.settings.sound) { Sound.plink(); Ambient.play(state.ambient.id); } else Ambient.stop(); break;
     case 'fullscreen': toggleFullscreen(); break;
@@ -3063,7 +3187,33 @@ async function onDrawerAction(act, v, el) {
       break;
   }
 }
-function applySettings() { document.body.classList.toggle('bg-paused', state.settings.bgPaused); applyBpmf(); }
+function applySettings() { document.body.classList.toggle('bg-paused', state.settings.bgPaused); applyBpmf(); renderMarquee(); }
+function editMarquee(on) {
+  const m = $('#marquee'); m.classList.toggle('editing', on);
+  if (on) { const i = $('#mqEdit'); i.value = state.settings.marquee || ''; setTimeout(() => { i.focus(); i.select(); }, 30); }
+}
+function saveMarquee() {
+  state.settings.marquee = ($('#mqEdit').value || '').trim().slice(0, 120); save(); editMarquee(false); renderMarquee(); if (drawerOpen) renderDrawer();
+  toast(state.settings.marquee ? '公告已更新' : '公告已清空');
+}
+function placeMarquee() {
+  const m = $('#marquee'), slot = document.getElementById('mqSlot');
+  const inClock = !!(slot && slot.offsetParent && curScreen === 'home' && state.mode === 'clock' && !zoomed && !state.settings.mqHide);
+  m.classList.toggle('in-clock', inClock);
+  if (inClock) {
+    const ui = $('#ui').getBoundingClientRect(), r = slot.getBoundingClientRect(), k = ui.width / $('#ui').offsetWidth || 1;
+    m.style.left = ((r.left - ui.left) / k).toFixed(1) + 'px'; m.style.top = ((r.top - ui.top) / k).toFixed(1) + 'px'; m.style.width = (r.width / k).toFixed(1) + 'px';
+  } else { m.style.left = m.style.top = m.style.width = ''; }
+}
+// 畫面切換有淡入動畫，動畫結束後再對一次位置
+const placeMarqueeSoon = () => { placeMarquee(); clearTimeout(placeMarqueeSoon.t); placeMarqueeSoon.t = setTimeout(placeMarquee, 620); };
+function renderMarquee() {
+  const t = (state.settings.marquee || '').trim(), m = $('#marquee'), el = $('#mqText');
+  m.classList.toggle('off', !!state.settings.mqHide); m.classList.toggle('empty', !t); document.body.classList.toggle('mq-hide', !!state.settings.mqHide); placeMarqueeSoon();
+  el.textContent = t || '點右邊的 ✎ 輸入公告'; if (!t) return;
+  // 依文字長度決定速度：每秒約 110 像素
+  requestAnimationFrame(() => { const w = el.offsetWidth || 1920; el.style.setProperty('--mqd', Math.max(10, w / 110).toFixed(1) + 's'); });
+}
 /* ---------- 注音：用 Google 字型庫的注音字型（Bpmf Huninn 粉圓注音／Bpmf Zihi Kai Std 字嗨楷書注音） ----------
    只在開啟注音時才載入字型；瀏覽器只下載畫面上用到的字。沒有網路時顯示一般字。 */
 const BPMF_FONTS = { huninn: { family: 'Bpmf Huninn', label: '圓體注音' }, kai: { family: 'Bpmf Zihi Kai Std', label: '楷書注音' } };
@@ -3124,7 +3274,7 @@ function layout() {
   DPR = PERF === 'high' ? Math.min(window.devicePixelRatio || 1, 1.25) : 1;
   for (const [c, x] of [[bgC, bgX], [fxC, fxX]]) { c.width = W * DPR; c.height = H * DPR; c.style.width = W + 'px'; c.style.height = H + 'px'; x.setTransform(DPR, 0, 0, DPR, 0, 0); }
   fishes.forEach(f => { f.x = clamp(f.x, LY.xMin, LY.xMax); f.baseY = f.targetY = clamp(f.baseY, LY.yMin, LY.yMax); });
-  initMotes();
+  initMotes(); if (typeof placeMarqueeSoon === 'function' && $('#marquee')) placeMarqueeSoon();
 }
 let lastT = performance.now(), lastSec = -1, hiddenAcc = 0, frameNo = 0, bgAcc = 0;
 /* ---------- 效能模式 ----------
@@ -3191,7 +3341,7 @@ function onCenterClick(e) {
 }
 
 function init() {
-  ensureMissions();
+  ensureMissions(); migrateWxPlace();
   document.querySelectorAll('i[data-ic]').forEach(e => e.outerHTML = ic(e.dataset.ic));
   buildScene(); layout(); buildRoster(); buildFish(); buildSchools();
   // 重新整理時：已到時的計時器直接推進到正確狀態（不重播提示音）
@@ -3210,6 +3360,11 @@ function init() {
   // 首頁面板
   document.querySelectorAll('#tabs .tab').forEach(b => b.addEventListener('click', () => { Sound.init(); setMode(b.dataset.tab); }));
   $('#centerPanel').addEventListener('click', onCenterClick);
+  $('#centerPanel').addEventListener('change', e => {
+    if (!e.target.matches('.wx-select')) return;
+    state.weather.place = +e.target.value; state.weather.err = false; state.weather.dataPlace = -1; save(); renderWx(); loadWeather(true);
+    toast(`天氣地點：${WX_PLACES[state.weather.place][0]}`);
+  });
   document.querySelectorAll('.lp-tab').forEach(b => b.addEventListener('click', () => setLeftTab(b.dataset.lp)));
   $('#notesAdd').addEventListener('submit', e => { e.preventDefault(); addNote($('#notesInput').value); $('#notesInput').value = ''; $('#notesInput').focus(); });
   $('#notesList').addEventListener('click', e => {
@@ -3230,6 +3385,20 @@ function init() {
   setLeftTab(state.leftTab);
   $('#clearTask').addEventListener('click', () => { Sound.init(); clearTask(); });
   $('#allTask').addEventListener('click', () => { Sound.init(); checkAllTask(); });
+  $('#mqEditBtn').addEventListener('click', () => editMarquee(true));
+  $('#drBody').addEventListener('change', e => {
+    if (e.target.id !== 'tzSelect') return;
+    state.clockTz = e.target.value; save(); renderCenter(true); toast(`大時鐘改為${zoneName(state.clockTz)}時間`);
+  });
+  $('#mqTrack').addEventListener('click', () => editMarquee(true));
+  $('#mqForm').addEventListener('submit', e => { e.preventDefault(); saveMarquee(); });
+  $('#mqCancel').addEventListener('click', () => editMarquee(false));
+  $('#mqEdit').addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); editMarquee(false); } });
+  $('#rdChips').addEventListener('click', e => { const b = e.target.closest('[data-rw]'); if (!b) return; const r = state.rewards[+b.dataset.rw]; if (r) doRedeem(r.name, r.cost); });
+  $('#rdOk').addEventListener('click', () => doRedeem($('#rdItem').value, $('#rdPts').value));
+  $('#rdPts').addEventListener('keydown', e => { if (e.key === 'Enter') doRedeem($('#rdItem').value, $('#rdPts').value); });
+  $('#rdCancel').addEventListener('click', () => $('#rdModal').classList.remove('show'));
+  $('#rdModal').addEventListener('click', e => { if (e.target.id === 'rdModal') $('#rdModal').classList.remove('show'); });
   $('#rosterTitle').addEventListener('click', e => {
     const t = e.target.closest('[data-mi]'); if (t) { const k = +t.dataset.mi; if (k === state.missionIdx) editMission(k); else switchMission(k); return; }
     if (e.target.closest('[data-madd]')) addMission();
@@ -3277,7 +3446,7 @@ function init() {
   window.addEventListener('beforeunload', saveNow);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); else updateTimeViews(); });
   document.addEventListener('keydown', e => {
-    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#pModal').classList.contains('show') || $('#setup').classList.contains('show')) return;
+    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#pModal').classList.contains('show') || $('#rdModal').classList.contains('show') || $('#setup').classList.contains('show')) return;
     const k = e.key.toLowerCase();
     if (k >= '1' && k <= '5') setMode(TAB_IDS[+k - 1]);
     else if (k === ' ' && state.mode === 'picker') { e.preventDefault(); Sound.init(); drawNumber(); }
