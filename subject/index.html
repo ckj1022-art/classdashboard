@@ -143,7 +143,7 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 .mq-lbl{flex:none;display:flex;align-items:center;gap:6px;height:42px;padding:0 14px 0 10px;border-radius:14px;background:rgba(242,182,93,.16);border:1px solid rgba(242,182,93,.45);color:#FFD9A0;font:600 18px var(--sans);letter-spacing:.12em}
 .mq-lbl svg{width:22px;height:22px}
 .mq-track{flex:1;min-width:0;height:100%;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
-#mqText{display:inline-block;padding-left:100%;font:500 25px/64px var(--sans);letter-spacing:.12em;color:#FFF3D6;text-shadow:0 1px 6px rgba(0,0,0,.45);
+#mqText{display:inline-block;padding-left:100%;font:500 33px/64px var(--sans);letter-spacing:.1em;color:#FFF3D6;text-shadow:0 1px 6px rgba(0,0,0,.45);
   animation:mq var(--mqd,20s) linear infinite;will-change:transform}
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-100%)}}
 .perf-min #mqText{animation:none;padding-left:0;display:block;text-align:center}
@@ -159,7 +159,7 @@ input{font-family:inherit;user-select:text;-webkit-user-select:text}
 #marquee.editing .mq-form{display:flex}
 #marquee.editing .mq-track,#marquee.editing .mq-ed{display:none}
 #ui.portrait #marquee{left:40px;right:212px;bottom:140px;height:56px}
-#ui.portrait #mqText{font-size:23px;line-height:56px}
+#ui.portrait #mqText{font-size:30px;line-height:56px}
 #btnPerf{grid-template-rows:auto auto;align-content:center;gap:1px}
 #btnBpmf{grid-template-rows:auto auto;align-content:center;gap:0}
 #btnBpmf .bp-ic{font:700 24px/1 'PingFang TC','Microsoft JhengHei',sans-serif}
@@ -290,8 +290,8 @@ body.bpmf .dc .dn{display:none}
 .lp-tab.on{background:linear-gradient(180deg,#8be4cd,#5fc2ab);color:#05282c}
 .lp-view{display:none;flex:1;min-height:0;flex-direction:column}.lp-view.on{display:flex}
 #notesList{flex:1;overflow-y:auto;margin:10px 0 0;padding:0 18px 0 22px;list-style:none;counter-reset:nb;scrollbar-width:thin}
-#notesList li{counter-increment:nb;position:relative;display:flex;align-items:flex-start;gap:12px;padding:11px 8px 11px 4px;border-bottom:1px dashed rgba(170,220,230,.16);font:500 22px/1.45 var(--sans);letter-spacing:.04em;color:var(--ink);word-break:break-word}
-#notesList li::before{content:counter(nb);flex:none;width:32px;height:32px;margin-top:1px;border-radius:50%;display:grid;place-items:center;font:600 17px var(--mono);color:#05282c;background:var(--energy)}
+#notesList li{counter-increment:nb;position:relative;display:flex;align-items:flex-start;gap:12px;padding:11px 8px 11px 4px;border-bottom:1px dashed rgba(170,220,230,.16);font:500 30px/1.4 var(--sans);letter-spacing:.04em;color:var(--ink);word-break:break-word}
+#notesList li::before{content:counter(nb);flex:none;width:40px;height:40px;margin-top:1px;border-radius:50%;display:grid;place-items:center;font:600 21px var(--mono);color:#05282c;background:var(--energy)}
 #notesList li span{flex:1;min-width:0}
 #notesList li.done span{color:rgba(241,245,244,.4);text-decoration:line-through}
 #notesList li.done::before{background:rgba(112,214,189,.35)}
@@ -489,7 +489,7 @@ body.bpmf .dc .dn{display:none}
 body.mq-hide .mq-slot{display:none}
 #marquee{z-index:12}
 #marquee.in-clock{height:60px;bottom:auto;right:auto}
-#marquee.in-clock #mqText{font-size:26px;line-height:60px}
+#marquee.in-clock #mqText{font-size:34px;line-height:60px}
 #marquee.in-clock .mq-lbl{height:40px}
 .tz-ref{margin-top:12px;min-height:34px;font-size:19px;color:rgba(241,245,244,.65);letter-spacing:.06em;display:flex;align-items:center;gap:6px}
 .tz-ref b{font-family:var(--mono);color:var(--gold);font-weight:600}
