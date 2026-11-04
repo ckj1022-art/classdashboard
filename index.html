@@ -576,6 +576,23 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 .clear-task:hover{background:rgba(232,115,90,.24)}
 .all-task{height:46px;padding:0 20px;margin-right:-10px;border-radius:14px;border:1px solid rgba(112,214,189,.55);background:rgba(112,214,189,.12);color:#a9f0dc;font:500 18px var(--sans);letter-spacing:.1em;transition:background .2s}
 .all-task:hover{background:rgba(112,214,189,.24)}
+.add-pt{height:46px;padding:0 18px;margin-right:-10px;border-radius:14px;border:1px solid rgba(242,182,93,.6);background:rgba(242,182,93,.12);color:#FFD9A0;font:500 18px var(--sans);letter-spacing:.08em;transition:background .2s;flex:none}
+.add-pt:hover{background:rgba(242,182,93,.24)}
+/* 加點模式：打卡區變金色，按鈕換成「復原／完成」 */
+.add-banner{display:none;position:absolute;left:40px;right:40px;top:20px;height:52px;align-items:center;gap:14px;padding:0 10px 0 20px;border-radius:16px;background:linear-gradient(90deg,rgba(242,182,93,.28),rgba(242,182,93,.12));border:1px solid rgba(242,182,93,.6);z-index:2}
+.add-banner span{font:700 22px var(--sans);letter-spacing:.12em;color:#FFE2A8}
+.add-banner small{flex:1;font-size:17px;color:rgba(255,236,200,.85);letter-spacing:.06em}
+.add-banner button{height:40px;padding:0 18px;border-radius:12px;font:500 17px var(--sans);letter-spacing:.08em;border:1px solid rgba(255,226,168,.55);background:rgba(0,0,0,.18);color:#FFE2A8;cursor:pointer}
+.add-banner button:disabled{opacity:.35;cursor:default}
+.add-banner #addDone{background:#F2B65D;color:#3a2204;border-color:#F2B65D;font-weight:700}
+#roster.add-mode{border-color:rgba(242,182,93,.65);box-shadow:0 0 0 2px rgba(242,182,93,.35),0 20px 50px rgba(0,0,0,.35)}
+#roster.add-mode .add-banner{display:flex}
+#roster.add-mode .roster-head{visibility:hidden}
+#roster.add-mode .seat:not(.empty){border-color:rgba(242,182,93,.55);cursor:pointer}
+#roster.add-mode .seat:not(.empty):hover{transform:translateY(-2px);box-shadow:0 0 16px rgba(242,182,93,.45)}
+.pt-fly{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font:700 22px var(--sans);color:#FFD45E;text-shadow:0 2px 8px rgba(0,0,0,.6);white-space:nowrap;pointer-events:none;animation:ptFly 1s ease-out forwards;z-index:3}
+@keyframes ptFly{0%{opacity:0;transform:translate(-50%,6px) scale(.8)}20%{opacity:1;transform:translate(-50%,-6px) scale(1.1)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
+#ui.portrait .add-banner{left:24px;right:24px;top:14px}
 #countText{font:400 40px var(--num);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;letter-spacing:.04em}
 #countText small{font:500 18px var(--sans);letter-spacing:.2em;opacity:.7;margin-left:10px}
 #pctText{font:400 26px var(--mono);color:var(--energy);min-width:80px;text-align:right}
@@ -972,9 +989,10 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
           <div id="countText">0<small>COMPLETED</small></div>
           <div class="pbar"><i id="countBar"></i></div>
           <div id="pctText">0%</div>
-          <button class="all-task" id="allTask" title="把還沒打卡的同學全部打卡">全選</button><button class="clear-task" id="clearTask" title="清除全部打卡，任務魚從 0 份重新餵食">清除任務</button>
+          <button class="add-pt" id="addPt" title="幫同學加點：按下後點座號加 1 點">⭐ 加點</button><button class="all-task" id="allTask" title="把還沒打卡的同學全部打卡">全選</button><button class="clear-task" id="clearTask" title="清除全部打卡，任務魚從 0 份重新餵食">清除任務</button>
         </div>
       </div>
+      <div class="add-banner" id="addBanner"><span>⭐ 加點模式</span><small>點座號，幫同學加 1 點</small><button id="addUndo" disabled>復原</button><button id="addDone">完成</button></div>
       <div id="seatGrid"></div>
     </div>
   </section>
@@ -1107,7 +1125,7 @@ const validSp = id => isNewSp(id) || !!SP_RARITY[id];
 const freshClassFish = (no = 1) => ({ no, food: 0, eaten: 0, evolved: false, species: null, rarity: null, evolvedAt: null, born: Date.now(), carry: 0 });
 const freshFish = () => ({ hatched: false, hatchedAt: null, food: 0, eaten: 0, evolved: false, species: null, rarity: null, evolvedAt: null });
 const freshHwFish = (target = N) => ({ food: 0, target, evolved: false, species: null, rarity: null, evolvedAt: null });
-const freshStudent = i => ({ seat: i + 1, checked: false, records: [], spent: 0, redeems: [], fish: freshFish() });
+const freshStudent = i => ({ seat: i + 1, checked: false, records: [], spent: 0, redeems: [], bonus: [], fish: freshFish() });
 function defaultState() {
   return {
     v: 5, mode: 'clock', coins: 0,
@@ -1220,6 +1238,7 @@ function sanitize(d) {
     st.records = Array.isArray(src.records) ? src.records : [];
     st.redeems = Array.isArray(src.redeems) ? src.redeems.filter(r => r && r.pts > 0).slice(-200) : [];
     st.spent = st.redeems.reduce((a, r) => a + (r.pts | 0), 0);
+    st.bonus = Array.isArray(src.bonus) ? src.bonus.filter(r => r && r.pts > 0).slice(-500) : [];
     st.fish = Object.assign(freshFish(), src.fish || {});
     return st;
   });
@@ -1963,6 +1982,29 @@ function newHwRound(auto) {
 }
 // 清除任務：全部座號取消打卡，任務魚的飼料歸零重新餵食（已進化收藏的魚不受影響）
 // 一鍵全選：把還沒打卡的同學全部打卡（逐一點亮，任務魚吃滿就照常進化）
+// 加點模式：1 分鐘沒操作自動結束
+let addMode = false, addTimer = 0, addHist = [];
+function setAddMode(on) {
+  addMode = on; $('#roster').classList.toggle('add-mode', on); addHist = []; $('#addUndo').disabled = true; clearTimeout(addTimer);
+  if (on) { bumpAdd(); toast('加點模式：點座號幫同學加 1 點'); }
+}
+function bumpAdd() { clearTimeout(addTimer); addTimer = setTimeout(() => { if (addMode) { setAddMode(false); toast('已自動結束加點模式'); } }, 60000); }
+function addPoint(seat, btn) {
+  const st = state.students[seat - 1]; if (!st) return;
+  if (!Array.isArray(st.bonus)) st.bonus = [];
+  st.bonus.push({ at: Date.now(), pts: 1 }); addHist.push(seat); $('#addUndo').disabled = false;
+  save(); bumpAdd(); Sound.plink && Sound.plink();
+  const ro = $('#roster'), r = btn.getBoundingClientRect(), rr = ro.getBoundingClientRect(), k = rr.width / ro.offsetWidth || 1;
+  const f = document.createElement('span'); f.className = 'pt-fly'; f.textContent = '+1 ⭐';
+  f.style.left = ((r.left - rr.left + r.width / 2) / k + ro.scrollLeft).toFixed(0) + 'px'; f.style.top = ((r.top - rr.top) / k + ro.scrollTop).toFixed(0) + 'px';
+  ro.appendChild(f); setTimeout(() => f.remove(), 1000);
+  toast(`已幫 ${pad(seat)} 號加 1 點`); if (drawerOpen) renderDrawer();
+}
+function undoAdd() {
+  const seat = addHist.pop(); if (!seat) return;
+  const st = state.students[seat - 1]; if (st && st.bonus.length) st.bonus.pop();
+  save(); $('#addUndo').disabled = !addHist.length; bumpAdd(); toast(`已復原 ${pad(seat)} 號的加點`); if (drawerOpen) renderDrawer();
+}
 async function checkAllTask() {
 
   if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候'); return; }
@@ -2350,7 +2392,7 @@ let curScreen = 'home', uiHidden = false;
 const SCREENS = ['home', 'feed', 'fish', 'dex', 'stats'];
 function rememberView() { try { sessionStorage.setItem('cd-view', JSON.stringify({ mode: state.mode, screen: curScreen, zoom: zoomed })); } catch (e) {} }
 function setScreen(s) {
-  curScreen = s; setTimeout(rememberView, 0); setTimeout(placeMarqueeSoon, 0); if (s !== 'home' && zoomed) setZoom(false);
+  curScreen = s; if (addMode && s !== 'feed') setAddMode(false); setTimeout(rememberView, 0); setTimeout(placeMarqueeSoon, 0); if (s !== 'home' && zoomed) setZoom(false);
   SCREENS.forEach(k => document.getElementById('scr-' + k).classList.toggle('active', k === s));
   document.querySelectorAll('#bottomNav [data-nav]').forEach(b => b.classList.toggle('on', b.dataset.nav === s));
   closeFishCard();
@@ -2798,13 +2840,14 @@ function renderMissionTabs() {
 // 小視窗：輸入文字（可選刪除）
 /* ---------- 個人點數兌換：每完成一次任務 1 點；兌換扣「可用點數」，累計完成次數不變 ---------- */
 const ptsTotal = st => st.records.length;
-const ptsLeft = st => Math.max(0, st.records.length - (st.spent || 0));
+const ptsBonus = st => (st.bonus || []).reduce((a, r) => a + (r.pts | 0), 0);
+const ptsLeft = st => Math.max(0, st.records.length + ptsBonus(st) - (st.spent || 0));
 let rdSeat = 0;
 function openRedeem(seat) {
   rdSeat = seat; const st = state.students[seat - 1]; if (!st) return;
   const left = ptsLeft(st);
   $('#rdTitle').textContent = `${pad(seat)} 號兌換點數`;
-  $('#rdInfo').innerHTML = `可用 <b>${left}</b> 點　·　累計完成 ${ptsTotal(st)} 次　·　已兌換 ${st.spent || 0} 點`;
+  $('#rdInfo').innerHTML = `可用 <b>${left}</b> 點　·　累計完成 ${ptsTotal(st)} 次${ptsBonus(st) ? `　·　老師加點 ${ptsBonus(st)}` : ''}　·　已兌換 ${st.spent || 0} 點`;
   $('#rdChips').innerHTML = state.rewards.length ? state.rewards.map((r, i) => `<button class="btn ${r.cost > left ? 'dis' : ''}" data-rw="${i}" ${r.cost > left ? 'disabled' : ''}>${escapeHTML(r.name)}<small>${r.cost} 點</small></button>`).join('') : '<p class="note">還沒有兌換品，可以在下方自己輸入。</p>';
   $('#rdItem').value = ''; $('#rdPts').value = ''; $('#rdModal').classList.add('show'); setTimeout(() => $('#rdItem').focus(), 60);
 }
@@ -2878,6 +2921,7 @@ function renderStats() {
 }
 function onSeatClick(seat, btn) {
   Sound.init();
+  if (addMode) { if (!isEmptySeat(seat)) addPoint(seat, btn); return; }
   if (isEmptySeat(seat)) { toast(`${pad(seat)} 號是空號（可在教師控制台的「學生」分頁恢復）`); return; }
   // 已打卡的座號再點一次＝取消（按錯時可以改回來），任務魚也會退回一份飼料
   if (state.students[seat - 1].checked) {
@@ -2985,6 +3029,11 @@ function sellFish(idx, quiet) {
   if (!quiet) { Sound.note(1318, 0, .25, .08); Sound.note(1760, .08, .35, .07); toast(`賣出${sp.name}，得到 ${price} 金幣`, 'gold'); save(); renderRoster(); if (drawerOpen) renderDrawer(); }
   return price;
 }
+async function confirmSell(idx) {
+  const c = state.collection[idx]; if (!c || c.sold) return;
+  const sp = SPECIES_BY_ID[c.species], price = SELL_PRICE[sp.rarity] || 10;
+  if (await confirmBox(`賣出「${sp.name}」？`, `可以得到 ${price} 金幣。賣出後這條魚會離開水族箱，圖鑑的收集紀錄會保留。`, '確定賣出')) sellFish(idx);
+}
 async function sellAll() {
   const list = tankCollection(); if (!list.length) { toast('水族箱裡沒有可以賣的魚'); return; }
   const total = list.reduce((a, c) => a + (SELL_PRICE[c.rarity] || 10), 0);
@@ -2993,7 +3042,7 @@ async function sellAll() {
   Sound.note(1046, 0, .3, .08); Sound.note(1318, .1, .3, .08); Sound.note(1760, .2, .5, .08);
   toast(`水族箱清空了！得到 ${total} 金幣`, 'gold'); save(); renderRoster(); if (drawerOpen) renderDrawer();
 }
-$('#fishCard').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { sellFish(+b.dataset.sell); closeFishCard(); } });
+$('#fishCard').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { const i = +b.dataset.sell; closeFishCard(); confirmSell(i); } });
 document.addEventListener('click', e => { if (!e.target.closest('#fishCard') && !e.target.closest('.fish')) closeFishCard(); });
 
 /* ===================================================================
@@ -3030,7 +3079,7 @@ function renderDrawer() {
         <button class="btn sm ${em ? 'on' : ''}" data-act="emptySeat" data-v="${i + 1}" title="轉出或沒有人的座號設為空號">${em ? '恢復' : '空號'}</button>
         <button class="btn sm gold-sm" data-act="redeem" data-v="${i + 1}" ${em ? 'disabled' : ''}>兌換</button>
         <button class="btn sm ${openRecords === i + 1 ? 'on' : ''}" data-act="records" data-v="${i + 1}">紀錄</button></div>`;
-      if (openRecords === i + 1) h += `<div class="records">${s.redeems.length ? `<div class="rd-h">兌換紀錄</div>${s.redeems.map((r, j) => ({ r, j })).reverse().map(({ r, j }) => `${fmtStamp(r.at)}　${escapeHTML(r.item)}　−${r.pts} 點 <button class="rd-undo" data-act="rdUndo" data-v="${i + 1}" data-i="${j}">撤銷</button>`).join('<br>')}<div class="rd-h">完成紀錄</div>` : ''}${s.records.length ? s.records.slice().reverse().map((r, j) => `#${s.records.length - j}　${fmtStamp(r)}`).join('<br>') : '尚無完成紀錄'}</div>`;
+      if (openRecords === i + 1) h += `<div class="records">${(s.bonus || []).length ? `<div class="rd-h">加點紀錄</div>${s.bonus.map((r, j) => ({ r, j })).reverse().slice(0, 30).map(({ r, j }) => `${fmtStamp(r.at)}　老師加點　+${r.pts} 點 <button class="rd-undo" data-act="bonusUndo" data-v="${i + 1}" data-i="${j}">撤銷</button>`).join('<br>')}` : ''}${s.redeems.length ? `<div class="rd-h">兌換紀錄</div>${s.redeems.map((r, j) => ({ r, j })).reverse().map(({ r, j }) => `${fmtStamp(r.at)}　${escapeHTML(r.item)}　−${r.pts} 點 <button class="rd-undo" data-act="rdUndo" data-v="${i + 1}" data-i="${j}">撤銷</button>`).join('<br>')}<div class="rd-h">完成紀錄</div>` : ''}${s.records.length ? s.records.slice().reverse().map((r, j) => `#${s.records.length - j}　${fmtStamp(r)}`).join('<br>') : '尚無完成紀錄'}</div>`;
     });
     h += '</div>';
   } else if (drawerTab === 'fish') {
@@ -3147,6 +3196,7 @@ async function onDrawerAction(act, v, el) {
     case 'hwTitleSave': state.homework.title = $('#hwTitle').value.trim() || '今日任務'; save(); updateTimeViews(); renderRoster(); renderDrawer(); toast('任務名稱已儲存'); break;
     case 'emptySeat': toggleEmptySeat(+v); break;
     case 'redeem': openRedeem(+v); break;
+    case 'bonusUndo': { const st = state.students[+v - 1], r = st && st.bonus[+el.dataset.i]; if (r) { st.bonus.splice(+el.dataset.i, 1); save(); renderDrawer(); toast(`已撤銷加點，扣回 ${r.pts} 點`); } break; }
     case 'rdUndo': if (await confirmBox('撤銷這筆兌換？', '點數會退回給這位同學。', '撤銷')) undoRedeem(+v, +el.dataset.i); break;
     case 'rwAdd': { const n = ($('#rwName').value || '').trim(), c = parseInt($('#rwCost').value);
       if (!n) { toast('請輸入兌換品名稱'); break; } if (!(c >= 1 && c <= 999)) { toast('點數請輸入 1～999'); break; }
@@ -3385,6 +3435,9 @@ function init() {
   setLeftTab(state.leftTab);
   $('#clearTask').addEventListener('click', () => { Sound.init(); clearTask(); });
   $('#allTask').addEventListener('click', () => { Sound.init(); checkAllTask(); });
+  $('#addPt').addEventListener('click', () => { Sound.init(); setAddMode(true); });
+  $('#addDone').addEventListener('click', () => { setAddMode(false); toast('已結束加點模式'); });
+  $('#addUndo').addEventListener('click', undoAdd);
   $('#mqEditBtn').addEventListener('click', () => editMarquee(true));
   $('#drBody').addEventListener('change', e => {
     if (e.target.id !== 'tzSelect') return;
@@ -3405,7 +3458,7 @@ function init() {
   });
   $('#schedList').addEventListener('click', e => { const r = e.target.closest('.srow'); if (r) { Sound.init(); focusFromSchedule(+r.dataset.i); } });
   $('#ambList').addEventListener('click', e => { const a = e.target.closest('[data-amb]'); if (!a) return; Sound.init(); state.ambient.id = a.dataset.amb; save(); Ambient.play(a.dataset.amb); renderAmbient(); });
-  $('#fishSheet').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { sellFish(+b.dataset.sell); return; } if (e.target.closest('[data-act=sellAll]')) sellAll(); });
+  $('#fishSheet').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { confirmSell(+b.dataset.sell); return; } if (e.target.closest('[data-act=sellAll]')) sellAll(); });
   $('#ambVol').addEventListener('input', e => Ambient.setVol(e.target.value / 100));
   // 導覽
   document.querySelectorAll('#bottomNav [data-nav]').forEach(b => b.addEventListener('click', () => { Sound.init(); setScreen(b.dataset.nav); }));
