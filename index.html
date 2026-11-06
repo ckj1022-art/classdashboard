@@ -169,7 +169,7 @@ body.bpmf #btnBpmf{color:var(--gold);border-color:rgba(242,182,93,.6);background
    其他按鈕、分頁、天氣、教師控制台都維持原字型，不會跑版 */
 body.bpmf{--bpmf:'Bpmf Huninn','PingFang TC','Microsoft JhengHei',sans-serif}
 body.bpmf.bp-kai{--bpmf:'Bpmf Zihi Kai Std','BiauKai','DFKai-SB','PingFang TC',serif}
-body.bpmf :is(#notesList li span,.srow .sname,.sbreak,.m-tab .mt-name,#hwTitleView,#feedSub,.cd-txt b,.cf-cd,#cWeek,#pkLbl,
+body.bpmf :is(#nzState,#notesList li span,.srow .sname,.sbreak,.m-tab .mt-name,#hwTitleView,#feedSub,.cd-txt b,.cf-cd,#cWeek,#pkLbl,
   .dc .nm,.fc-lb,#fishCard h4,#evoTitle,#evoName,#evoBadge,#evoSeat,#mqText){font-family:var(--bpmf)!important}
 body.bpmf .cf-cd b{font-family:var(--num)!important}
 body.bpmf .m-tab{max-width:270px;padding:0 12px;gap:8px}
@@ -879,6 +879,65 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 #fishCard .fc-art svg{height:100%;width:auto;overflow:visible}
 #fishCard h4{margin:0;font:500 20px var(--sans);letter-spacing:.1em}
 #fishCard .fc-line{font-size:14px;color:rgba(241,245,244,.72);margin-top:6px;line-height:1.6}
+
+/* ---------- 版面加寬：聯絡簿／作息表變寬，環境音收成一排圖示 ---------- */
+#ambPanel{overflow:hidden}
+.amb{padding:12px 22px}
+.amb-t,.amb-hp{transition:opacity .2s}
+.amb-t{min-width:0;white-space:nowrap}
+.amb-art{transition:width .4s,height .4s}
+.amb-head{display:flex;align-items:center;padding-right:18px;white-space:nowrap}
+.lay-btn{margin-left:auto;height:34px;padding:0 14px;border-radius:17px;border:1px solid rgba(170,220,230,.25);background:rgba(255,255,255,.06);color:rgba(241,245,244,.8);font:500 15px var(--sans);letter-spacing:.08em;cursor:pointer;white-space:nowrap}
+.lay-btn:hover{color:var(--energy);border-color:rgba(112,214,189,.5)}
+#ui.portrait .lay-btn{display:none}
+#ui.lay-anim #taskPanel,#ui.lay-anim #ambPanel{transition:width .5s cubic-bezier(.4,0,.2,1),left .5s cubic-bezier(.4,0,.2,1),opacity .45s ease}
+#ui.lay-anim #centerPanel,#ui.lay-anim #tabs{transition:transform .5s cubic-bezier(.4,0,.2,1),opacity .45s ease}
+#ui.lay-instant #taskPanel,#ui.lay-instant #ambPanel,#ui.lay-instant #centerPanel,#ui.lay-instant #tabs{transition:none!important}
+#ui.wide:not(.portrait) #taskPanel{width:686px}
+#ui.wide:not(.portrait):not(.zoom) #centerPanel,#ui.wide:not(.portrait) #tabs{transform:translateX(286px)}
+#ui.wide:not(.portrait) #ambPanel{left:1690px;width:120px}
+#ui.wide:not(.portrait) #ambPanel .amb-t,#ui.wide:not(.portrait) #ambPanel .amb-hp{position:absolute;left:120px;opacity:0;pointer-events:none}
+#ui.wide:not(.portrait) #ambPanel .amb{padding:10px 25px}
+#ui.wide:not(.portrait) #ambPanel .amb-art{width:70px;height:70px}
+#ui.wide:not(.portrait) .amb-head{flex-direction:column;gap:10px;padding:0;font-size:0}
+#ui.wide:not(.portrait) .amb-head span{font-size:16px;margin:0}
+#ui.wide:not(.portrait) .lay-btn{margin:0;padding:0 16px;font-size:20px}
+#ui.wide:not(.portrait) #ambPanel .vol-row{font-size:0;padding:12px 14px 0}
+#ui.wide:not(.portrait) #ambPanel .vol-row input{flex:none;width:92px}
+#ui.wide:not(.portrait) #notesList li:not(.nb-empty){font-size:34px}
+#ui.wide:not(.portrait) #notesList li::before{width:44px;height:44px;font-size:22px}
+#ui.wide:not(.portrait) .srow,#ui.wide:not(.portrait) .sbreak{height:40px}
+#ui.wide:not(.portrait) .sname{font-size:22px}
+#ui.wide:not(.portrait) .stime{font-size:16px;width:118px}
+#ui.wide:not(.portrait) .srow.cur{height:62px}
+#ui.wide:not(.portrait) .srow.cur .sname{font-size:28px}
+
+/* ---------- 音量偵測 ---------- */
+#tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
+.tab{font-size:19px;letter-spacing:.04em;gap:6px;padding:0 4px}
+.tab svg{width:23px;height:23px}
+.nz-state{margin-top:22px;font:700 104px/1.1 var(--sans);letter-spacing:.08em;color:rgba(241,245,244,.35);transition:color .4s}
+.nz-q .nz-state{color:var(--energy)}
+.nz-m .nz-state{color:#F2B65D}
+.nz-l .nz-state{color:#F2808F;animation:nzPulse .8s ease-in-out infinite alternate}
+@keyframes nzPulse{to{transform:scale(1.06)}}
+.perf-min .nz-l .nz-state{animation:none}
+.nz-sub{margin-top:8px;min-height:38px;font-size:19px;color:rgba(241,245,244,.65);letter-spacing:.06em;text-align:center;max-width:660px;line-height:1.5}
+.nz-sub b{font:600 30px var(--mono);color:#fff}
+.nz-err{color:#F2B65D}
+.nz-meter{position:relative;width:620px;height:30px;margin-top:16px;border-radius:15px;background:rgba(0,0,0,.35);border:1px solid rgba(170,220,230,.16)}
+.nz-meter i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:15px;background:linear-gradient(90deg,#70D6BD,#9fd9a0 35%,#F2B65D 60%,#F2808F 85%) no-repeat;background-size:620px 100%;transition:width .12s linear}
+.nz-meter s{position:absolute;top:-6px;bottom:-6px;width:4px;margin-left:-2px;border-radius:2px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.8)}
+.nz-scale{display:flex;justify-content:space-between;width:620px;margin-top:6px;font:400 14px var(--mono);color:rgba(241,245,244,.45)}
+.nz-row{display:flex;align-items:center;gap:12px;margin-top:18px;font-size:18px;color:rgba(241,245,244,.7);letter-spacing:.06em}
+.nz-chip{height:50px;padding:0 20px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid rgba(170,220,230,.16);color:var(--ink);font:500 20px var(--sans);letter-spacing:.06em;cursor:pointer;transition:all .2s}
+.nz-chip small{margin-left:8px;font:400 15px var(--mono);color:rgba(241,245,244,.5)}
+.nz-chip.on{border-color:var(--energy);color:var(--energy);background:rgba(112,214,189,.12)}
+.nz-chip.on small{color:var(--energy)}
+.nz-row input{width:280px;accent-color:var(--energy)}
+.nz-row b{font:600 22px var(--mono);color:#fff;min-width:40px}
+.nz-mute .eq i{animation:none;height:5px}
+#centerPanel.nz-loud{box-shadow:0 0 0 3px rgba(242,128,143,.75),0 0 70px rgba(242,128,143,.45)}
 </style>
 </head>
 <body>
@@ -965,10 +1024,11 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
       <button class="tab" data-tab="pomodoro"><i data-ic="tomato"></i>番茄鐘</button>
       <button class="tab" data-tab="homework"><i data-ic="check"></i>任務</button>
       <button class="tab" data-tab="picker"><i data-ic="dice"></i>抽號</button>
+      <button class="tab" data-tab="noise"><i data-ic="mic"></i>音量</button>
     </div>
     <div id="centerPanel" class="panel pe"><div id="centerBody"></div></div>
     <div id="ambPanel" class="panel pe">
-      <div class="p-head">AMBIENT<span>環境音</span></div>
+      <div class="p-head amb-head">AMBIENT<span>環境音</span><button class="lay-btn" id="layBtn" type="button">收合 »</button></div>
       <div id="ambList"></div>
       <div class="vol-row">音量<input type="range" id="ambVol" min="0" max="100"></div>
     </div>
@@ -1129,7 +1189,7 @@ const freshStudent = i => ({ seat: i + 1, checked: false, records: [], spent: 0,
 function defaultState() {
   return {
     v: 5, mode: 'clock', coins: 0,
-    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn', marquee: MARQUEE_DEFAULT, mqHide: false },
+    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn', marquee: MARQUEE_DEFAULT, mqHide: false, wide: false, nzTh: 60 },
     classFish: freshClassFish(1), collection: [], totalFood: 0, dexDone: false,
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
@@ -1623,6 +1683,7 @@ const fmtStamp = ts => { const p = nowParts(ts); return `${p.mo}/${p.d} ${p.h}:$
 
 /* ---------- 介面圖示（線條 SVG） ---------- */
 const ICONS = {
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/>',
   gauge: '<path d="M3.5 17a9 9 0 1 1 17 0"/><path d="M12 15l4.5-5"/><circle cx="12" cy="15.5" r="1.4"/>',
   back: '<path d="M10 6l-6 6 6 6M4 12h11a5 5 0 0 1 5 5v1"/>',
   eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
@@ -2136,11 +2197,12 @@ function renderCenter(force) {
   const swap = centerKey.split('|')[0] !== m || centerKey.split('|')[1] !== key.split('|')[1];
   centerKey = key;
   const host = $('#centerBody');
-  host.innerHTML = m === 'clock' ? clockViewHTML() : m === 'homework' ? hwViewHTML() : m === 'picker' ? pickerHTML() : act ? runViewHTML() : m === 'focus' ? focusIdleHTML() : pomoIdleHTML();
+  host.innerHTML = m === 'clock' ? clockViewHTML() : m === 'homework' ? hwViewHTML() : m === 'picker' ? pickerHTML() : m === 'noise' ? noiseHTML() : act ? runViewHTML() : m === 'focus' ? focusIdleHTML() : pomoIdleHTML();
   if (swap) { host.classList.remove('swap'); void host.offsetWidth; host.classList.add('swap'); }
   if (m === 'focus' && !act) initPicker();
   if (m === 'homework') renderHwTank();
   if (m === 'picker') updatePicker();
+  if (m === 'noise') Noise.paint();
   if (m === 'clock') { loadWeather(); updateClockCountdown(); }
   updateTimeViews(); if (typeof placeMarqueeSoon === 'function') placeMarqueeSoon();
 }
@@ -2212,9 +2274,10 @@ function setEnergy(p) {
   document.documentElement.style.setProperty('--liq', `rgb(${a.map((v, i) => Math.round(lerp(v, b[i], k))).join(',')})`);
 }
 
-const TAB_IDS = ['clock', 'focus', 'pomodoro', 'homework', 'picker'];
+const TAB_IDS = ['clock', 'focus', 'pomodoro', 'homework', 'picker', 'noise'];
 function setMode(m) {
   if (!TAB_IDS.includes(m)) m = 'clock';
+  if (m !== 'noise') Noise.stop();
   state.mode = m; Timer.syncIdle(); save(); rememberView();
   document.querySelectorAll('#tabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tab === m));
   if (curScreen !== 'home' && !(curScreen === 'feed' && m === 'homework')) setScreen('home');
@@ -2381,9 +2444,92 @@ const Ambient = {
   },
   setVol(v) { state.ambient.vol = v; save(); if (this.out && Sound.ctx) this.out.gain.setTargetAtTime(v, Sound.ctx.currentTime, .2); }
 };
+
+/* ---------- 版面加寬 ---------- */
+function applyWide(anim) {
+  const ui = $('#ui'), on = !!state.settings.wide;
+  if (anim) { const c = PERF === 'high' ? 'lay-anim' : 'lay-instant'; ui.classList.remove('lay-anim', 'lay-instant'); ui.classList.add(c); clearTimeout(applyWide.t); applyWide.t = setTimeout(() => ui.classList.remove(c), 650); }
+  ui.classList.toggle('wide', on);
+  const b = $('#layBtn'); if (b) { b.textContent = on ? '«' : '收合 »'; b.title = on ? '展開環境音，回到三欄' : '收合環境音，讓聯絡簿和作息表變寬'; }
+  if (anim && PERF === 'high') { const t0 = performance.now(); const f = () => { placeMarquee(); if (performance.now() - t0 < 640) requestAnimationFrame(f); }; requestAnimationFrame(f); }
+  placeMarqueeSoon();
+}
+/* ---------- 音量偵測：只計算音量大小，不錄音、不存檔、不上傳 ---------- */
+const NZ_PRE = [['自習', 50], ['上課', 60], ['討論', 70]];
+const NZ_OFFSET = 100;     // 麥克風音量（dBFS）換算成估計分貝的位移，每支麥克風不同，所以只當參考
+const noiseHTML = () => `<div class="kicker mt"><span class="dot"></span>音量偵測　·　只看音量，不錄音</div>
+  <div class="nz-state" id="nzState">未開啟</div>
+  <div class="nz-sub" id="nzSub"></div>
+  <div class="nz-meter"><i id="nzFill"></i><s id="nzLine"></s></div>
+  <div class="nz-scale"><span>30</span><span>45</span><span>60</span><span>75</span><span>90</span></div>
+  <div class="nz-row">${NZ_PRE.map(([n, v]) => `<button class="nz-chip" data-nzth="${v}">${n}<small>${v}</small></button>`).join('')}</div>
+  <div class="nz-row">音量過大的界線<input type="range" id="nzTh" min="40" max="90" step="1" aria-label="音量過大的界線"><b id="nzThV"></b></div>
+  <div class="ctrl-row"><button class="start-btn txt sm" data-act="nzToggle" id="nzBtn"><span class="pi">${ic('mic')}</span><span id="nzBtnLbl">開始偵測</span></button></div>`;
+const Noise = {
+  on: false, busy: false, stream: null, src: null, an: null, buf: null, timer: 0, lv: -1, st: 'off', loudAt: 0, ambWas: false, err: '',
+  async start() {
+    if (this.on || this.busy) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { this.err = '這個網址不能使用麥克風，請用 https 網址（例如 GitHub 網址）開啟。'; this.paint(); return; }
+    this.busy = true; this.err = ''; this.paint();
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+      if (state.mode !== 'noise' || curScreen !== 'home') { s.getTracks().forEach(t => t.stop()); this.busy = false; this.paint(); return; }
+      Sound.init(); const ctx = Sound.ctx; if (!ctx) throw new Error('noctx');
+      if (ctx.state !== 'running') await ctx.resume().catch(() => {});
+      this.stream = s; this.src = ctx.createMediaStreamSource(s); this.an = ctx.createAnalyser(); this.an.fftSize = 2048;
+      this.buf = new Float32Array(this.an.fftSize); this.src.connect(this.an);
+      this.ambWas = !!Ambient.out; if (this.ambWas) Ambient.stop();
+      this.on = true; this.lv = -1; this.st = 'quiet'; this.loudAt = 0;
+      this.timer = setInterval(() => this.tick(), 100);
+    } catch (e) {
+      const n = e && e.name;
+      this.err = n === 'NotAllowedError' || n === 'SecurityError' ? '麥克風被封鎖了：點網址列左邊的圖示，把「麥克風」改成允許，再按一次開始。'
+        : n === 'NotFoundError' || n === 'OverconstrainedError' ? '找不到麥克風，請確認電腦有接上麥克風。' : '無法開啟麥克風，請確認沒有其他程式正在使用。';
+    }
+    this.busy = false; this.paint();
+  },
+  stop() {
+    clearInterval(this.timer); this.timer = 0;
+    try { this.src && this.src.disconnect(); } catch (e) {}
+    if (this.stream) this.stream.getTracks().forEach(t => t.stop());
+    const was = this.on; this.stream = this.src = this.an = null; this.on = false; this.st = 'off'; this.lv = -1;
+    $('#centerPanel').classList.remove('nz-loud'); $('#centerBody').classList.remove('nz-q', 'nz-m', 'nz-l');
+    if (was && this.ambWas && state.ambient.id !== 'none') Ambient.play(state.ambient.id);
+    this.ambWas = false; this.paint();
+  },
+  tick() {
+    if (!this.an) return;
+    this.an.getFloatTimeDomainData(this.buf); let s = 0; for (let i = 0; i < this.buf.length; i++) s += this.buf[i] * this.buf[i];
+    const db = clamp(20 * Math.log10(Math.sqrt(s / this.buf.length) + 1e-9) + NZ_OFFSET, 20, 110);
+    this.lv = this.lv < 0 ? db : db > this.lv ? this.lv * .6 + db * .4 : this.lv * .88 + db * .12;   // 變大反應快、變小慢慢降
+    const th = state.settings.nzTh, now = Date.now();
+    let want = this.lv >= th ? 'loud' : this.lv >= th - 10 ? 'mid' : 'quiet';
+    if (want === 'loud' && this.st !== 'loud') { if (!this.loudAt) this.loudAt = now; if (now - this.loudAt < 1500) want = 'mid'; }   // 持續 1.5 秒才算音量過大，關門聲不會誤判
+    else if (want !== 'loud') this.loudAt = 0;
+    if (this.st === 'loud' && want !== 'loud' && this.lv > th - 3) want = 'loud';
+    this.st = want; this.paint();
+  },
+  paint() {
+    const el = id => document.getElementById(id), loud = this.on && this.st === 'loud';
+    $('#centerPanel').classList.toggle('nz-loud', loud);
+    $('#ambPanel').classList.toggle('nz-mute', this.on);
+    const st = el('nzState'); if (!st) return;
+    const host = $('#centerBody'), th = state.settings.nzTh;
+    host.classList.toggle('nz-q', this.on && this.st === 'quiet'); host.classList.toggle('nz-m', this.on && this.st === 'mid'); host.classList.toggle('nz-l', loud);
+    const txt = !this.on ? (this.busy ? '開啟中' : '未開啟') : loud ? '音量過大' : this.st === 'mid' ? '有點吵' : '安靜';
+    if (st.textContent !== txt) st.textContent = txt;
+    const sub = this.err ? `<span class="nz-err">${this.err}</span>` : this.on ? `目前約 <b>${Math.round(this.lv)}</b> 分貝（估計值）` : this.busy ? '請在瀏覽器跳出的視窗按「允許」' : '按「開始偵測」後，瀏覽器會詢問是否允許使用麥克風';
+    if (el('nzSub')._v !== sub) { el('nzSub')._v = sub; el('nzSub').innerHTML = sub; }
+    el('nzFill').style.width = this.on ? (clamp((this.lv - 30) / 60, 0, 1) * 100).toFixed(1) + '%' : '0';
+    el('nzLine').style.left = (clamp((th - 30) / 60, 0, 1) * 100).toFixed(1) + '%';
+    const r = el('nzTh'); if (document.activeElement !== r) r.value = th; el('nzThV').textContent = th;
+    document.querySelectorAll('.nz-chip').forEach(b => b.classList.toggle('on', +b.dataset.nzth === th));
+    el('nzBtnLbl').textContent = this.on ? '停止偵測' : '開始偵測'; el('nzBtn').disabled = this.busy;
+  }
+};
 function renderAmbient() {
   const cur = state.ambient.id;
-  $('#ambList').innerHTML = AMB.map(a => `<div class="amb ${cur === a.id ? 'sel' : ''}" data-amb="${a.id}"><div class="amb-art">${AMB_ART[a.id]}</div><div class="amb-t"><b>${a.name}</b><small>${a.sub}</small></div>${a.id === 'none' ? '' : `<span class="amb-hp">${cur === a.id ? '<span class="eq"><i></i><i></i><i></i></span>' : ic('hp')}</span>`}</div>`).join('');
+  $('#ambList').innerHTML = AMB.map(a => `<div class="amb ${cur === a.id ? 'sel' : ''}" data-amb="${a.id}" title="${a.name}"><div class="amb-art">${AMB_ART[a.id]}</div><div class="amb-t"><b>${a.name}</b><small>${a.sub}</small></div>${a.id === 'none' ? '' : `<span class="amb-hp">${cur === a.id ? '<span class="eq"><i></i><i></i><i></i></span>' : ic('hp')}</span>`}</div>`).join('');
   $('#ambVol').value = Math.round(state.ambient.vol * 100);
 }
 
@@ -2392,7 +2538,7 @@ let curScreen = 'home', uiHidden = false;
 const SCREENS = ['home', 'feed', 'fish', 'dex', 'stats'];
 function rememberView() { try { sessionStorage.setItem('cd-view', JSON.stringify({ mode: state.mode, screen: curScreen, zoom: zoomed })); } catch (e) {} }
 function setScreen(s) {
-  curScreen = s; if (addMode && s !== 'feed') setAddMode(false); setTimeout(rememberView, 0); setTimeout(placeMarqueeSoon, 0); if (s !== 'home' && zoomed) setZoom(false);
+  curScreen = s; if (s !== 'home' && Noise.on) Noise.stop(); if (addMode && s !== 'feed') setAddMode(false); setTimeout(rememberView, 0); setTimeout(placeMarqueeSoon, 0); if (s !== 'home' && zoomed) setZoom(false);
   SCREENS.forEach(k => document.getElementById('scr-' + k).classList.toggle('active', k === s));
   document.querySelectorAll('#bottomNav [data-nav]').forEach(b => b.classList.toggle('on', b.dataset.nav === s));
   closeFishCard();
@@ -3223,7 +3369,7 @@ async function onDrawerAction(act, v, el) {
     case 'mqToggle': state.settings.mqHide = !state.settings.mqHide; save(); renderMarquee(); renderDrawer(); toast(state.settings.mqHide ? '公告欄已隱藏' : '公告欄已顯示'); break;
     case 'mqDefault': state.settings.marquee = MARQUEE_DEFAULT; save(); renderMarquee(); renderDrawer(); toast('已恢復預設跑馬燈'); break;
     case 'toggleBg': state.settings.bgPaused = !state.settings.bgPaused; applySettings(); save(); renderDrawer(); break;
-    case 'toggleSound': state.settings.sound = !state.settings.sound; save(); renderDrawer(); if (state.settings.sound) { Sound.plink(); Ambient.play(state.ambient.id); } else Ambient.stop(); break;
+    case 'toggleSound': state.settings.sound = !state.settings.sound; save(); renderDrawer(); if (state.settings.sound) { Sound.plink(); if (!Noise.on) Ambient.play(state.ambient.id); } else Ambient.stop(); break;
     case 'fullscreen': toggleFullscreen(); break;
     case 'backup': downloadBackup(); break;
     case 'restore': { const f = $('#restoreFile'); f.value = ''; f.onchange = () => { if (f.files[0]) restoreBackup(f.files[0]); }; f.click(); break; }
@@ -3375,6 +3521,8 @@ function onCenterClick(e) {
   if (b.dataset.act === 'wxPlace') { document.getElementById('wxMenu')?.classList.toggle('open'); return; }
   if (b.dataset.wx) { state.weather.place = +b.dataset.wx; state.weather.err = false; save(); renderWx(); loadWeather(true); toast(`天氣地點：${WX_PLACES[state.weather.place][0]}`); return; }
   if (b.dataset.act === 'pkDraw') { drawNumber(); return; }
+  if (b.dataset.act === 'nzToggle') { Noise.on ? Noise.stop() : Noise.start(); return; }
+  if (b.dataset.nzth) { state.settings.nzTh = +b.dataset.nzth; save(); Noise.paint(); return; }
   if (b.dataset.act === 'pkReset') { if (!picking) { state.picker.drawn = []; pkLast = null; save(); updatePicker(); toast('已重新開始抽號'); } return; }
   if (b.dataset.act === 'pkRepeat') { state.picker.noRepeat = !state.picker.noRepeat; save(); updatePicker(); return; }
   if (b.dataset.act === 'tzMenu') { tzMenuOpen = !tzMenuOpen; document.querySelector('.tz-menu')?.classList.toggle('open', tzMenuOpen); return; }
@@ -3396,7 +3544,7 @@ function init() {
   buildScene(); layout(); buildRoster(); buildFish(); buildSchools();
   // 重新整理時：已到時的計時器直接推進到正確狀態（不重播提示音）
   for (let g = 0; g < 4 && state.timer.status === 'running' && state.timer.endAt <= Date.now(); g++) Timer.finish(true);
-  applySettings(); applyPerf(false); renderSchedule(true); renderAmbient();
+  applySettings(); applyPerf(false); applyWide(false); renderSchedule(true); renderAmbient();
   let view = null; try { view = JSON.parse(sessionStorage.getItem('cd-view') || 'null'); } catch (e) {}
   setMode(view && TAB_IDS.includes(view.mode) ? view.mode : 'clock'); setScreen(view && SCREENS.includes(view.screen) ? view.screen : 'home');
   if (view && view.zoom && curScreen === 'home') setZoom(true);
@@ -3457,7 +3605,9 @@ function init() {
     if (e.target.closest('[data-madd]')) addMission();
   });
   $('#schedList').addEventListener('click', e => { const r = e.target.closest('.srow'); if (r) { Sound.init(); focusFromSchedule(+r.dataset.i); } });
-  $('#ambList').addEventListener('click', e => { const a = e.target.closest('[data-amb]'); if (!a) return; Sound.init(); state.ambient.id = a.dataset.amb; save(); Ambient.play(a.dataset.amb); renderAmbient(); });
+  $('#ambList').addEventListener('click', e => { const a = e.target.closest('[data-amb]'); if (!a) return; Sound.init(); state.ambient.id = a.dataset.amb; save(); if (Noise.on) { Noise.ambWas = a.dataset.amb !== 'none'; if (Noise.ambWas) toast('音量偵測中，停止偵測後才會播放環境音'); } else Ambient.play(a.dataset.amb); renderAmbient(); });
+  $('#layBtn').addEventListener('click', () => { state.settings.wide = !state.settings.wide; save(); applyWide(true); });
+  $('#centerBody').addEventListener('input', e => { if (e.target.id === 'nzTh') { state.settings.nzTh = +e.target.value; save(); Noise.paint(); } });
   $('#fishSheet').addEventListener('click', e => { const b = e.target.closest('[data-sell]'); if (b) { confirmSell(+b.dataset.sell); return; } if (e.target.closest('[data-act=sellAll]')) sellAll(); });
   $('#ambVol').addEventListener('input', e => Ambient.setVol(e.target.value / 100));
   // 導覽
@@ -3494,14 +3644,14 @@ function init() {
   // 系統
   window.addEventListener('resize', layout);
   window.addEventListener('orientationchange', () => setTimeout(layout, 250));
-  document.addEventListener('pointerdown', () => { Sound.init(); if (state.ambient.id !== 'none' && !Ambient.out) Ambient.play(state.ambient.id); }, { passive: true });
+  document.addEventListener('pointerdown', () => { Sound.init(); if (state.ambient.id !== 'none' && !Ambient.out && !Noise.on) Ambient.play(state.ambient.id); }, { passive: true });
   document.addEventListener('fullscreenchange', () => { setTimeout(layout, 60); if (drawerOpen && drawerTab === 'special') renderDrawer(); });
   window.addEventListener('beforeunload', saveNow);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); else updateTimeViews(); });
   document.addEventListener('keydown', e => {
     if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#pModal').classList.contains('show') || $('#rdModal').classList.contains('show') || $('#setup').classList.contains('show')) return;
     const k = e.key.toLowerCase();
-    if (k >= '1' && k <= '5') setMode(TAB_IDS[+k - 1]);
+    if (k >= '1' && k <= '6') setMode(TAB_IDS[+k - 1]);
     else if (k === ' ' && state.mode === 'picker') { e.preventDefault(); Sound.init(); drawNumber(); }
     else if (k === ' ') { e.preventDefault(); Sound.init(); const st = state.timer.status; st === 'running' ? Timer.pause() : st === 'paused' ? Timer.resume() : Timer.start(); }
     else if (k === 'f') toggleFullscreen(); else if (k === 't') openDrawer(); else if (k === 'h') setHidden(!uiHidden); else if (k === 'z') setZoom(!zoomed);
