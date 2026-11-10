@@ -960,6 +960,19 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 #whWrap.port .wh-stat:nth-child(3){border-left:0}
 #whHint{position:absolute;left:0;right:0;bottom:5%;text-align:center;font:400 16px var(--sans);letter-spacing:.3em;color:#e6f6f4;opacity:0;transition:opacity 1.3s ease}
 #ach.whtext #whHint{opacity:.45}
+
+/* ---------- 聯絡簿直書（第 1 點在最右邊，由上往下） ---------- */
+.nb-tools{display:flex;align-items:center;gap:8px;flex:none}
+.nb-orient{display:inline-flex;height:32px;border-radius:16px;border:1px solid rgba(255,255,255,.18);overflow:hidden}
+.nb-orient button{padding:0 12px;background:transparent;border:0;color:rgba(241,245,244,.6);font-size:14px;letter-spacing:.1em;cursor:pointer}
+.nb-orient button.on{background:var(--energy);color:#05282c;font-weight:600}
+#ui:not(.wide):not(.portrait) #notesHead{font-size:0;letter-spacing:0}
+#ui:not(.wide):not(.portrait) #notesHead span{font-size:15px;margin-left:0;white-space:nowrap}
+#notesList.vt{writing-mode:vertical-rl;overflow-x:auto;overflow-y:hidden;padding:4px 6px 6px}
+#notesList.vt li{gap:6px;padding:2px 8px 6px;border-bottom:0;border-left:1px dashed rgba(170,220,230,.2);line-height:1.4}
+#notesList.vt li::before,#notesList.vt li button{writing-mode:horizontal-tb}
+#notesList.vt .tcy{text-combine-upright:all}
+#notesList.vt .nb-empty{writing-mode:horizontal-tb;border-left:0}
 </style>
 </head>
 <body>
@@ -1026,7 +1039,7 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
         <div id="schedList"></div>
       </div>
       <div class="lp-view" id="lpNotes">
-        <div class="sched-top"><div class="p-head">CONTACT BOOK<span id="notesDate">聯絡簿</span></div><button class="nb-clear" id="notesClear">清空</button></div>
+        <div class="sched-top"><div class="p-head" id="notesHead">CONTACT BOOK<span id="notesDate">聯絡簿</span></div><div class="nb-tools"><div class="nb-orient" id="nbOrient" title="聯絡簿橫書／直書"><button type="button" data-o="h">橫</button><button type="button" data-o="v">直</button></div><button class="nb-clear" id="notesClear">清空</button></div></div>
         <ol id="notesList"></ol>
         <form class="nb-add" id="notesAdd" autocomplete="off"><input id="notesInput" maxlength="60" placeholder="輸入一項，按 Enter 加入"><button type="submit" aria-label="加入">＋</button></form>
       </div>
@@ -1212,7 +1225,7 @@ const freshStudent = i => ({ seat: i + 1, checked: false, records: [], spent: 0,
 function defaultState() {
   return {
     v: 5, mode: 'clock', coins: 0,
-    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn', marquee: MARQUEE_DEFAULT, mqHide: false, wide: false, nzTh: 60 },
+    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn', marquee: MARQUEE_DEFAULT, mqHide: false, wide: false, nzTh: 60, nbVert: false },
     classFish: freshClassFish(1), collection: [], totalFood: 0, bigSeen: 0, dexDone: false,
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
@@ -2346,10 +2359,14 @@ function updateClockCountdown() {
 function renderNotes() {
   const np = nowParts(); $('#notesDate').textContent = `${np.mo}/${np.d} 聯絡簿`;
   $('#notesList').innerHTML = state.notes.length
-    ? state.notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${escapeHTML(n.t)}</span><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
+    ? state.notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t)}</span><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
     : '<li class="nb-empty">還沒有聯絡簿事項。<br>在下方輸入一項，按 Enter 加入，可以一項一項慢慢加。</li>';
   $('#notesClear').style.visibility = state.notes.length ? 'visible' : 'hidden';
+  const v = !!state.settings.nbVert; $('#notesList').classList.toggle('vt', v);
+  document.querySelectorAll('#nbOrient button').forEach(b => b.classList.toggle('on', (b.dataset.o === 'v') === v));
 }
+// 直書時，三位數以內的數字直立擠成一格（例如 P.32 的 32）；其他文字照原樣
+const nbText = t => escapeHTML(t).replace(/&[^;]+;|\d+/g, m => m[0] === '&' || m.length > 3 ? m : `<span class="tcy">${m}</span>`);
 function addNote(t) {
   t = t.trim(); if (!t) return;
   if (state.notes.length >= 30) { toast('聯絡簿最多 30 項'); return; }
@@ -3781,6 +3798,8 @@ function init() {
     const del = e.target.closest('[data-del]'); if (del) { state.notes.splice(+del.dataset.del, 1); save(); renderNotes(); return; }
     const li = e.target.closest('li[data-i]'); if (li) { const n = state.notes[+li.dataset.i]; n.done = !n.done; save(); renderNotes(); }
   });
+  $('#nbOrient').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const v = b.dataset.o === 'v'; if (v === !!state.settings.nbVert) return; state.settings.nbVert = v; save(); renderNotes(); });
+  $('#notesList').addEventListener('wheel', e => { const L = e.currentTarget; if (!L.classList.contains('vt') || !e.deltaY || L.scrollWidth <= L.clientWidth) return; e.preventDefault(); L.scrollLeft -= e.deltaY; }, { passive: false });   // 直書時滾輪改成左右捲
   $('#notesClear').addEventListener('click', async () => { if (await confirmBox('清空聯絡簿？', `將刪除全部 ${state.notes.length} 項聯絡簿事項。`, '清空')) { state.notes = []; save(); renderNotes(); } });
   $('#daysAdd').addEventListener('click', e => { const b = e.target.closest('[data-cdname]'); if (b) { $('#daysName').value = b.dataset.cdname; $('#daysDate').focus(); } });
   $('#daysAdd').addEventListener('submit', e => {
