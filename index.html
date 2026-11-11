@@ -972,6 +972,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 #notesList.vt li{gap:6px;padding:2px 8px 6px;border-bottom:0;border-left:1px dashed rgba(170,220,230,.2);line-height:1.4}
 #notesList.vt li::before,#notesList.vt li button{writing-mode:horizontal-tb}
 #notesList.vt .tcy{text-combine-upright:all}
+#notesList.vt .upr{text-orientation:upright;letter-spacing:0}
+body.bpmf #notesList.vt li span.upr,body.bpmf #notesList.vt li span.tcy{font-family:var(--sans)!important}   /* 注音字型的英數字直書會躺著，改用一般字型 */
 #notesList.vt .nb-empty{writing-mode:horizontal-tb;border-left:0}
 </style>
 </head>
@@ -2359,14 +2361,27 @@ function updateClockCountdown() {
 function renderNotes() {
   const np = nowParts(); $('#notesDate').textContent = `${np.mo}/${np.d} 聯絡簿`;
   $('#notesList').innerHTML = state.notes.length
-    ? state.notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t)}</span><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
+    ? state.notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t, state.settings.nbVert)}</span><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
     : '<li class="nb-empty">還沒有聯絡簿事項。<br>在下方輸入一項，按 Enter 加入，可以一項一項慢慢加。</li>';
   $('#notesClear').style.visibility = state.notes.length ? 'visible' : 'hidden';
   const v = !!state.settings.nbVert; $('#notesList').classList.toggle('vt', v);
   document.querySelectorAll('#nbOrient button').forEach(b => b.classList.toggle('on', (b.dataset.o === 'v') === v));
 }
 // 直書時，三位數以內的數字直立擠成一格（例如 P.32 的 32）；其他文字照原樣
-const nbText = t => escapeHTML(t).replace(/&[^;]+;|\d+/g, m => m[0] === '&' || m.length > 3 ? m : `<span class="tcy">${m}</span>`);
+// 直書顯示時整理半形字（只改顯示，不改老師輸入的原文）：
+//  半形標點換成全形（括號會變成直書用的︵︶）；三位數以內的數字直立擠成一格；英文字母、較長的數字一個一個直立排列
+const NB_FW = { '(': '（', ')': '）', ',': '，', ':': '：', ';': '；', '!': '！', '?': '？', '~': '～', '[': '［', ']': '］', '<': '〈', '>': '〉' };
+const nbText = (t, vert) => {
+  if (!vert) return escapeHTML(t);
+  // 頁碼「P32、p.5」這種一個字母加二位數以內的數字，合成直立的一格（點省略）；數字之間的 - 改成 ～
+  const fw = t.replace(/(?<![A-Za-z])([A-Za-z])\.?\s?(\d{1,2})(?!\d)/g, '\u0001$1$2\u0002').replace(/(?<=[\d\u0002])\s?[-－–—‐‑−]\s?(?=[A-Za-z\u0001]?\d|\u0001)/g, '~').replace(/[-－–—‐‑−―]+/g, '︱')
+    .replace(/[(),:;!?~\[\]<>]/g, c => NB_FW[c]).replace(/(?<=[A-Za-z\d])\.(?=[A-Za-z\d])|\.(?=\d)/g, '．');
+  return escapeHTML(fw).replace(/\u0001([^\u0002]*)\u0002|&[^;]+;|\d+|[A-Za-z]+|[\/+=%#@*．]/g, (m, pg) =>
+    pg ? `<span class="tcy">${pg}</span>`
+    : m[0] === '&' && m.length > 1 && m.endsWith(';') ? `<span class="upr">${m}</span>`
+    : /^\d+$/.test(m) ? (m.length <= 3 ? `<span class="tcy">${m}</span>` : `<span class="upr">${m}</span>`)
+    : `<span class="upr">${m}</span>`);
+};
 function addNote(t) {
   t = t.trim(); if (!t) return;
   if (state.notes.length >= 30) { toast('聯絡簿最多 30 項'); return; }
