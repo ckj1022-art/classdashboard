@@ -1,9 +1,30 @@
 <!DOCTYPE html>
+<!--
+  班級儀表板 CLASS DASHBOARD・科任版
+  Design by Ray Chen／陳耿睿 · https://www.facebook.com/ray.chen.7370
+  授權：創用 CC 姓名標示─非商業性 4.0 國際（CC BY-NC 4.0）
+        可以免費使用、分享與改作，但必須標示原作者「Ray Chen／陳耿睿」並附上原始連結，且不得用於商業用途。
+        https://creativecommons.org/licenses/by-nc/4.0/deed.zh-hant
+-->
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>班級儀表板・科任版</title>
+<meta name="author" content="Ray Chen／陳耿睿">
+<meta name="description" content="給科任老師的教室大螢幕工具：一台電腦切換多個班級，各班的打卡、任務魚、圖鑑分開記錄。免安裝、免帳號，打開就能用。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="班級儀表板 CLASS DASHBOARD">
+<meta property="og:title" content="班級儀表板・科任版｜一台電腦切換多個班級">
+<meta property="og:description" content="給科任老師的教室大螢幕工具：一台電腦切換多個班級，各班的打卡、任務魚、圖鑑分開記錄。免安裝、免帳號，打開就能用。 Design by Ray Chen／陳耿睿">
+<meta property="og:url" content="https://ckj1022-art.github.io/classdashboard/subject/">
+<meta property="og:image" content="https://ckj1022-art.github.io/classdashboard/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ckj1022-art.github.io/classdashboard/og.jpg">
+
 <!-- ===================================================================
      1. HTML 基本架構（只載入 Google 字型；離線時改用系統字型，版面不受影響）
      =================================================================== -->
@@ -994,6 +1015,16 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 #whWrap.port .wh-stat:nth-child(3){border-left:0}
 #whHint{position:absolute;left:0;right:0;bottom:5%;text-align:center;font:400 16px var(--sans);letter-spacing:.3em;color:#e6f6f4;opacity:0;transition:opacity 1.3s ease}
 #ach.whtext #whHint{opacity:.45}
+
+/* ---------- 作者資訊 ---------- */
+.about-card{display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(170,220,230,.16)}
+.about-card .ab-name{font-size:17px;letter-spacing:.06em;color:#f1f5f4}
+.about-card .ab-name em{font-family:Georgia,'Times New Roman',serif;font-style:italic;letter-spacing:.04em;color:rgba(241,245,244,.85)}
+.about-card .ab-meta{font-size:13px;letter-spacing:.06em;color:rgba(241,245,244,.55);line-height:1.6}
+.about-card a.btn{text-decoration:none;text-align:center}
+.credit-line{margin-top:16px;font-size:12px;letter-spacing:.14em;color:rgba(241,245,244,.38);text-align:center}
+.credit-line em{font-family:Georgia,'Times New Roman',serif;font-style:italic;letter-spacing:.06em}
+.credit-line a{color:inherit;text-decoration:none}
 </style>
 </head>
 <body>
@@ -1197,6 +1228,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
   <p class="ce-note" id="ceNumsNote">科任課一週只上一兩次，進化份數預設為實際人數的一半，之後可在教師控制台調整。</p>
   <label class="lbl">代表色</label><div class="ce-colors" id="ceColors"></div>
   <div class="ce-btns"><button class="btn danger" id="ceDel">刪除這個班級</button><span style="flex:1"></span><button class="btn" id="ceCancel">取消</button><button class="btn primary" id="ceOk">建立</button></div>
+
+  <p class="credit-line" id="ceCredit"><a href="https://www.facebook.com/ray.chen.7370" target="_blank" rel="noopener"><em>Design by Ray Chen</em>　／　陳耿睿</a></p>
 </div></div>
 <div id="classFlash"><div><small>現在上課的班級</small><b id="classFlashName"></b></div></div>
 <div id="rdModal"><div class="modal-card rd-card"><h3 id="rdTitle">兌換點數</h3><p class="rd-info" id="rdInfo"></p>
@@ -3550,6 +3583,13 @@ function renderDrawer() {
       <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn primary" data-act="backup">下載備份檔</button><button class="btn" data-act="restore">從備份檔還原</button></div>
       <input type="file" id="restoreFile" accept=".json,application/json" hidden>
       <p class="note mt-2">也可以把備份檔帶到另一台電腦還原，讓兩台電腦的資料一樣。</p></div>
+
+      <div class="sec"><h3>ABOUT · 關於</h3><div class="about-card">
+        <div class="ab-name">班級儀表板・科任版　<span style="opacity:.5;font-size:13px">v2026.11</span></div>
+        <div class="ab-name"><em>Design by Ray Chen</em>　／　陳耿睿</div>
+        <a class="btn" href="https://www.facebook.com/ray.chen.7370" target="_blank" rel="noopener">到 FB 粉專留言、回饋建議</a>
+        <div class="ab-meta">授權：創用 CC 姓名標示─非商業性 4.0（CC BY-NC 4.0）<br>歡迎免費使用與分享，轉載或改作請標示作者並附上原始連結，不得用於商業用途。</div>
+      </div></div>
       <div class="sec"><h3>DANGER ZONE · 全部重設</h3><button class="btn danger w-full" data-act="resetAll">重置：清除全部資料</button>
       <p class="note mt-2">按下後會詢問兩次才清除。清除後回到第一次使用的畫面，重新設定班級人數。</p></div>`;
   }
@@ -3864,7 +3904,7 @@ let ceMode = 'new', ceId = null, ceColor = CLASS_COLORS[0], ceFeedTouched = fals
 function openClassEditor(mode, id) {
   ceMode = mode; ceId = id || null; ceFeedTouched = false;
   const c = id ? store.classes.find(x => x.id === id) : null, first = mode === 'first';
-  $('#ceTitle').textContent = first ? '建立第一個班級' : c ? '編輯班級' : '新增班級';
+  $('#ceTitle').textContent = first ? '建立第一個班級' : c ? '編輯班級' : '新增班級'; $('#ceCredit').hidden = !first;
   $('#ceIntro').style.display = c ? 'none' : '';
   $('#ceName').value = c ? c.name : '';
   $('#ceNums').style.display = $('#ceNumsNote').style.display = $('#ceEmptyWrap').style.display = c ? 'none' : ''; $('#ceEmpty').value = '';
