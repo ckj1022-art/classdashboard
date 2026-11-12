@@ -1,9 +1,30 @@
 <!DOCTYPE html>
+<!--
+  班級儀表板 CLASS DASHBOARD
+  Design by Ray Chen／陳耿睿 · https://www.facebook.com/ray.chen.7370
+  授權：創用 CC 姓名標示─非商業性 4.0 國際（CC BY-NC 4.0）
+        可以免費使用、分享與改作，但必須標示原作者「Ray Chen／陳耿睿」並附上原始連結，且不得用於商業用途。
+        https://creativecommons.org/licenses/by-nc/4.0/deed.zh-hant
+-->
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>班級儀表板</title>
+<meta name="author" content="Ray Chen／陳耿睿">
+<meta name="description" content="台灣時間大時鐘、聯絡簿、作息表、上課工具，還有全班一起養魚的任務打卡。免安裝、免帳號，打開就能用。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="班級儀表板 CLASS DASHBOARD">
+<meta property="og:title" content="班級儀表板｜教室大螢幕的好幫手">
+<meta property="og:description" content="台灣時間大時鐘、聯絡簿、作息表、上課工具，還有全班一起養魚的任務打卡。免安裝、免帳號，打開就能用。 Design by Ray Chen／陳耿睿">
+<meta property="og:url" content="https://ckj1022-art.github.io/classdashboard/">
+<meta property="og:image" content="https://ckj1022-art.github.io/classdashboard/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://ckj1022-art.github.io/classdashboard/og.jpg">
+
 <!-- ===================================================================
      1. HTML 基本架構（只載入 Google 字型；離線時改用系統字型，版面不受影響）
      =================================================================== -->
@@ -975,6 +996,16 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 #notesList.vt .upr{text-orientation:upright;letter-spacing:0}
 body.bpmf #notesList.vt li span.upr,body.bpmf #notesList.vt li span.tcy{font-family:var(--sans)!important}   /* 注音字型的英數字直書會躺著，改用一般字型 */
 #notesList.vt .nb-empty{writing-mode:horizontal-tb;border-left:0}
+
+/* ---------- 作者資訊 ---------- */
+.about-card{display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(170,220,230,.16)}
+.about-card .ab-name{font-size:17px;letter-spacing:.06em;color:#f1f5f4}
+.about-card .ab-name em{font-family:Georgia,'Times New Roman',serif;font-style:italic;letter-spacing:.04em;color:rgba(241,245,244,.85)}
+.about-card .ab-meta{font-size:13px;letter-spacing:.06em;color:rgba(241,245,244,.55);line-height:1.6}
+.about-card a.btn{text-decoration:none;text-align:center}
+.credit-line{margin-top:16px;font-size:12px;letter-spacing:.14em;color:rgba(241,245,244,.38);text-align:center}
+.credit-line em{font-family:Georgia,'Times New Roman',serif;font-style:italic;letter-spacing:.06em}
+.credit-line a{color:inherit;text-decoration:none}
 </style>
 </head>
 <body>
@@ -1180,6 +1211,7 @@ body.bpmf #notesList.vt li span.upr,body.bpmf #notesList.vt li span.tcy{font-fam
   <div class="setup-row"><div class="flex gap-2 items-center mt-3"><input class="field" id="setupSize" type="number" min="1" max="50" inputmode="numeric" style="flex:1;font-size:22px;text-align:center"><span style="font-size:18px">號</span></div>
   <input class="field mt-2" id="setupEmpty" placeholder="空號（沒有就不用填），例如：7、15" style="width:100%;font-size:17px"><p class="setup-hint" id="setupHint"></p>
   <button class="btn primary w-full mt-3" id="setupOk" style="padding:14px;font-size:18px">開始使用</button></div>
+  <p class="credit-line"><a href="https://www.facebook.com/ray.chen.7370" target="_blank" rel="noopener"><em>Design by Ray Chen</em>　／　陳耿睿</a></p>
 </div></div>
 <div id="toast"></div>
 
@@ -3509,6 +3541,13 @@ function renderDrawer() {
       <div class="grid grid-cols-2 gap-2 mt-2"><button class="btn primary" data-act="backup">下載備份檔</button><button class="btn" data-act="restore">從備份檔還原</button></div>
       <input type="file" id="restoreFile" accept=".json,application/json" hidden>
       <p class="note mt-2">也可以把備份檔帶到另一台電腦還原，讓兩台電腦的資料一樣。</p></div>
+
+      <div class="sec"><h3>ABOUT · 關於</h3><div class="about-card">
+        <div class="ab-name">班級儀表板　<span style="opacity:.5;font-size:13px">v2026.11</span></div>
+        <div class="ab-name"><em>Design by Ray Chen</em>　／　陳耿睿</div>
+        <a class="btn" href="https://www.facebook.com/ray.chen.7370" target="_blank" rel="noopener">到 FB 粉專留言、回饋建議</a>
+        <div class="ab-meta">授權：創用 CC 姓名標示─非商業性 4.0（CC BY-NC 4.0）<br>歡迎免費使用與分享，轉載或改作請標示作者並附上原始連結，不得用於商業用途。</div>
+      </div></div>
       <div class="sec"><h3>DANGER ZONE · 全部重設</h3><button class="btn danger w-full" data-act="resetAll">重置：清除全部資料</button>
       <p class="note mt-2">按下後會詢問兩次才清除。清除後回到第一次使用的畫面，重新設定班級人數。</p></div>`;
   }
