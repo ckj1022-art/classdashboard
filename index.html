@@ -2778,9 +2778,9 @@ function renderNbBoard() {
     : '<li class="nb-empty">今天還沒有聯絡簿事項。</li>';
   document.querySelectorAll('#nbbOrient button').forEach(b => b.classList.toggle('on', (b.dataset.o === 'v') === vt));
   if (!notes.length) return;
-  // 直書：每一直行約放 10 個字（題號圓圈約佔 1 字高，直書字距 0.02em）
+  // 直書：從一直行約 7 個字的大字開始，放不下再逐步縮小（事項多時每行字數會變多）
   const ps = getComputedStyle(L), innerH = L.clientHeight - parseFloat(ps.paddingTop) - parseFloat(ps.paddingBottom);
-  const fMax = vt ? Math.min(110, Math.floor(innerH / (10 * 1.02 + 1.05))) : 104;
+  const fMax = vt ? Math.min(140, Math.floor(innerH / (7 * 1.02 + 1.05))) : 104;
   for (let f = fMax; f >= 30; f -= 2) {
     L.style.setProperty('--nbf', f + 'px');
     if (vt ? L.scrollWidth <= L.clientWidth + 1 : L.scrollHeight <= L.clientHeight + 1) break;
