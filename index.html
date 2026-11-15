@@ -655,8 +655,9 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 #nbbList li.done::before{background:rgba(112,214,189,.35)}
 #nbbList .nb-empty{display:block;border:none;cursor:default;color:rgba(241,245,244,.5);font-size:36px;padding:60px 10px}
 #nbbList .nb-empty::before{display:none}
-#nbbList.vt{writing-mode:vertical-rl;padding:28px 48px 20px}
-#nbbList.vt li{gap:calc(var(--nbf) * .28);padding:0 calc(var(--nbf) * .22);border-bottom:0;border-left:2px dashed rgba(170,220,230,.18);line-height:1.45}
+#nbbList.vt{writing-mode:vertical-rl;padding:14px 48px 8px}
+#nbbList.vt li{gap:calc(var(--nbf) * .2);padding:0 calc(var(--nbf) * .22);border-bottom:0;border-left:2px dashed rgba(170,220,230,.18);line-height:1.45;letter-spacing:.02em}
+#nbbList.vt li::before{width:calc(var(--nbf) * .82);height:calc(var(--nbf) * .82)}
 #nbbList.vt li::before{writing-mode:horizontal-tb;margin:0 0 0 0}
 #nbbList.vt .tcy{text-combine-upright:all}
 #nbbList.vt .upr{text-orientation:upright;letter-spacing:0}
@@ -961,6 +962,19 @@ body.bpmf #nbbList.vt li span.upr,body.bpmf #nbbList.vt li span.tcy{font-family:
 #ui.portrait #rosterTitle{flex-basis:100%;margin-right:0;overflow-x:auto}
 #schedEd{position:fixed;inset:0;z-index:58;display:none;place-items:center;background:rgba(2,8,14,.6);overflow-y:auto;padding:12px}
 #schedEd.show{display:grid}
+#nbBatch{position:fixed;inset:0;z-index:58;display:none;place-items:center;background:rgba(2,8,14,.6);overflow-y:auto;padding:12px}
+#nbBatch.show{display:grid}
+#nbbText{width:100%;height:min(46vh,380px);resize:vertical;padding:14px 16px;border-radius:14px;border:1px solid rgba(170,220,230,.25);background:rgba(2,14,24,.7);color:#eef6f6;font:17px/1.75 var(--sans);outline:none}
+#nbbText:focus{border-color:rgba(112,214,189,.6)}
+#nbbInfo{min-height:24px;margin:10px 2px 16px;font-size:14px;line-height:1.7;color:rgba(241,245,244,.7)}
+#nbbInfo b{color:var(--energy)} #nbbInfo .warn{color:var(--gold)}
+.nb-days{display:flex;align-items:center;gap:6px;margin:10px 18px 0 22px}
+.nbd-btn{width:30px;height:30px;flex:none;border-radius:50%;border:1px solid rgba(170,220,230,.25);background:rgba(255,255,255,.05);color:var(--ink);font:500 18px/1 var(--sans);display:grid;place-items:center;cursor:pointer}
+.nbd-btn:hover{background:rgba(255,255,255,.14)}
+#nbDay{font:500 17px var(--sans);letter-spacing:.04em;color:var(--ink);white-space:nowrap}
+#nbDay em{font-style:normal;margin-left:6px;padding:1px 8px;border-radius:10px;font-size:13px;background:rgba(112,214,189,.18);color:var(--energy)}
+#nbDay em.fut{background:rgba(242,182,93,.18);color:var(--gold)}
+#nbDay em.past{background:rgba(255,255,255,.08);color:rgba(241,245,244,.6)}
 .se-card{width:min(620px,94vw)}
 .se-hint{font-size:15px}
 .se-hint code{font-family:var(--mono);color:var(--energy);background:rgba(112,214,189,.1);padding:1px 6px;border-radius:6px}
@@ -1166,6 +1180,7 @@ body.bpmf #notesList.vt li span.upr,body.bpmf #notesList.vt li span.tcy{font-fam
       </div>
       <div class="lp-view" id="lpNotes">
         <div class="sched-top"><div class="p-head" id="notesHead">CONTACT BOOK<span id="notesDate">聯絡簿</span></div><div class="nb-tools"><div class="nb-orient" id="nbOrient" title="聯絡簿橫書／直書"><button type="button" data-o="h">橫</button><button type="button" data-o="v">直</button></div><button class="nb-clear" id="notesClear">清空</button><button class="nb-clear nb-big" id="notesBig" title="抄寫模式：全螢幕放大聯絡簿（Esc 離開）"><i data-ic="expand"></i>抄寫</button></div></div>
+        <div class="nb-days"><button type="button" class="nbd-btn" id="nbPrev" title="前一天">‹</button><span id="nbDay">今天</span><button type="button" class="nbd-btn" id="nbNext" title="後一天">›</button><span style="flex:1"></span><button type="button" class="nb-clear" id="nbMulti" title="一次輸入好幾天的聯絡簿">多天輸入</button></div>
         <ol id="notesList"></ol>
         <form class="nb-add" id="notesAdd" autocomplete="off"><input id="notesInput" maxlength="60" placeholder="輸入一項，按 Enter 加入"><button type="submit" aria-label="加入">＋</button></form>
       </div>
@@ -1301,6 +1316,13 @@ body.bpmf #notesList.vt li span.upr,body.bpmf #notesList.vt li span.tcy{font-fam
   <div id="seInfo"></div>
   <div class="se-btns"><button class="btn" id="seDefault">換回範例</button><span style="flex:1"></span><button class="btn" id="seCancel">取消</button><button class="btn primary" id="seSave">儲存</button></div>
 </div></div>
+<div id="nbBatch"><div class="modal-card se-card">
+  <h3>一次輸入多天聯絡簿</h3>
+  <p class="se-hint">日期一行，下面一行一項事項。到了那一天，聯絡簿會自動換成當天的內容。<br>例如：<code>11/16（一）</code>換行<code>數學習作 P.32～33</code>。畫面上有的日期會整天改成這裡寫的內容。</p>
+  <textarea id="nbbText" spellcheck="false"></textarea>
+  <div id="nbbInfo"></div>
+  <div class="se-btns"><button class="btn" id="nbbSample">放入範例</button><span style="flex:1"></span><button class="btn" id="nbbCancel">取消</button><button class="btn primary" id="nbbSave">排入聯絡簿</button></div>
+</div></div>
 <div id="rdModal"><div class="modal-card rd-card"><h3 id="rdTitle">兌換點數</h3><p class="rd-info" id="rdInfo"></p>
   <div class="rd-chips" id="rdChips"></div>
   <label class="lbl" style="display:block;margin:16px 0 6px;font-size:14px;color:rgba(241,245,244,.7)">或自己輸入</label>
@@ -1370,7 +1392,7 @@ function defaultState() {
     classFish: freshClassFish(1), collection: [], totalFood: 0, bigSeen: 0, dexDone: false, giftUsed: [],
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
-    taskSel: 't2', ambient: { id: 'none', vol: .5 }, picker: { noRepeat: true, drawn: [] }, weather: { place: 0, data: null, at: 0, dataPlace: -1, err: false }, leftTab: 'notes', schedText: '', rewards: DEFAULT_REWARDS.map(r => ({ ...r })), notes: [], countdowns: [],
+    taskSel: 't2', ambient: { id: 'none', vol: .5 }, picker: { noRepeat: true, drawn: [] }, weather: { place: 0, data: null, at: 0, dataPlace: -1, err: false }, leftTab: 'notes', schedText: '', rewards: DEFAULT_REWARDS.map(r => ({ ...r })), notes: [], notesBook: {}, countdowns: [],
     timer: { duration: 20 * 60000, remaining: 20 * 60000, endAt: null, status: 'idle', kind: 'focus', phase: 'work', round: 1 },
     homework: { title: '今日任務', deadline: Date.now() + 60 * 60000, fish: freshHwFish() },
     hwHistory: [],
@@ -1425,6 +1447,9 @@ function sanitize(d) {
   s.schedText = typeof d.schedText === 'string' ? d.schedText.slice(0, 4000) : '';
   s.countdowns = Array.isArray(d.countdowns) ? d.countdowns.filter(c => c && c.name && /^\d{4}-\d{2}-\d{2}$/.test(c.date)).slice(0, 10) : [];
   s.notes = Array.isArray(d.notes) ? d.notes.filter(n => n && typeof n.t === 'string').slice(0, 30) : [];
+  // 聯絡簿依日期存放：{ 'YYYY-MM-DD': [事項…] }
+  s.notesBook = {};
+  if (d.notesBook && typeof d.notesBook === 'object') for (const k in d.notesBook) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(d.notesBook[k])) s.notesBook[k] = d.notesBook[k].filter(n => n && typeof n.t === 'string').slice(0, 30);
   s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = parseInt(s.weather.place) || 0;   // 地點清單的對應在 init 時處理（migrateWxPlace）
   s.missions = d.missions; s.missionIdx = d.missionIdx;
   s.emptySeats = Array.isArray(d.emptySeats) ? [...new Set(d.emptySeats.filter(n => Number.isInteger(n) && n >= 1 && n <= 50))].sort((a, b) => a - b) : [];
@@ -2595,6 +2620,7 @@ function initPicker() {
 }
 
 function updateTimeViews() {
+  checkNotesDay();
   const t = state.timer;
   if (t.status === 'running' && t.endAt <= Date.now()) { Timer.finish(); return; }
   const p = nowParts(), rem = Timer.remaining(), el = id => document.getElementById(id);
@@ -2675,6 +2701,67 @@ function updateClockCountdown() {
   const up = sortedCountdowns().find(c => c.n >= 0);
   el.innerHTML = up ? `<div class="cf-cd">${up.n === 0 ? `今天就是<b style="font-size:34px">${escapeHTML(up.name)}</b>` : `距離${escapeHTML(up.name)}<b>${up.n}</b>天`}</div>` : `<div class="cf-stat"><span id="cDone">${doneCount()}</span><small>　/ <span id="cTotal">${activeN()}</span> 已完成</small></div>`;
 }
+/* ---------- 聯絡簿依日期：可預先排好之後幾天，過了午夜自動換成當天內容 ---------- */
+const WD = '日一二三四五六';
+const dayKey = (ts = Date.now()) => { const p = nowParts(ts); return `${p.y}-${pad(+p.mo)}-${pad(+p.d)}`; };
+const keyDate = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d, 12); };
+const keyShift = (k, n) => { const t = keyDate(k); t.setDate(t.getDate() + n); return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`; };
+const keyLabel = k => { const t = keyDate(k); return `${t.getMonth() + 1}/${t.getDate()}（${WD[t.getDay()]}）`; };
+let nbView = null, nbLastDay = null;          // nbView：正在看的日期（null＝今天）
+const nbKey = () => nbView || dayKey();
+function NB(k = nbKey()) { return state.notesBook[k] || (state.notesBook[k] = []); }
+// 清掉 14 天前的紀錄與空白的日子
+function pruneNotes() {
+  const today = dayKey(), old = keyShift(today, -14);
+  for (const k in state.notesBook) if (k < old || (k !== today && !state.notesBook[k].length)) delete state.notesBook[k];
+}
+function checkNotesDay() {
+  const dk = dayKey();
+  if (dk === nbLastDay) return;
+  const was = nbLastDay; nbLastDay = dk;
+  if (was) { if (nbView === was || nbView === dk) nbView = null; pruneNotes(); save(); renderNotes(); }
+}
+/* 多天輸入：解析「日期一行、事項一行」 */
+function parseNbBatch(text) {
+  const out = [], now = new Date(), clean = t => t.replace(/^\s*(?:\d{1,2}\s*[.、．)）]|[（(]\d{1,2}[)）]|[①-⑳]|[-•・*＊])\s*/, '').trim();
+  let cur = null;
+  for (let line of text.split(/\r?\n/)) {
+    line = line.trim(); if (!line) continue;
+    const m = line.match(/^(?:(\d{4})\s*[\/.\-年]\s*)?(\d{1,2})\s*[\/.\-月]\s*(\d{1,2})\s*日?\s*(?:[（(]\s*(?:星期|週|周|禮拜)?[一二三四五六日天]\s*[)）]|(?:星期|週|周|禮拜)[一二三四五六日天])?\s*[:：]?\s*(.*)$/);
+    if (m && +m[2] >= 1 && +m[2] <= 12 && +m[3] >= 1 && +m[3] <= 31) {
+      let y = m[1] ? +m[1] : now.getFullYear(); const mo = +m[2];
+      if (!m[1]) { if (mo < now.getMonth() + 1 - 6) y++; else if (mo > now.getMonth() + 1 + 6) y--; }   // 跨年
+      cur = out.find(o => o.key === `${y}-${pad(mo)}-${pad(+m[3])}`) || (out.push({ key: `${y}-${pad(mo)}-${pad(+m[3])}`, items: [] }), out[out.length - 1]);
+      if (m[4] && clean(m[4])) cur.items.push(clean(m[4]).slice(0, 60));
+      continue;
+    }
+    if (!cur) { cur = { key: nbKey(), items: [] }; out.push(cur); }
+    const t = clean(line); if (t) cur.items.push(t.slice(0, 60));
+  }
+  return out.sort((a, b) => a.key < b.key ? -1 : 1);
+}
+function nbBatchInfo() {
+  const days = parseNbBatch($('#nbbText').value), today = dayKey();
+  $('#nbbInfo').innerHTML = days.length
+    ? '會排入 ' + days.map(d => `<b>${keyLabel(d.key)}</b> ${d.items.length} 項`).join('、') + (days.some(d => d.key < today) ? '<br><span class="warn">有日期已經過去了，仍會存進去，可以用 ‹ 往回翻查看。</span>' : '') + (days.some(d => d.items.length > 30) ? '<br><span class="warn">每天最多 30 項，超過的不會排入。</span>' : '')
+    : '還沒有內容。日期一行，下面一行一項事項。';
+}
+function openNbBatch() {
+  // 預先放入今天之後已經排好的日子，方便修改
+  const today = dayKey(), ks = Object.keys(state.notesBook).filter(k => k >= today && state.notesBook[k].length).sort();
+  $('#nbbText').value = ks.map(k => keyLabel(k) + '\n' + state.notesBook[k].map(n => n.t).join('\n')).join('\n\n');
+  nbBatchInfo(); $('#nbBatch').classList.add('show'); setTimeout(() => $('#nbbText').focus(), 50);
+}
+function saveNbBatch() {
+  const days = parseNbBatch($('#nbbText').value);
+  if (!days.length) { toast('沒有可以排入的內容'); return; }
+  days.forEach(d => {
+    const old = state.notesBook[d.key] || [];
+    state.notesBook[d.key] = d.items.slice(0, 30).map(t => { const o = old.find(n => n.t === t); return o || { t, done: false, at: Date.now() }; });
+  });
+  pruneNotes(); save(); renderNotes(); $('#nbBatch').classList.remove('show');
+  toast(`已排入 ${days.length} 天、共 ${days.reduce((a, d) => a + Math.min(30, d.items.length), 0)} 項聯絡簿`);
+}
 let nbZoomed = false;
 function setNbZoom(v) {
   nbZoomed = v; if (v) { if (zoomed) setZoom(false); if (curScreen !== 'home') setScreen('home'); }
@@ -2683,26 +2770,31 @@ function setNbZoom(v) {
 }
 // 抄寫模式：字體從大往小試，找出能一次放下全部事項的最大字
 function renderNbBoard() {
-  const np = nowParts(), wk = '日一二三四五六'[new Date().getDay()], vt = !!state.settings.nbVert, L = $('#nbbList');
-  $('#nbbDate').textContent = `${np.mo} 月 ${np.d} 日（${wk}）聯絡簿`;
+  const kd = keyDate(nbKey()), vt = !!state.settings.nbVert, L = $('#nbbList'), notes = NB();
+  $('#nbbDate').textContent = `${kd.getMonth() + 1} 月 ${kd.getDate()} 日（${WD[kd.getDay()]}）聯絡簿`;
   L.classList.toggle('vt', vt);
-  L.innerHTML = state.notes.length
-    ? state.notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t, vt)}</span></li>`).join('')
+  L.innerHTML = notes.length
+    ? notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t, vt)}</span></li>`).join('')
     : '<li class="nb-empty">今天還沒有聯絡簿事項。</li>';
   document.querySelectorAll('#nbbOrient button').forEach(b => b.classList.toggle('on', (b.dataset.o === 'v') === vt));
-  if (!state.notes.length) return;
-  for (let f = 104; f >= 30; f -= 4) {
+  if (!notes.length) return;
+  // 直書：每一直行約放 10 個字（題號圓圈約佔 1 字高，直書字距 0.02em）
+  const ps = getComputedStyle(L), innerH = L.clientHeight - parseFloat(ps.paddingTop) - parseFloat(ps.paddingBottom);
+  const fMax = vt ? Math.min(110, Math.floor(innerH / (10 * 1.02 + 1.05))) : 104;
+  for (let f = fMax; f >= 30; f -= 2) {
     L.style.setProperty('--nbf', f + 'px');
     if (vt ? L.scrollWidth <= L.clientWidth + 1 : L.scrollHeight <= L.clientHeight + 1) break;
   }
 }
 function renderNotes() {
   if (nbZoomed) renderNbBoard();
-  const np = nowParts(); $('#notesDate').textContent = `${np.mo}/${np.d} 聯絡簿`;
-  $('#notesList').innerHTML = state.notes.length
-    ? state.notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t, state.settings.nbVert)}</span><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
-    : '<li class="nb-empty">還沒有聯絡簿事項。<br>在下方輸入一項，按 Enter 加入，可以一項一項慢慢加。</li>';
-  $('#notesClear').style.visibility = state.notes.length ? 'visible' : 'hidden';
+  const k = nbKey(), today = dayKey(), notes = NB(k), diff = Math.round((keyDate(k) - keyDate(today)) / 864e5);
+  $('#notesDate').textContent = '聯絡簿';
+  $('#nbDay').innerHTML = keyLabel(k) + (diff === 0 ? '<em>今天</em>' : diff === 1 ? '<em class="fut">明天</em>' : diff > 1 ? `<em class="fut">${diff} 天後</em>` : `<em class="past">${-diff} 天前</em>`);
+  $('#notesList').innerHTML = notes.length
+    ? notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t, state.settings.nbVert)}</span><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
+    : `<li class="nb-empty">${diff === 0 ? '今天還沒有聯絡簿事項。' : `${keyLabel(k)} 還沒有事項。`}<br>在下方輸入一項，按 Enter 加入；<br>要排好幾天，按右上「多天輸入」。</li>`;
+  $('#notesClear').style.visibility = notes.length ? 'visible' : 'hidden';
   const v = !!state.settings.nbVert; $('#notesList').classList.toggle('vt', v);
   document.querySelectorAll('#nbOrient button').forEach(b => b.classList.toggle('on', (b.dataset.o === 'v') === v));
 }
@@ -2723,8 +2815,8 @@ const nbText = (t, vert) => {
 };
 function addNote(t) {
   t = t.trim(); if (!t) return;
-  if (state.notes.length >= 30) { toast('聯絡簿最多 30 項'); return; }
-  state.notes.push({ t, done: false, at: Date.now() }); save(); renderNotes();
+  const notes = NB(); if (notes.length >= 30) { toast('聯絡簿最多 30 項'); return; }
+  notes.push({ t, done: false, at: Date.now() }); save(); renderNotes();
   const l = $('#notesList'); l.scrollTop = l.scrollHeight;
 }
 function renderSchedule(force) {
@@ -4428,6 +4520,9 @@ function init() {
   buildScene(); layout(); buildRoster(); buildFish(); buildSchools();
   // 重新整理時：已到時的計時器直接推進到正確狀態（不重播提示音）
   for (let g = 0; g < 4 && state.timer.status === 'running' && state.timer.endAt <= Date.now(); g++) Timer.finish(true);
+  // 舊版只有「一份」聯絡簿：搬到今天
+  if (state.notes.length) { const k = dayKey(); if (!(state.notesBook[k] || []).length) state.notesBook[k] = state.notes; state.notes = []; save(); }
+  pruneNotes(); nbLastDay = dayKey();
   applySettings(); applyPerf(false); applyWide(false); applyTheme(); renderSchedule(true); renderAmbient();
   let view = null; try { view = JSON.parse(sessionStorage.getItem('cd-view') || 'null'); } catch (e) {}
   setMode(view && TAB_IDS.includes(view.mode) ? view.mode : 'clock'); setScreen(view && SCREENS.includes(view.screen) ? view.screen : 'home');
@@ -4450,17 +4545,25 @@ function init() {
   document.querySelectorAll('.lp-tab').forEach(b => b.addEventListener('click', () => setLeftTab(b.dataset.lp)));
   $('#notesAdd').addEventListener('submit', e => { e.preventDefault(); addNote($('#notesInput').value); $('#notesInput').value = ''; $('#notesInput').focus(); });
   $('#notesList').addEventListener('click', e => {
-    const del = e.target.closest('[data-del]'); if (del) { state.notes.splice(+del.dataset.del, 1); save(); renderNotes(); return; }
-    const li = e.target.closest('li[data-i]'); if (li) { const n = state.notes[+li.dataset.i]; n.done = !n.done; save(); renderNotes(); }
+    const del = e.target.closest('[data-del]'); if (del) { NB().splice(+del.dataset.del, 1); save(); renderNotes(); return; }
+    const li = e.target.closest('li[data-i]'); if (li) { const n = NB()[+li.dataset.i]; n.done = !n.done; save(); renderNotes(); }
   });
   $('#notesBig').addEventListener('click', () => setNbZoom(true));
   window.addEventListener('resize', () => { if (nbZoomed) setTimeout(renderNbBoard, 80); });
   $('#nbbClose').addEventListener('click', () => setNbZoom(false));
-  $('#nbbList').addEventListener('click', e => { const li = e.target.closest('li[data-i]'); if (li) { const n = state.notes[+li.dataset.i]; n.done = !n.done; save(); renderNotes(); } });
+  $('#nbbList').addEventListener('click', e => { const li = e.target.closest('li[data-i]'); if (li) { const n = NB()[+li.dataset.i]; n.done = !n.done; save(); renderNotes(); } });
+  $('#nbPrev').addEventListener('click', () => { const k = keyShift(nbKey(), -1); if (k < keyShift(dayKey(), -14)) { toast('只保留最近 14 天的聯絡簿'); return; } nbView = k === dayKey() ? null : k; renderNotes(); });
+  $('#nbNext').addEventListener('click', () => { const k = keyShift(nbKey(), 1); if (k > keyShift(dayKey(), 60)) return; nbView = k === dayKey() ? null : k; renderNotes(); });
+  $('#nbDay').addEventListener('click', () => { nbView = null; renderNotes(); });
+  $('#nbMulti').addEventListener('click', openNbBatch);
+  $('#nbbText').addEventListener('input', nbBatchInfo);
+  $('#nbbCancel').addEventListener('click', () => $('#nbBatch').classList.remove('show'));
+  $('#nbbSave').addEventListener('click', saveNbBatch);
+  $('#nbbSample').addEventListener('click', () => { const t = dayKey(); $('#nbbText').value = [1, 2, 3].map((n, i) => keyLabel(keyShift(t, n)) + '\n' + [['數學習作 P.32～33', '國語：生字第五課圈詞', '聯絡簿請家長簽名'], ['英文單字 Unit 3 小考', '明天帶美勞用具（剪刀、膠水）'], ['自然習作 P.20', '週末閱讀心得']][i].join('\n')).join('\n\n'); nbBatchInfo(); });
   $('#nbbOrient').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const v = b.dataset.o === 'v'; if (v === !!state.settings.nbVert) return; state.settings.nbVert = v; save(); renderNotes(); });
   $('#nbOrient').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const v = b.dataset.o === 'v'; if (v === !!state.settings.nbVert) return; state.settings.nbVert = v; save(); renderNotes(); });
   $('#notesList').addEventListener('wheel', e => { const L = e.currentTarget; if (!L.classList.contains('vt') || !e.deltaY || L.scrollWidth <= L.clientWidth) return; e.preventDefault(); L.scrollLeft -= e.deltaY; }, { passive: false });   // 直書時滾輪改成左右捲
-  $('#notesClear').addEventListener('click', async () => { if (await confirmBox('清空聯絡簿？', `將刪除全部 ${state.notes.length} 項聯絡簿事項。`, '清空')) { state.notes = []; save(); renderNotes(); } });
+  $('#notesClear').addEventListener('click', async () => { const k = nbKey(); if (await confirmBox(`清空 ${keyLabel(k)} 的聯絡簿？`, `將刪除這一天的 ${NB(k).length} 項聯絡簿事項，其他日子不受影響。`, '清空')) { state.notesBook[k] = []; save(); renderNotes(); } });
   $('#daysAdd').addEventListener('click', e => { const b = e.target.closest('[data-cdname]'); if (b) { $('#daysName').value = b.dataset.cdname; $('#daysDate').focus(); } });
   $('#daysAdd').addEventListener('submit', e => {
     e.preventDefault(); const name = $('#daysName').value.trim(), date = $('#daysDate').value;
