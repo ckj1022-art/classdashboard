@@ -191,7 +191,7 @@ body.bpmf #btnBpmf{color:var(--gold);border-color:rgba(242,182,93,.6);background
    其他按鈕、分頁、天氣、教師控制台都維持原字型，不會跑版 */
 body.bpmf{--bpmf:'Bpmf Huninn','PingFang TC','Microsoft JhengHei',sans-serif}
 body.bpmf.bp-kai{--bpmf:'Bpmf Zihi Kai Std','BiauKai','DFKai-SB','PingFang TC',serif}
-body.bpmf :is(#whText h2,#whSub,#whFact,.wh-stat small,.wh-stat b,#nzState,#notesList li span,.srow .sname,.sbreak,.m-tab .mt-name,#hwTitleView,#feedSub,.cd-txt b,.cf-cd,#cWeek,#pkLbl,
+body.bpmf :is(#whText h2,#whSub,#whFact,.wh-stat small,.wh-stat b,#nzState,#notesList li span,#nbbList li span,.srow .sname,.sbreak,.m-tab .mt-name,#hwTitleView,#feedSub,.cd-txt b,.cf-cd,#cWeek,#pkLbl,
   .dc .nm,.fc-lb,#fishCard h4,#evoTitle,#evoName,#evoBadge,#evoSeat,#mqText){font-family:var(--bpmf)!important}
 body.bpmf .cf-cd b{font-family:var(--num)!important}
 body.bpmf .m-tab{max-width:270px;padding:0 12px;gap:8px}
@@ -664,6 +664,8 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 body.bpmf #nbbList.vt li span.upr,body.bpmf #nbbList.vt li span.tcy{font-family:var(--sans)!important}
 #nbbList.vt .nb-empty{writing-mode:horizontal-tb;border-left:0}
 #ui.portrait #nbBoard{left:40px;top:150px;width:1000px;height:calc(var(--sh) - 330px)}
+.nbb-bpmf{flex:none;height:52px;padding:0 20px;border-radius:26px;border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(241,245,244,.7);font:500 21px var(--sans);letter-spacing:.06em;white-space:nowrap;cursor:pointer}
+.nbb-bpmf.on{color:var(--gold);border-color:rgba(242,182,93,.6);background:rgba(242,182,93,.12)}
 .nbb-head .p-head{white-space:nowrap}.nbb-close,.nbb-tools .nb-orient{flex:none;white-space:nowrap}
 #ui.portrait .nbb-head{flex-wrap:wrap;row-gap:16px;padding:0 36px 18px}
 #ui.portrait .nbb-head .p-head span{font-size:34px}
@@ -1303,7 +1305,7 @@ body.bpmf #notesList.vt li span.upr,body.bpmf #notesList.vt li span.tcy{font-fam
 
   <div id="nbBoard" class="panel pe" aria-hidden="true">
     <div class="nbb-head"><div class="p-head">CONTACT BOOK<span id="nbbDate">聯絡簿</span></div>
-      <div class="nbb-tools"><div class="nb-orient" id="nbbOrient" title="橫書／直書"><button type="button" data-o="h">橫</button><button type="button" data-o="v">直</button></div><button class="nbb-close" id="nbbClose"><i data-ic="shrink"></i>結束抄寫</button></div></div>
+      <div class="nbb-tools"><button type="button" class="nbb-bpmf" id="nbbBpmf" title="注音：抄寫的文字加上注音">ㄅ 注音</button><div class="nb-orient" id="nbbOrient" title="橫書／直書"><button type="button" data-o="h">橫</button><button type="button" data-o="v">直</button></div><button class="nbb-close" id="nbbClose"><i data-ic="shrink"></i>結束抄寫</button></div></div>
     <ol id="nbbList"></ol>
   </div>
   <nav id="bottomNav" class="chrome pe">
@@ -2877,6 +2879,7 @@ function renderNbBoard() {
     ? notes.map((n, i) => `<li class="${n.done ? 'done' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t, vt)}</span></li>`).join('')
     : '<li class="nb-empty">今天還沒有聯絡簿事項。</li>';
   document.querySelectorAll('#nbbOrient button').forEach(b => b.classList.toggle('on', (b.dataset.o === 'v') === vt));
+  $('#nbbBpmf').classList.toggle('on', !!state.settings.bpmf);
   if (!notes.length) return;
   // 直書：從一直行約 7 個字的大字開始，放不下再逐步縮小（事項多時每行字數會變多）
   const ps = getComputedStyle(L), innerH = L.clientHeight - parseFloat(ps.paddingTop) - parseFloat(ps.paddingBottom);
@@ -4642,12 +4645,13 @@ function loadBpmfCss(key) {
 function applyBpmf(announce) {
   const on = !!state.settings.bpmf, key = state.settings.bpmfFont || 'huninn', fam = BPMF_FONTS[key].family;
   document.body.classList.toggle('bpmf', on); document.body.classList.toggle('bp-kai', key === 'kai');
+  if (nbZoomed) renderNbBoard();
   if (!on) { if (announce) toast('已關閉注音'); return; }
   // 先等樣式表下載完，再確認字型可以用（只下載畫面上用到的字）
   if (announce && !bpmfCss[key]) toast('正在載入注音字型…');
   loadBpmfCss(key)
     .then(() => document.fonts ? document.fonts.load(`24px "${fam}"`, '注音') : [1])
-    .then(f => { if (!f || !f.length) throw new Error('font'); if (announce) toast(`已開啟注音（${BPMF_FONTS[key].label}）`); })
+    .then(f => { if (!f || !f.length) throw new Error('font'); if (announce) toast(`已開啟注音（${BPMF_FONTS[key].label}）`); if (nbZoomed) (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(renderNbBoard, 300)); })
     .catch(() => { if (state.settings.bpmf && (state.settings.bpmfFont || 'huninn') === key) toast('注音字型載入失敗，請確認網路連線後再按一次「ㄅ」'); });
 }
 function toggleFullscreen() {
@@ -4857,6 +4861,7 @@ function init() {
   $('#tankChip').addEventListener('click', () => setScreen('dex'));
   $('#btnPerf').addEventListener('click', e => { e.stopPropagation(); cyclePerf(); });
   $('#btnBpmf').addEventListener('click', e => { e.stopPropagation(); state.settings.bpmf = !state.settings.bpmf; save(); applyBpmf(true); });
+  $('#nbbBpmf').addEventListener('click', () => { state.settings.bpmf = !state.settings.bpmf; save(); applyBpmf(true); });
   document.addEventListener('pointerdown', () => { if (PERF !== 'min') return; perfBoost = performance.now() + 12000; if (perfIdle) { clearTimeout(perfIdleTimer); perfIdle = false; lastT = performance.now(); requestAnimationFrame(frame); } }, true);
   // 作息表編輯
   const seInfo = () => {
