@@ -1480,6 +1480,9 @@ html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) :is(#notesList li,.srow,.cd
 html.t-pastel #marquee .mq-ed{color:var(--tx);border-color:rgba(21,77,82,.22);background-color:rgba(255,255,255,.55)}
 html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) .nb-orient button.on,html.t-pastel .lp-tab.on{color:#fff!important}
 html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) :is(.wx-sel,.wx-select,.wx-r,.wx-r b){color:var(--tx)}
+html.t-pastel #centerPanel{background:linear-gradient(180deg,#A9DBCD 0%,#C4E6DC 40%,#EFF8F5 62%,#E6F2EE 100%)}
+html.t-pastel #taskPanel,html.t-pastel #ambPanel{background:linear-gradient(180deg,#C9E8DF 0%,#DDF0EA 40%,#F3FAF8 62%,#E6F2EE 100%)}
+html.t-pastel #ui.zoom:not(.portrait) #centerPanel{transform:translate(-40px,-32px) scale(1.5)}
 </style>
 <style id="bc-link">
 /* Bubble Check 串連：右欄「訂正」分頁 */
@@ -1494,7 +1497,7 @@ html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) :is(.wx-sel,.wx-select,.wx-
 #ui.wide:not(.portrait) #ambPanel.has-bc .rp-tabs{display:none}#ui.wide:not(.portrait) #ambPanel.has-bc .amb-head>span{display:inline}
 #ui.wide:not(.portrait) #ambPanel.has-bc.show-bc #ambList{display:block}#ui.wide:not(.portrait) #ambPanel.has-bc.show-bc .vol-row{display:flex}#ui.wide:not(.portrait) #ambPanel.has-bc.show-bc #bcView{display:none}
 .bc-top{display:flex;align-items:baseline;gap:10px;padding:14px 26px 8px}.bc-top b{font:700 21px var(--sans);letter-spacing:.06em}.bc-top span{margin-left:auto;font-size:15px;color:var(--gold);white-space:nowrap}
-#bcList{flex:1;min-height:0;overflow-y:auto;padding:0 18px;display:flex;flex-direction:column;gap:9px}
+#bcList{flex:1;min-height:0;overflow-y:auto;padding:0 18px;display:flex;flex-direction:column;gap:7px}
 .bc-row{padding:11px 13px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(170,220,230,.12)}
 .bc-row b{display:flex;align-items:baseline;gap:8px;font:500 20px var(--sans);color:var(--ink)}
 .bc-row b em{font-style:normal;font-size:14px;color:var(--gold);margin-left:auto;white-space:nowrap}
@@ -1504,6 +1507,17 @@ html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) :is(.wx-sel,.wx-select,.wx-
 .bc-foot{flex:none;display:flex;align-items:center;gap:10px;margin:10px 18px 0}#bcSrc{flex:1;min-width:0;font-size:13px;line-height:1.35;color:rgba(241,245,244,.6)}#bcClass{cursor:pointer}
 .bc-open{flex:none;padding:0 16px;height:44px;border-radius:14px;display:grid;place-items:center;text-decoration:none;font:500 16px var(--sans);color:var(--energy);background:rgba(112,214,189,.12);border:1px solid rgba(112,214,189,.35)}
 .bc-open:hover{background:rgba(112,214,189,.22)}
+.bc-seg{flex:none;display:flex;gap:4px;margin:0 18px 10px;padding:3px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(170,220,230,.16)}
+.bc-seg button{flex:1;height:32px;border:0;border-radius:11px;background:none;color:rgba(241,245,244,.75);font:500 15px var(--sans);letter-spacing:.06em;cursor:pointer}
+.bc-seg button.on{background:rgba(112,214,189,.22);color:var(--energy)}
+.bc-srow{display:flex;align-items:flex-start;gap:10px;padding:5px 9px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(170,220,230,.12)}
+.bc-no{flex:none;min-width:36px;height:36px;padding:0 6px;border-radius:18px;display:grid;place-items:center;font:700 19px var(--sans);font-variant-numeric:tabular-nums;color:#06303a;background:radial-gradient(circle at 35% 30%,#d6fff3,#7fdcc4 60%,#4fb9a2)}
+.bc-tasks{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:5px;padding-top:3px}
+.bc-tasks em{font-style:normal;font:500 16px/1.2 var(--sans);padding:5px 10px;border-radius:15px;background:rgba(242,182,93,.16);border:1px solid rgba(242,182,93,.4);color:var(--ink)}
+html.t-pastel .bc-seg{background:rgba(214,234,228,.6);border-color:rgba(190,220,212,.8)}html.t-pastel .bc-seg button{color:#154D52}html.t-pastel .bc-seg button.on{background:#5FAFA3;color:#fff}
+html.t-pastel .bc-srow{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(238,247,243,.75));border:1.5px solid rgba(255,255,255,.9)}
+html.t-pastel .bc-no{background:linear-gradient(180deg,#B5DEC4,#8EC9A6);color:#154D52}
+html.t-pastel .bc-tasks em{background:rgba(241,217,161,.5);border-color:#E3C27A;color:#154D52}
 html.t-pastel .rp-tabs{background:rgba(214,234,228,.6);border-color:rgba(190,220,212,.8)}
 html.t-pastel .rp-tab{color:#154D52}html.t-pastel .rp-tab.on{background:linear-gradient(180deg,#E39590,#D27577);color:#fff}
 html.t-pastel .bc-row{background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(238,247,243,.75));border:1.5px solid rgba(255,255,255,.9)}
@@ -1613,7 +1627,7 @@ html.t-pastel .bc-open{background:#55A596;border-color:#3B8375;color:#fff}
     <div id="ambPanel" class="panel pe">
       <div class="p-head amb-head">AMBIENT<span>環境音</span><div class="rp-tabs" id="rpTabs"><button type="button" class="rp-tab" data-rp="amb">環境音</button><button type="button" class="rp-tab" data-rp="bc">訂正<i id="bcBadge"></i></button></div><button class="lay-btn" id="layBtn" type="button">收合 »</button></div>
       <div id="ambList"></div>
-      <div id="bcView"><div class="bc-top"><b id="bcClass">待訂正</b><span id="bcTotal"></span></div><div id="bcList"></div><div class="bc-foot"><span id="bcSrc"></span><a class="bc-open" id="bcOpen" target="_blank" rel="noopener">開啟 Bubble Check</a></div></div>
+      <div id="bcView"><div class="bc-top"><b id="bcClass">待訂正</b><span id="bcTotal"></span></div><div class="bc-seg" id="bcSeg" role="radiogroup" aria-label="名單看法"><button type="button" data-v="task">依作業</button><button type="button" data-v="student">依學生</button></div><div id="bcList"></div><div class="bc-foot"><span id="bcSrc"></span><a class="bc-open" id="bcOpen" target="_blank" rel="noopener">開啟 Bubble Check</a></div></div>
       <div class="vol-row">音量<input type="range" id="ambVol" min="0" max="100"></div>
     </div>
   </section>
@@ -1825,7 +1839,7 @@ const freshStudent = i => ({ seat: i + 1, checked: false, records: [], spent: 0,
 function defaultState() {
   return {
     v: 5, mode: 'clock', coins: 0,
-    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn', marquee: MARQUEE_DEFAULT, mqHide: false, wide: false, nzTh: 60, nbVert: false, theme: 'ocean', skin: 'classic', bcShow: false, rightTab: 'amb', bcCode: '', bcClass: '' },
+    settings: { feedTotal: 30, sound: true, bgPaused: false, classSize: 30, classSizeSet: false, perf: 'auto', bpmf: false, bpmfFont: 'huninn', marquee: MARQUEE_DEFAULT, mqHide: false, wide: false, nzTh: 60, nbVert: false, theme: 'ocean', skin: 'classic', bcShow: false, rightTab: 'amb', bcCode: '', bcClass: '', bcView: '' },
     classFish: freshClassFish(1), collection: [], totalFood: 0, bigSeen: 0, dexDone: false, giftUsed: [], drawTickets: 0, customSp: [],
     focusMin: 20, pomo: { work: 25, brk: 5 }, clockTz: 'Asia/Taipei',
     tasks: [{ id: 't2', name: '閱讀時間', icon: 'book', min: 20 }, { id: 't3', name: '掃地時間', icon: 'broom', min: 20 }, { id: 't1', name: '數學習作', icon: 'calc' }, { id: 't4', name: '小組討論', icon: 'chat' }],
@@ -1870,7 +1884,7 @@ function sanitize(d) {
   s.settings.marquee = typeof s.settings.marquee === 'string' ? s.settings.marquee.slice(0, 120) : MARQUEE_DEFAULT;
   s.settings.mqHide = !!s.settings.mqHide;
   if (!['classic', 'pastel'].includes(s.settings.skin)) s.settings.skin = 'classic';
-  s.settings.bcShow = !!s.settings.bcShow; if (s.settings.rightTab !== 'bc') s.settings.rightTab = 'amb'; s.settings.bcCode = typeof s.settings.bcCode === 'string' ? s.settings.bcCode.slice(0, 40) : ''; s.settings.bcClass = typeof s.settings.bcClass === 'string' ? s.settings.bcClass : '';
+  s.settings.bcShow = !!s.settings.bcShow; if (s.settings.rightTab !== 'bc') s.settings.rightTab = 'amb'; s.settings.bcCode = typeof s.settings.bcCode === 'string' ? s.settings.bcCode.slice(0, 40) : ''; s.settings.bcClass = typeof s.settings.bcClass === 'string' ? s.settings.bcClass : ''; if (!['task', 'student'].includes(s.settings.bcView)) s.settings.bcView = '';
   s.settings.bpmf = !!s.settings.bpmf; if (!['huninn', 'kai'].includes(s.settings.bpmfFont)) s.settings.bpmfFont = 'huninn';
   s.settings.classSize = clamp(parseInt(s.settings.classSize) || 30, 1, 50); N = s.settings.classSize;
   if (d.settings && d.v && !('classSizeSet' in d.settings)) s.settings.classSizeSet = true;   // 舊資料視為已設定（30 人）
@@ -5288,6 +5302,14 @@ function bcGroups(cls) {   // 同一份作業一組，列出還沒訂正的座�
   }));
   return [...m.values()].map(g => { const pg = [...g.pages].sort((a, b) => a - b); return { label: g.subject + (pg.length ? ` p.${pg.join('、')}` : ''), seats: [...g.seats].sort((a, b) => a - b) }; });
 }
+/* 名單看法：依作業／依學生。沒在儀表板選過，就跟這台電腦上 Bubble Check 的選擇一樣 */
+const BC_VIEW_KEY = 'homework-fix-board-bytask';
+function bcView() { const v = state.settings.bcView; if (v) return v; try { return localStorage.getItem(BC_VIEW_KEY) === '0' ? 'student' : 'task'; } catch (e) { return 'task'; } }
+function bcStudents(cls) {   // 一人一行：這位同學還沒訂正的作業
+  return (cls.students || []).map(st => { const m = new Map();
+    (st.tasks || []).forEach(t => { if (!t || (t.status !== 'pending' && t.status !== 'reviewing')) return; const k = String(t.subject || '作業'); if (!m.has(k)) m.set(k, new Set()); if (t.page != null && t.page !== '') m.get(k).add(t.page); });
+    return { id: st.id, tasks: [...m].map(([sub, pg]) => { const a = [...pg].sort((x, y) => x - y); return sub + (a.length ? ` p.${a.join('、')}` : ''); }) }; }).filter(x => x.tasks.length).sort((a, b) => a.id - b.id);
+}
 /* 雲端：直接讀 Bubble Check 的雲端空間（和 Bubble Check 用同一個邀請碼），這台電腦不用另外開著 Bubble Check */
 const BC_FB = { apiKey: 'AIzaSyCVX7j9z8B4H5xCz7uvxDlomm2skS_8ink', authDomain: 'bubblecheck-test.firebaseapp.com', projectId: 'bubblecheck-test', storageBucket: 'bubblecheck-test.firebasestorage.app', messagingSenderId: '529011105885', appId: '1:529011105885:web:8c2300d6230d626defadb4' };
 const BC_FB_VER = '10.12.2', BC_SYNC_KEY = 'homework-fix-board-sync';
@@ -5329,13 +5351,15 @@ function renderBc() {
   document.querySelectorAll('.rp-tab').forEach(b => b.classList.toggle('on', b.dataset.rp === state.settings.rightTab));
   if (!on) return;
   const d = bcData(), cls = d && d.classes.length ? bcPickClass(d) : null, gs = cls ? bcGroups(cls) : [], n = new Set(gs.flatMap(g => g.seats)).size, live = bcCloud.status === 'live';
+  const vw = bcView(); document.querySelectorAll('#bcSeg button').forEach(b => { b.classList.toggle('on', b.dataset.v === vw); b.setAttribute('aria-checked', b.dataset.v === vw); });
   const bd = $('#bcBadge'); bd.textContent = n; bd.classList.toggle('on', n > 0 && state.settings.rightTab !== 'bc');
   $('#bcClass').textContent = cls ? (cls.name || '待訂正') + (d.classes.length > 1 ? ' ▾' : '') : '作業訂正';
   $('#bcTotal').textContent = n ? `${n} 人還沒訂正完` : '';
   $('#bcSrc').textContent = live ? '雲端同步中' : bcCloud.code ? BC_ST[bcCloud.status] + (readBc() ? '，先顯示這台電腦的資料' : '') : readBc() ? '這台電腦的 Bubble Check' : '';
   $('#bcList').innerHTML = !cls ? `<div class="bc-empty">${bcCloud.status === 'connecting' ? '正在連線到 Bubble Check…' : bcCloud.status === 'denied' ? '邀請碼不對，或這個邀請碼沒有權限。<br>請到教師控制台重新輸入。' : bcCloud.status === 'error' ? '連不上 Bubble Check 的雲端。<br>請檢查網路，或稍後再試。' : live ? '雲端裡還沒有班級資料。<br>先在 Bubble Check 建立班級並登記。' : '還沒有 Bubble Check 的資料。<br>到教師控制台輸入 Bubble Check 的邀請碼，<br>或在這台電腦開一次 Bubble Check。'}</div>`
-    : gs.length ? gs.map(g => `<div class="bc-row"><b>${escapeHTML(g.label)}<em>${g.seats.length} 人</em></b><div class="bc-seats">${g.seats.map(x => `<span>${escapeHTML(String(x))}</span>`).join('')}</div></div>`).join('')
-    : '<div class="bc-empty">全班都訂正完了 🎉<br>Bubble Check 裡沒有待訂正的作業。</div>';
+    : !gs.length ? '<div class="bc-empty">全班都訂正完了 🎉<br>Bubble Check 裡沒有待訂正的作業。</div>'
+    : vw === 'student' ? bcStudents(cls).map(x => `<div class="bc-srow"><span class="bc-no">${escapeHTML(String(x.id))}</span><div class="bc-tasks">${x.tasks.map(t => `<em>${escapeHTML(t)}</em>`).join('')}</div></div>`).join('')
+    : gs.map(g => `<div class="bc-row"><b>${escapeHTML(g.label)}<em>${g.seats.length} 人</em></b><div class="bc-seats">${g.seats.map(x => `<span>${escapeHTML(String(x))}</span>`).join('')}</div></div>`).join('');
 }
 function bcNextClass() { const d = bcData(); if (!d || d.classes.length < 2) return; const cur = bcPickClass(d), i = d.classes.indexOf(cur); state.settings.bcClass = d.classes[(i + 1) % d.classes.length].id; save(); renderBc(); }
 function setRightTab(t) { state.settings.rightTab = t === 'bc' ? 'bc' : 'amb'; save(); renderBc(); }
@@ -5573,8 +5597,9 @@ function init() {
   $('#mqEditBtn').addEventListener('click', () => editMarquee(true));
   $('#rpTabs').addEventListener('click', e => { const b = e.target.closest('.rp-tab'); if (b) setRightTab(b.dataset.rp); });
   $('#bcClass').addEventListener('click', bcNextClass);
+  $('#bcSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { state.settings.bcView = b.dataset.v; save(); renderBc(); } });
   $('#bcOpen').href = /github\.io$/.test(location.hostname) ? '/bubblecheck/' : 'https://ckj1022-art.github.io/bubblecheck/';
-  window.addEventListener('storage', e => { if (e.key === BC_KEY) renderBc(); else if (e.key === BC_SYNC_KEY && !state.settings.bcCode) bcConnect(); });
+  window.addEventListener('storage', e => { if (e.key === BC_KEY || e.key === BC_VIEW_KEY) renderBc(); else if (e.key === BC_SYNC_KEY && !state.settings.bcCode) bcConnect(); });
   bcConnect();
   $('#drBody').addEventListener('change', e => {
     if (e.target.id === 'skinSelect') {
