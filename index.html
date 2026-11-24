@@ -750,6 +750,15 @@ body.bpmf #nbbList.vt li span.upr,body.bpmf #nbbList.vt li span.tcy{font-family:
 .seat.pulse::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:3px solid rgba(112,214,189,.8);pointer-events:none;opacity:0;animation:seatRing .7s ease-out both;animation-delay:inherit}
 @keyframes seatRing{0%{transform:scale(1);opacity:1}100%{transform:scale(1.45);opacity:0}}
 #seatGrid.instant .seat{transition:none}
+.seat{-webkit-touch-callout:none;user-select:none;touch-action:manipulation}
+.seat .abs-tag{position:absolute;right:-4px;top:-4px;min-width:26px;height:26px;padding:0 4px;border-radius:13px;background:#F2B65D;color:#3a2400;font:700 14px/26px var(--sans);text-align:center;opacity:0;transform:scale(.4);transition:all .35s cubic-bezier(.3,1.6,.5,1);pointer-events:none}
+.seat.absent{border-style:dashed;border-color:rgba(242,182,93,.75);background:transparent;box-shadow:none}
+.seat.absent span:not(.abs-tag){opacity:.45;text-decoration:line-through;text-decoration-thickness:2px}
+.seat.absent .abs-tag{opacity:1;transform:scale(1)}
+.seat.absent .chk{opacity:0}
+.seat.holding::before{content:"";position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(#F2B65D var(--hp,0%),transparent 0);-webkit-mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));animation:seatHold 1s linear forwards;pointer-events:none}
+@property --hp{syntax:'<percentage>';inherits:false;initial-value:0%}
+@keyframes seatHold{to{--hp:100%}}
 
 /* 我的小魚／圖鑑／統計 */
 .sheet{left:240px;top:140px;width:1440px;height:800px;padding:30px 44px 30px;display:flex;flex-direction:column}
@@ -1528,6 +1537,18 @@ html.t-pastel #ui:not(.portrait):has(#marquee:not(.in-clock):not(.off)) #bottomN
 .bc-row b em{font-style:normal;font-size:14px;color:var(--gold);margin-left:auto;white-space:nowrap}
 .bc-seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .bc-seats span{min-width:38px;height:38px;padding:0 7px;border-radius:19px;display:grid;place-items:center;font:700 18px var(--sans);font-variant-numeric:tabular-nums;color:#06303a;background:radial-gradient(circle at 35% 30%,#d6fff3,#7fdcc4 60%,#4fb9a2)}
+.bc-age{font-style:normal;flex:none;align-self:center;font:700 14px/1 var(--sans);padding:5px 10px;border-radius:999px;white-space:nowrap}
+.bc-age.a0,.bc-tasks em.a0{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22);color:var(--ink)}
+.bc-age.a1,.bc-tasks em.a1{background:#FFD43B;border-color:#FFD43B;color:#3A2E00}
+.bc-age.a2,.bc-tasks em.a2{background:#FFA94D;border-color:#FFA94D;color:#3A1D00}
+.bc-age.a3,.bc-tasks em.a3{background:#FF6B6B;border-color:#FF6B6B;color:#fff}
+.bc-tasks em i{font-style:normal;font-weight:700;opacity:.9}
+.bc-row.old,.bc-srow.old{border:2px solid #FF6B6B;box-shadow:0 0 0 3px rgba(255,107,107,.22)}
+html.t-pastel .bc-age.a0,html.t-pastel .bc-tasks em.a0{background:rgba(21,77,82,.08);border-color:rgba(21,77,82,.15);color:#154D52}
+html.t-pastel .bc-tasks em.a1{background:#FFD43B;border-color:#FFD43B;color:#3A2E00}
+html.t-pastel .bc-tasks em.a2{background:#FFA94D;border-color:#FFA94D;color:#3A1D00}
+html.t-pastel .bc-tasks em.a3{background:#FF6B6B;border-color:#FF6B6B;color:#fff}
+html.t-pastel .bc-row.old,html.t-pastel .bc-srow.old{border:2px solid #FF6B6B;box-shadow:0 0 0 3px rgba(255,107,107,.2)}
 .bc-empty{padding:34px 10px;text-align:center;color:rgba(241,245,244,.6);line-height:1.8;font-size:17px}
 .bc-foot{flex:none;display:flex;align-items:center;gap:10px;margin:10px 18px 0}#bcSrc{flex:1;min-width:0;font-size:13px;line-height:1.35;color:rgba(241,245,244,.6)}#bcClass{cursor:pointer}
 .bc-open{flex:none;padding:0 16px;height:44px;border-radius:14px;display:grid;place-items:center;text-decoration:none;font:500 16px var(--sans);color:var(--energy);background:rgba(112,214,189,.12);border:1px solid rgba(112,214,189,.35)}
@@ -3239,7 +3260,7 @@ function undoAdd() {
 async function checkAllTask() {
 
   if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候'); return; }
-  const list = state.students.map((s, i) => (!s.checked && !isEmptySeat(i + 1)) ? i + 1 : 0).filter(Boolean);
+  const list = state.students.map((s, i) => (!s.checked && !isEmptySeat(i + 1) && !isAbsent(i + 1)) ? i + 1 : 0).filter(Boolean);
   if (!list.length) { toast('全班都已完成任務'); return; }
   if (!(await confirmBox('全部打卡？', `把還沒打卡的 ${list.length} 位同學全部標示完成。按錯的話，點座號可以個別取消。`, '全部打卡'))) return;
   if (hwRevealPending || state.homework.fish.evolved) return;
@@ -3320,18 +3341,18 @@ async function playHwEvolution() {
 
 /* ---------- 抽號器：從 1～班級人數隨機抽出座號 ---------- */
 let picking = false, pkLast = null;
-const pickerHTML = () => `<div class="kicker mt"><span class="dot"></span>隨機抽號　·　全班 <span id="pkSize">${activeN()}</span> 人</div>
+const pickerHTML = () => `<div class="kicker mt"><span class="dot"></span>隨機抽號　·　全班 <span id="pkSize">${presentN()}</span> 人</div>
   <div class="pk-num" id="pkNum">--</div>
   <div class="pk-lbl" id="pkLbl">按下「抽號」開始</div>
   <div class="pk-row"><button class="pk-toggle" data-act="pkRepeat" id="pkRepeat"></button><span id="pkLeft"></span></div>
   <div class="pk-hist" id="pkHist"></div>
   <div class="ctrl-row"><button class="start-btn txt sm" data-act="pkDraw" id="pkBtn"><span class="pi">${ic('dice')}</span><span>抽號</span></button><button class="cbtn" data-act="pkReset">${ic('reset')}重新開始</button></div>`;
-const pkPool = () => { const d = new Set(state.picker.drawn); return Array.from({ length: N }, (_, i) => i + 1).filter(n => !isEmptySeat(n) && (!state.picker.noRepeat || !d.has(n))); };
+const pkPool = () => { const d = new Set(state.picker.drawn); return Array.from({ length: N }, (_, i) => i + 1).filter(n => !isEmptySeat(n) && !isAbsent(n) && (!state.picker.noRepeat || !d.has(n))); };
 function updatePicker() {
   const el = id => document.getElementById(id); if (!el('pkNum')) return;
   state.picker.drawn = state.picker.drawn.filter(n => n >= 1 && n <= N);
   const left = pkPool().length, d = state.picker.drawn;
-  el('pkSize').textContent = activeN();
+  el('pkSize').textContent = presentN();
   el('pkRepeat').textContent = state.picker.noRepeat ? '✓ 不重複抽號' : '可重複抽號';
   el('pkRepeat').classList.toggle('on', state.picker.noRepeat);
   el('pkLeft').innerHTML = state.picker.noRepeat ? `還有 <b>${left}</b> 位沒被抽到` : `已抽 <b>${d.length}</b> 次`;
@@ -3435,7 +3456,7 @@ function updateTimeViews() {
     setTime(el('hwClock'), `${p.h}:${p.mi}:${p.s}`); el('hwDate').textContent = `${p.y}年${p.mo}月${p.d}日　${p.wd}`;
     const hw = state.homework, done = doneCount();
     el('hwTitleView').textContent = hw.title || '今日任務';
-    el('hwMeta').innerHTML = `已完成 <b>${done}</b> 人　未完成 <b>${activeN() - done}</b> 人`;
+    el('hwMeta').innerHTML = `已完成 <b>${done}</b> 人　未完成 <b>${presentN() - done}</b> 人`;
   }
   if (curScreen === 'feed') renderFeedHead();
   renderSchedule();
@@ -3955,7 +3976,7 @@ function renderFeedHead() {
   $('#feedKicker').innerHTML = '<span class="dot"></span>台灣時間　·　任務完成登記';
   const np = nowParts();
   $('#feedTitle').innerHTML = `<span class="feed-time">${timeHTML(`${np.h}:${np.mi}:${np.s}`)}</span>`;
-  $('#feedSub').innerHTML = `${escapeHTML(state.homework.title || '今日任務')}　·　已完成 <b>${c}</b> 人　·　未完成 <b>${activeN() - c}</b> 人`;
+  $('#feedSub').innerHTML = `${escapeHTML(state.homework.title || '今日任務')}　·　已完成 <b>${c}</b> 人　·　未完成 <b>${presentN() - c}</b> 人`;
 }
 function renderFishSheet() {
   const f = state.homework.fish, rv = hwRevealed(), list = shownCollection(), tank = tankCollection(), rest = restCollection(), st = f.evolved ? 3 : hwStage();
@@ -4008,7 +4029,7 @@ function renderStatsSheet() {
   const times = state.students.map(s => s.records.length), max = Math.max(1, ...times);
   const tile = (lab, val, sub, c) => `<div class="stile"><small>${lab}</small><b style="${c ? `color:${c}` : ''}">${val}</b><span>${sub || ''}</span></div>`;
   $('#statsSheet').innerHTML = `<div class="stiles">
-    ${tile('本次已完成', `${done}<i> / ${activeN()}</i>`, Math.round(done / activeN() * 100) + '%')}${tile('全班圖鑑', `${discoveredIds().size}<i> / ${curSpecies().length}</i>`, '種' + TW().kind)}
+    ${tile('本次已完成', `${done}<i> / ${presentN()}</i>`, Math.round(done / presentN() * 100) + '%')}${tile('全班圖鑑', `${discoveredIds().size}<i> / ${curSpecies().length}</i>`, '種' + TW().kind)}
     ${tile(TW().home, tankCollection().length, TW().unit + TW().kind)}${tile('金幣', state.coins, '枚', RARITY.epic.hex)}
     ${RARITY_ORDER.map(r => tile(RARITY[r].name + (isJungle() ? '恐龍' : '魚種'), cnt(r), '隻', RARITY[r].hex)).join('')}</div>
     <h4 class="sh4">每位同學完成次數</h4>
@@ -4465,7 +4486,36 @@ function drawStar(ctx, x, y, r, rot, big) {
 const parseSeatList = (t, max) => [...new Set(String(t || '').replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 65248)).split(/[^0-9]+/).map(Number).filter(n => n >= 1 && n <= max))].sort((a, b) => a - b);
 const isEmptySeat = n => Array.isArray(state.emptySeats) && state.emptySeats.includes(n);
 const activeN = () => Math.max(1, N - (state.emptySeats || []).filter(n => n <= N).length);
-const doneCount = () => state.students.filter((s, i) => s.checked && !isEmptySeat(i + 1)).length;
+const doneCount = () => state.students.filter((s, i) => s.checked && !isEmptySeat(i + 1) && !isAbsent(i + 1)).length;
+/* ---------- 請假：任務打卡時長按座號 1 秒＝今天請假，不列入人數和完成名單；隔天自動清除 ---------- */
+const absDay = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+function absentList() {
+  const a = state.absent;
+  if (!a || a.d !== absDay()) { const had = a && Array.isArray(a.s) && a.s.length; state.absent = { d: absDay(), s: [] }; if (had) { fixAbsentTargets(activeN() - a.s.filter(n => n <= N && !isEmptySeat(n)).length, activeN()); save(); } }
+  return state.absent.s;
+}
+const isAbsent = n => absentList().includes(n);
+const presentN = () => Math.max(1, activeN() - absentList().filter(n => n <= N && !isEmptySeat(n)).length);
+function fixAbsentTargets(oldP, newP) {
+  (state.missions || []).forEach((m, i) => { const f = i === state.missionIdx ? state.homework.fish : m.fish; if (f && !f.evolved && f.target === oldP) f.target = newP; });
+  const f = state.homework.fish; if (f.target === oldP && !f.evolved) f.target = newP;
+}
+function toggleAbsent(n) {
+  if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
+  ensureMissions(); const list = absentList(), oldP = presentN(), st = state.students[n - 1]; if (!st) return;
+  if (list.includes(n)) state.absent.s = list.filter(x => x !== n);
+  else {
+    if (presentN() <= 1) { toast('至少要有一位同學在班上'); return; }
+    if (st.checked) { st.checked = false; st.records.pop(); unfeedHwFish(); }
+    state.missions.forEach((m, i) => { if (i !== state.missionIdx && m.checked.includes(n)) { m.checked = m.checked.filter(x => x !== n); if (!m.fish.evolved && m.fish.food > 0) m.fish.food--; } });
+    state.absent.s = [...list, n].sort((a, b) => a - b);
+  }
+  const newP = presentN(); fixAbsentTargets(oldP, newP);
+  const hf = state.homework.fish; if (!hf.evolved && hf.food > 0 && hf.food >= hf.target) { rollHwSpecies(); hwRevealPending = true; Shows.push(playHwEvolution); }
+  save(); renderRoster(); renderHwTank(); updatePicker(); updateTimeViews(); if (drawerOpen) renderDrawer();
+  Sound.plink && Sound.plink();
+  toast(isAbsent(n) ? `${pad(n)} 號今天請假，不列入完成名單（今天 ${newP} 人）` : `${pad(n)} 號取消請假（今天 ${newP} 人）`);
+}
 /* ---------- 多任務：最多 3 個任務同時進行，每個任務各養一隻任務魚 ----------
    目前打開的任務放在 state.homework 與 students[].checked；其他任務存在 state.missions[] 裡，切換時互換 */
 function ensureMissions(st) {
@@ -4501,7 +4551,7 @@ async function addMission() {
   ensureMissions(); if (state.missions.length >= 3) { toast('最多同時進行 3 個任務'); return; }
   if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
   const r = await promptBox('新增任務', '', false, '例如：數學習作'); if (!r || !r.value) return;
-  syncMission(); state.missions.push({ id: 'm' + Date.now().toString(36), title: r.value, fish: freshHwFish(state.homework.fish.target || activeN()), checked: [] });
+  syncMission(); state.missions.push({ id: 'm' + Date.now().toString(36), title: r.value, fish: freshHwFish(presentN()), checked: [] });
   switchMission(state.missions.length - 1); toast(`已新增任務「${r.value}」，每個任務各養一隻任務魚`);
 }
 async function editMission(k) {
@@ -4520,9 +4570,9 @@ async function editMission(k) {
   save(); renderRoster(); updateTimeViews(); if (drawerOpen) renderDrawer();
 }
 function renderMissionTabs() {
-  ensureMissions(); const A = activeN(); $('#roster').classList.toggle('multi', state.missions.length > 1);
+  ensureMissions(); const A = presentN(); $('#roster').classList.toggle('multi', state.missions.length > 1);
   $('#rosterTitle').innerHTML = state.missions.map((m, i) => {
-    const on = i === state.missionIdx, done = on ? doneCount() : m.checked.filter(n => n <= N && !isEmptySeat(n)).length, all = done >= A;
+    const on = i === state.missionIdx, done = on ? doneCount() : m.checked.filter(n => n <= N && !isEmptySeat(n) && !isAbsent(n)).length, all = done >= A;
     return `<button class="m-tab ${on ? 'on' : ''} ${all ? 'all' : ''}" data-mi="${i}" title="${on ? '再點一次可以改名或刪除' : '切換到這個任務'}"><span class="mt-name">${escapeHTML(on ? state.homework.title || m.title : m.title)}</span><span class="mt-ct">${done}/${A}</span>${on ? '<span class="mt-ed">✎</span>' : ''}</button>`;
   }).join('') + (state.missions.length < 3 ? `<button class="m-add" data-madd="1" title="新增任務（最多 3 個）">＋ 任務</button>` : '');
 }
@@ -4586,18 +4636,24 @@ function buildRoster() {
     const b = document.createElement('button'); b.className = 'seat'; b.dataset.seat = i + 1;
     b.innerHTML = `<svg class="ring" viewBox="0 0 90 90"><circle cx="45" cy="45" r="43" stroke="rgba(255,255,255,.06)"/><circle class="rp" cx="45" cy="45" r="43" stroke="rgba(112,214,189,.75)" stroke-dasharray="0 999" stroke-linecap="round"/></svg>
       <span>${pad(i + 1)}</span><span class="chk"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.8" stroke="#1d6f78" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="evo-dot"></span>`;
-    b.addEventListener('click', () => onSeatClick(i + 1, b));
+    b.insertAdjacentHTML('beforeend', '<span class="abs-tag">假</span>');
+    b.addEventListener('click', () => { if (b._lp) { b._lp = false; return; } onSeatClick(i + 1, b); });
+    let lpT = 0; const lpEnd = () => { clearTimeout(lpT); b.classList.remove('holding'); };
+    b.addEventListener('pointerdown', e => { if (addMode || isEmptySeat(i + 1) || (e.button && e.button !== 0)) return; b._lp = false; b.classList.add('holding');
+      lpT = setTimeout(() => { b.classList.remove('holding'); b._lp = true; toggleAbsent(i + 1); }, 1000); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, lpEnd));
+    b.addEventListener('contextmenu', e => e.preventDefault());
     g.appendChild(b);
   }
 }
 function renderRoster() {
   const btns = $('#seatGrid').children, total = feedTotal(), C = 2 * Math.PI * 43;
   state.students.forEach((s, i) => {
-    const b = btns[i]; b.classList.toggle('done', s.checked); b.classList.toggle('empty', isEmptySeat(i + 1));
-    b.title = `座號 ${pad(i + 1)}｜${s.checked ? '已完成' : '未完成'}`;
+    const b = btns[i]; b.classList.toggle('done', s.checked); b.classList.toggle('empty', isEmptySeat(i + 1)); const ab = isAbsent(i + 1); b.classList.toggle('absent', ab);
+    b.title = `座號 ${pad(i + 1)}｜${ab ? '今天請假（長按 1 秒取消）' : s.checked ? '已完成' : '未完成（長按 1 秒標示請假）'}`;
   });
-  const c = doneCount(), pct = Math.round(c / activeN() * 100), hw = state.mode === 'homework';
-  $('#countText').innerHTML = `${c} / ${activeN()}<small>人完成</small>`;
+  const c = doneCount(), pct = Math.round(c / presentN() * 100), hw = state.mode === 'homework';
+  $('#countText').innerHTML = `${c} / ${presentN()}<small>人完成</small>`;
   $('#countBar').style.width = pct + '%'; $('#pctText').textContent = pct + '%';
   renderMissionTabs();
   renderFeedHead(); renderStats(); refreshSheets();
@@ -4612,6 +4668,7 @@ function onSeatClick(seat, btn) {
   Sound.init();
   if (addMode) { if (!isEmptySeat(seat)) addPoint(seat, btn); return; }
   if (isEmptySeat(seat)) { toast(`${pad(seat)} 號是空號（可在教師控制台的「學生」分頁恢復）`); return; }
+  if (isAbsent(seat)) { toast(`${pad(seat)} 號今天請假，長按 1 秒可以取消請假`); return; }
   // 已打卡的座號再點一次＝取消（按錯時可以改回來），任務魚也會退回一份飼料
   if (state.students[seat - 1].checked) {
     if (hwRevealPending || state.homework.fish.evolved) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); toast('任務魚正在進化，請稍候再修改'); return; }
@@ -4633,7 +4690,7 @@ function checkIn(seat, opts = {}) {
 function uncheck(seat) {
   const s = state.students[seat - 1]; if (!s.checked) return;
   s.checked = false; s.records.pop();
-  if (doneCount() < activeN()) state.round.achieved = false;
+  if (doneCount() < presentN()) state.round.achieved = false;
   unfeedHwFish();
   renderRoster(); save(); if (drawerOpen) renderDrawer();
 }
@@ -5338,23 +5395,34 @@ function applySkin() { document.documentElement.classList.toggle('t-pastel', sta
 /* ---------- 串連 Bubble Check：讀 Bubble Check 存的訂正資料，只顯示不修改 ---------- */
 const BC_KEY = 'homework-fix-board-v2';
 function readBc() { try { const d = JSON.parse(localStorage.getItem(BC_KEY) || 'null'); if (d && Array.isArray(d.classes) && d.classes.length) return d; } catch (e) {} return null; }
-function bcGroups(cls) {   // 同一份作業一組，列出還沒訂正的座號
+/* 欠幾天：只算上課日（週一到週五）。今天登記＝0；週五登記、週一看＝1（跟 Bubble Check 一樣） */
+function bcAge(t) {
+  if (!t) return null; const d = new Date(t); d.setHours(0, 0, 0, 0); const today = new Date(); today.setHours(0, 0, 0, 0);
+  let n = 0; for (let i = 0; i < 400 && d < today; i++) { d.setDate(d.getDate() + 1); const w = d.getDay(); if (w !== 0 && w !== 6) n++; } return n;
+}
+const BC_RED = 3;   // 欠 3 天以上：整列紅框
+const bcAgeCls = n => n == null ? 'a0' : n >= BC_RED ? 'a3' : 'a' + n;
+function bcGroups(cls) {   // 同一份作業一組，列出還沒訂正的座號；欠最久的排最上面
   const m = new Map();
   (cls.students || []).forEach(st => (st.tasks || []).forEach(t => {
     if (!t || (t.status !== 'pending' && t.status !== 'reviewing')) return;
     const key = t.batch || `${t.subject}|${t.page ?? ''}`; let g = m.get(key);
-    if (!g) { g = { subject: String(t.subject || '作業'), pages: new Set(), seats: new Set() }; m.set(key, g); }
+    if (!g) { g = { subject: String(t.subject || '作業'), pages: new Set(), seats: new Set(), oldest: null }; m.set(key, g); }
     if (t.page != null && t.page !== '') g.pages.add(t.page); g.seats.add(st.id);
+    if (t.createdAt && (g.oldest == null || t.createdAt < g.oldest)) g.oldest = t.createdAt;
   }));
-  return [...m.values()].map(g => { const pg = [...g.pages].sort((a, b) => a - b); return { label: g.subject + (pg.length ? ` p.${pg.join('、')}` : ''), seats: [...g.seats].sort((a, b) => a - b) }; });
+  return [...m.values()].sort((a, b) => (a.oldest ?? 9e15) - (b.oldest ?? 9e15))
+    .map(g => { const pg = [...g.pages].sort((a, b) => a - b); return { label: g.subject + (pg.length ? ` p.${pg.join('、')}` : ''), seats: [...g.seats].sort((a, b) => a - b), age: g.oldest ? bcAge(g.oldest) : null }; });
 }
 /* 名單看法：依作業／依學生。沒在儀表板選過，就跟這台電腦上 Bubble Check 的選擇一樣 */
 const BC_VIEW_KEY = 'homework-fix-board-bytask';
 function bcView() { const v = state.settings.bcView; if (v) return v; try { return localStorage.getItem(BC_VIEW_KEY) === '0' ? 'student' : 'task'; } catch (e) { return 'task'; } }
-function bcStudents(cls) {   // 一人一行：這位同學還沒訂正的作業
-  return (cls.students || []).map(st => { const m = new Map();
-    (st.tasks || []).forEach(t => { if (!t || (t.status !== 'pending' && t.status !== 'reviewing')) return; const k = String(t.subject || '作業'); if (!m.has(k)) m.set(k, new Set()); if (t.page != null && t.page !== '') m.get(k).add(t.page); });
-    return { id: st.id, tasks: [...m].map(([sub, pg]) => { const a = [...pg].sort((x, y) => x - y); return sub + (a.length ? ` p.${a.join('、')}` : ''); }) }; }).filter(x => x.tasks.length).sort((a, b) => a.id - b.id);
+function bcStudents(cls) {   // 一人一行（照座號）：這位同學還沒訂正的作業，一份一顆標籤，欠最久的排前面
+  return (cls.students || []).map(st => {
+    const ts = (st.tasks || []).filter(t => t && (t.status === 'pending' || t.status === 'reviewing')).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+      .map(t => ({ label: String(t.subject || '作業') + (t.page != null && t.page !== '' ? ` p.${t.page}` : ''), age: t.createdAt ? bcAge(t.createdAt) : null }));
+    return { id: st.id, tasks: ts, max: Math.max(-1, ...ts.map(t => t.age ?? -1)) };
+  }).filter(x => x.tasks.length).sort((a, b) => a.id - b.id);
 }
 /* 雲端：直接讀 Bubble Check 的雲端空間（和 Bubble Check 用同一個邀請碼），這台電腦不用另外開著 Bubble Check */
 const BC_FB = { apiKey: 'AIzaSyCVX7j9z8B4H5xCz7uvxDlomm2skS_8ink', authDomain: 'bubblecheck-test.firebaseapp.com', projectId: 'bubblecheck-test', storageBucket: 'bubblecheck-test.firebasestorage.app', messagingSenderId: '529011105885', appId: '1:529011105885:web:8c2300d6230d626defadb4' };
@@ -5404,8 +5472,8 @@ function renderBc() {
   $('#bcSrc').textContent = live ? '雲端同步中' : bcCloud.code ? BC_ST[bcCloud.status] + (readBc() ? '，先顯示這台電腦的資料' : '') : readBc() ? '這台電腦的 Bubble Check' : '';
   $('#bcList').innerHTML = !cls ? `<div class="bc-empty">${bcCloud.status === 'connecting' ? '正在連線到 Bubble Check…' : bcCloud.status === 'denied' ? '邀請碼不對，或這個邀請碼沒有權限。<br>請到教師控制台重新輸入。' : bcCloud.status === 'error' ? '連不上 Bubble Check 的雲端。<br>請檢查網路，或稍後再試。' : live ? '雲端裡還沒有班級資料。<br>先在 Bubble Check 建立班級並登記。' : '還沒有 Bubble Check 的資料。<br>到教師控制台輸入 Bubble Check 的邀請碼，<br>或在這台電腦開一次 Bubble Check。'}</div>`
     : !gs.length ? '<div class="bc-empty">全班都訂正完了 🎉<br>Bubble Check 裡沒有待訂正的作業。</div>'
-    : vw === 'student' ? bcStudents(cls).map(x => `<div class="bc-srow"><span class="bc-no">${escapeHTML(String(x.id))}</span><div class="bc-tasks">${x.tasks.map(t => `<em>${escapeHTML(t)}</em>`).join('')}</div></div>`).join('')
-    : gs.map(g => `<div class="bc-row"><b>${escapeHTML(g.label)}<em>${g.seats.length} 人</em></b><div class="bc-seats">${g.seats.map(x => `<span>${escapeHTML(String(x))}</span>`).join('')}</div></div>`).join('');
+    : vw === 'student' ? bcStudents(cls).map(x => `<div class="bc-srow${x.max >= BC_RED ? ' old' : ''}"><span class="bc-no">${escapeHTML(String(x.id))}</span><div class="bc-tasks">${x.tasks.map(t => `<em class="${bcAgeCls(t.age)}">${escapeHTML(t.label)}${t.age == null ? '' : `<i>・${t.age ? t.age + ' 天' : '今天'}</i>`}</em>`).join('')}</div></div>`).join('')
+    : gs.map(g => `<div class="bc-row${g.age >= BC_RED ? ' old' : ''}"><b>${escapeHTML(g.label)}${g.age == null ? '' : `<i class="bc-age ${bcAgeCls(g.age)}">${g.age ? `已 ${g.age} 天` : '今天'}</i>`}<em>${g.seats.length} 人</em></b><div class="bc-seats">${g.seats.map(x => `<span>${escapeHTML(String(x))}</span>`).join('')}</div></div>`).join('');
 }
 function bcNextClass() { const d = bcData(); if (!d || d.classes.length < 2) return; const cur = bcPickClass(d), i = d.classes.indexOf(cur); state.settings.bcClass = d.classes[(i + 1) % d.classes.length].id; save(); renderBc(); }
 function setRightTab(t) { state.settings.rightTab = t === 'bc' ? 'bc' : 'amb'; save(); renderBc(); }
@@ -5637,6 +5705,7 @@ function init() {
   setLeftTab(state.leftTab);
   $('#clearTask').addEventListener('click', () => { Sound.init(); clearTask(); });
   $('#allTask').addEventListener('click', () => { Sound.init(); checkAllTask(); });
+  setInterval(() => { if (state.absent && state.absent.d !== absDay()) { absentList(); renderRoster(); renderHwTank(); updatePicker(); } }, 60000);
   $('#addPt').addEventListener('click', () => { Sound.init(); setAddMode(true); });
   $('#addDone').addEventListener('click', () => { setAddMode(false); toast('已結束加點模式'); });
   $('#addUndo').addEventListener('click', undoAdd);
