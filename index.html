@@ -1006,6 +1006,27 @@ body.bpmf #nbbList.vt li span.upr,body.bpmf #nbbList.vt li span.tcy{font-family:
 #modal.show{display:grid}
 #rdModal{position:fixed;inset:0;z-index:59;display:none;place-items:center;background:rgba(2,8,14,.6);padding:12px;overflow-y:auto}
 #rdModal.show{display:grid}
+#bcpModal{position:fixed;inset:0;z-index:59;display:none;place-items:center;background:rgba(2,8,14,.6);padding:12px;overflow-y:auto}
+#bcpModal.show{display:grid}
+.bcp-card{width:min(460px,100%)}
+.bcp-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.bcp-list .btn{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:54px;font-size:19px;text-align:left;padding:8px 16px}
+.bcp-list .bcp-all{justify-content:center}
+.bcp-list .bcp-undo{min-height:44px;font-size:16px;opacity:.85;justify-content:flex-start}
+.bcp-sub{margin-top:6px;font-size:13px;letter-spacing:.06em;opacity:.65}
+.bcp-list .bc-age{font-style:normal}
+.seat .bc-n{position:absolute;left:-5px;top:-5px;min-width:26px;height:26px;padding:0 5px;border-radius:13px;font:700 15px/26px var(--mono);text-align:center;display:none;pointer-events:none;background:#E6ECEA;color:#2a3a38;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+#roster.bcmode .seat.owe .bc-n{display:block}
+#roster.bcmode .seat.owe.a1 .bc-n{background:#FFD43B;color:#3A2E00}
+#roster.bcmode .seat.owe.a2 .bc-n{background:#FFA94D;color:#3A1D00}
+#roster.bcmode .seat.owe.a3 .bc-n{background:#FF6B6B;color:#fff}
+#roster.bcmode .seat.owe.a3{border:2px solid rgba(255,107,107,.85);box-shadow:0 0 0 4px rgba(255,107,107,.18)}
+#roster.bcmode .seat.done .chk{opacity:1;transform:scale(1)}
+#roster.bcmode :is(.pbar,#pctText,#allTask,#clearTask){display:none}
+.m-tab.bc-tab{border-style:dashed}
+.m-tab.bc-tab.on{border-style:solid}
+.bc-mail{white-space:nowrap}
+@media (max-height:500px){#bcpModal .bcp-card{padding:14px 18px}#bcpModal #bcpTitle{font-size:18px;margin:0}#bcpModal #bcpInfo{display:none}.bcp-list{gap:6px;margin-top:8px}.bcp-list .btn{min-height:40px;font-size:16px;padding:4px 12px}#bcpModal .bcp-card>.flex{margin-top:8px!important}}
 .rd-card{width:min(520px,94vw)}
 .rd-info{font-size:15px}.rd-info b{color:var(--gold);font-size:22px}
 .rd-chips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
@@ -1796,6 +1817,8 @@ html.t-pastel .bc-open{background:#55A596;border-color:#3B8375;color:#fff}
   <label class="lbl" style="display:block;margin:16px 0 6px;font-size:14px;color:rgba(241,245,244,.7)">或自己輸入</label>
   <div class="flex gap-2"><input class="field" id="rdItem" maxlength="20" placeholder="兌換什麼（可不填）" style="flex:1"><input class="field" id="rdPts" type="number" min="1" max="999" placeholder="扣幾點" style="width:100px"></div>
   <div class="flex gap-2" style="justify-content:flex-end;margin-top:18px"><button class="btn" id="rdCancel">取消</button><button class="btn primary" id="rdOk">確定兌換</button></div></div></div>
+<div id="bcpModal"><div class="modal-card rd-card bcp-card"><h3 id="bcpTitle"></h3><p class="rd-info" id="bcpInfo"></p><div class="bcp-list" id="bcpList"></div>
+  <div class="flex gap-2" style="justify-content:flex-end;margin-top:18px"><button class="btn" id="bcpClose">關閉</button></div></div></div>
 <div id="pModal"><div class="modal-card"><h3 id="pTitle"></h3><input class="field" id="pInput" maxlength="40" style="width:100%;font-size:20px">
   <div class="flex gap-2 items-center" style="margin-top:20px"><button class="btn danger" id="pDel">刪除這個任務</button><span style="flex:1"></span><button class="btn" id="pCancel">取消</button><button class="btn primary" id="pOk">確定</button></div></div></div>
 <div id="news" role="dialog" aria-labelledby="newsTitle"><div class="modal-card news-card">
@@ -1951,6 +1974,8 @@ function sanitize(d) {
   if (d.notesBook && typeof d.notesBook === 'object') for (const k in d.notesBook) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(d.notesBook[k])) s.notesBook[k] = d.notesBook[k].filter(n => n && typeof n.t === 'string').slice(0, 30);
   s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = parseInt(s.weather.place) || 0;   // 地點清單的對應在 init 時處理（migrateWxPlace）
   s.missions = d.missions; s.missionIdx = d.missionIdx;
+  s.bcOut = Array.isArray(d.bcOut) ? d.bcOut.filter(n => n && typeof n.id === 'string').slice(-200) : [];
+  s.bcFed = d.bcFed && typeof d.bcFed === 'object' ? d.bcFed : {}; s.bcBase = d.bcBase && typeof d.bcBase === 'object' ? d.bcBase : {};
   s.emptySeats = Array.isArray(d.emptySeats) ? [...new Set(d.emptySeats.filter(n => Number.isInteger(n) && n >= 1 && n <= 50))].sort((a, b) => a - b) : [];
   s.rewards = Array.isArray(d.rewards) ? d.rewards.filter(r => r && typeof r.name === 'string' && r.name.trim() && r.cost > 0).slice(0, 20).map(r => ({ name: r.name.slice(0, 20), cost: Math.min(999, r.cost | 0) })) : DEFAULT_REWARDS.map(r => ({ ...r }));
   s.picker = Object.assign({ noRepeat: true, drawn: [] }, d.picker || {}); if (!Array.isArray(s.picker.drawn)) s.picker.drawn = [];
@@ -3167,7 +3192,7 @@ function renderHwTank() {
   const egg = isJungle(), key = rv ? 'sp-' + sp.id : (egg ? 'egg' : 'fry') + (f.evolved ? 4 : hwStage());
   document.querySelectorAll('.hw-tank').forEach(tk => {
     const tw = TW();
-    tk.querySelector('[data-hw=lbl]').textContent = rv ? `${sp.dino ? '恐龍' : '任務魚'}・${sp.name}` : tw.pet;
+    tk.querySelector('[data-hw=lbl]').textContent = rv ? `${sp.dino ? '恐龍' : isBcCur() ? '訂正魚' : '任務魚'}・${sp.name}` : isBcCur() && !isJungle() ? '訂正魚' : tw.pet;
     tk.querySelector('[data-hw=st]').innerHTML = rv ? `<b style="color:${RARITY[sp.rarity].hex}">${RARITY[sp.rarity].name}${sp.dino ? '恐龍・' + sizeName(sp) : '魚種'}</b>` : isJungle() ? `孵化 <b>${f.food}</b> / ${f.target} 份` : `已吃 <b>${f.food}</b> / ${f.target} 份`;
     tk.querySelector('[data-hw=bar]').style.width = (f.evolved ? 100 : f.food / f.target * 100) + '%';
     const fe = tk.querySelector('[data-hw=fish]');
@@ -3258,6 +3283,7 @@ function undoAdd() {
   save(); $('#addUndo').disabled = !addHist.length; bumpAdd(); toast(`已復原 ${pad(seat)} 號的加點`); if (drawerOpen) renderDrawer();
 }
 async function checkAllTask() {
+  if (isBcCur()) { toast('訂正要一個一個點，才知道誰訂正好了'); return; }
 
   if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候'); return; }
   const list = state.students.map((s, i) => (!s.checked && !isEmptySeat(i + 1) && !isAbsent(i + 1)) ? i + 1 : 0).filter(Boolean);
@@ -3277,6 +3303,7 @@ async function checkAllTask() {
   toast(`已完成 ${list.length} 位同學的打卡`);
 }
 async function clearTask() {
+  if (isBcCur()) { toast('訂正的資料在 Bubble Check，請到 Bubble Check 修改'); return; }
   if (hwRevealPending || state.homework.fish.evolved) { toast('任務魚正在進化，請稍候再清除'); return; }
   const done = doneCount(), food = state.homework.fish.food;
   if (!done && !food) { toast('目前沒有需要清除的打卡'); return; }
@@ -3443,7 +3470,7 @@ function updateTimeViews() {
   el('miniClock').textContent = `${p.h}:${p.mi}`;
   if (el('cClock')) {
     const cz = state.clockTz, q = cz === TZ ? p : nowParts(Date.now(), cz);
-    setTime(el('cClock'), `${q.h}:${q.mi}:${q.s}`); el('cDate').textContent = `${q.y}年${q.mo}月${q.d}日`; el('cWeek').textContent = q.wd; if (el('cDone')) { el('cDone').textContent = doneCount(); el('cTotal').textContent = activeN(); }
+    setTime(el('cClock'), `${q.h}:${q.mi}:${q.s}`); el('cDate').textContent = `${q.y}年${q.mo}月${q.d}日`; el('cWeek').textContent = q.wd; if (el('cDone') && !isBcCur()) { el('cDone').textContent = doneCount(); el('cTotal').textContent = activeN(); }
     const ref = cz === TZ ? '' : `${tzDiffText(cz)}　·　台灣現在 <b>${p.h}:${p.mi}</b>　<button class="tz-back" data-tz="${TZ}">回到台灣時間</button>`;
     if (el('tzRef')._v !== ref) { el('tzRef')._v = ref; el('tzRef').innerHTML = ref; }
   }
@@ -3456,7 +3483,7 @@ function updateTimeViews() {
     setTime(el('hwClock'), `${p.h}:${p.mi}:${p.s}`); el('hwDate').textContent = `${p.y}年${p.mo}月${p.d}日　${p.wd}`;
     const hw = state.homework, done = doneCount();
     el('hwTitleView').textContent = hw.title || '今日任務';
-    el('hwMeta').innerHTML = `已完成 <b>${done}</b> 人　未完成 <b>${presentN() - done}</b> 人`;
+    el('hwMeta').innerHTML = isBcCur() ? bcSubLine(true) : `已完成 <b>${done}</b> 人　未完成 <b>${presentN() - done}</b> 人`;
   }
   if (curScreen === 'feed') renderFeedHead();
   renderSchedule();
@@ -3976,7 +4003,7 @@ function renderFeedHead() {
   $('#feedKicker').innerHTML = '<span class="dot"></span>台灣時間　·　任務完成登記';
   const np = nowParts();
   $('#feedTitle').innerHTML = `<span class="feed-time">${timeHTML(`${np.h}:${np.mi}:${np.s}`)}</span>`;
-  $('#feedSub').innerHTML = `${escapeHTML(state.homework.title || '今日任務')}　·　已完成 <b>${c}</b> 人　·　未完成 <b>${presentN() - c}</b> 人`;
+  $('#feedSub').innerHTML = isBcCur() ? bcSubLine() : `${escapeHTML(state.homework.title || '今日任務')}　·　已完成 <b>${c}</b> 人　·　未完成 <b>${presentN() - c}</b> 人`;
 }
 function renderFishSheet() {
   const f = state.homework.fish, rv = hwRevealed(), list = shownCollection(), tank = tankCollection(), rest = restCollection(), st = f.evolved ? 3 : hwStage();
@@ -4497,8 +4524,8 @@ function absentList() {
 const isAbsent = n => absentList().includes(n);
 const presentN = () => Math.max(1, activeN() - absentList().filter(n => n <= N && !isEmptySeat(n)).length);
 function fixAbsentTargets(oldP, newP) {
-  (state.missions || []).forEach((m, i) => { const f = i === state.missionIdx ? state.homework.fish : m.fish; if (f && !f.evolved && f.target === oldP) f.target = newP; });
-  const f = state.homework.fish; if (f.target === oldP && !f.evolved) f.target = newP;
+  (state.missions || []).forEach((m, i) => { if (m.bc) return; const f = i === state.missionIdx ? state.homework.fish : m.fish; if (f && !f.evolved && f.target === oldP) f.target = newP; });
+  const f = state.homework.fish; if (!isBcCur() && f.target === oldP && !f.evolved) f.target = newP;
 }
 function toggleAbsent(n) {
   if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
@@ -4522,7 +4549,8 @@ function ensureMissions(st) {
   const s0 = st || state;
   if (!Array.isArray(s0.emptySeats)) s0.emptySeats = [];
   let ms = Array.isArray(s0.missions) ? s0.missions.filter(m => m && typeof m === 'object') : [];
-  ms = ms.slice(0, 3).map((m, i) => ({ id: m.id || ('m' + i + Date.now().toString(36)), title: typeof m.title === 'string' && m.title.trim() ? m.title.slice(0, 40) : '今日任務',
+  let nNorm = 0, nBc = 0; ms = ms.filter(m => m.bc ? nBc++ < 1 : nNorm++ < 3);
+  ms = ms.map((m, i) => ({ ...(m.bc ? { bc: true } : {}), id: m.id || ('m' + i + Date.now().toString(36)), title: typeof m.title === 'string' && m.title.trim() ? m.title.slice(0, 40) : '今日任務',
     fish: m.fish && typeof m.fish === 'object' && m.fish.target > 0 ? m.fish : freshHwFish(N), checked: Array.isArray(m.checked) ? m.checked.filter(n => Number.isInteger(n) && n >= 1 && n <= 50) : [] }));
   if (!ms.length) ms = [{ id: 'm' + Date.now().toString(36), title: s0.homework.title || '今日任務', fish: s0.homework.fish, checked: s0.students.map((x, i) => x.checked ? i + 1 : 0).filter(Boolean) }];
   s0.missions = ms; s0.missionIdx = clamp(parseInt(s0.missionIdx) || 0, 0, ms.length - 1);
@@ -4544,18 +4572,20 @@ function switchMission(k) {
   ensureMissions(); if (k === state.missionIdx || !state.missions[k]) return;
   if (missionBusy()) { toast('任務魚正在進化，請稍候再切換任務'); return; }
   syncMission(); state.missionIdx = k; loadMission(); save();
+  { const hf = state.homework.fish; if (!hf.evolved && hf.food > 0 && hf.food >= hf.target) { rollHwSpecies(); hwRevealPending = true; Shows.push(playHwEvolution); } }
   renderHwTank(); renderRoster(); updateTimeViews(); if (drawerOpen) renderDrawer();
   const sg = $('#seatGrid'); sg.classList.remove('m-swap'); void sg.offsetWidth; sg.classList.add('m-swap');
 }
 async function addMission() {
-  ensureMissions(); if (state.missions.length >= 3) { toast('最多同時進行 3 個任務'); return; }
+  ensureMissions(); if (state.missions.filter(m => !m.bc).length >= 3) { toast('最多同時進行 3 個任務'); return; }
   if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
   const r = await promptBox('新增任務', '', false, '例如：數學習作'); if (!r || !r.value) return;
-  syncMission(); state.missions.push({ id: 'm' + Date.now().toString(36), title: r.value, fish: freshHwFish(presentN()), checked: [] });
-  switchMission(state.missions.length - 1); toast(`已新增任務「${r.value}」，每個任務各養一隻任務魚`);
+  syncMission(); const nm = { id: 'm' + Date.now().toString(36), title: r.value, fish: freshHwFish(presentN()), checked: [] }, bi = state.missions.findIndex(m => m.bc);
+  if (bi >= 0) { state.missions.splice(bi, 0, nm); if (state.missionIdx >= bi) state.missionIdx++; switchMission(bi); } else { state.missions.push(nm); switchMission(state.missions.length - 1); } toast(`已新增任務「${r.value}」，每個任務各養一隻任務魚`);
 }
 async function editMission(k) {
   ensureMissions(); const m = state.missions[k]; if (!m) return;
+  if (m.bc) { toast('「訂正」跟著 Bubble Check：點座號就是訂正好了，不用改名'); return; }
   const r = await promptBox('任務名稱', k === state.missionIdx ? state.homework.title : m.title, state.missions.length > 1); if (!r) return;
   if (r.del) {
     if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
@@ -4570,11 +4600,15 @@ async function editMission(k) {
   save(); renderRoster(); updateTimeViews(); if (drawerOpen) renderDrawer();
 }
 function renderMissionTabs() {
-  ensureMissions(); const A = presentN(); $('#roster').classList.toggle('multi', state.missions.length > 1);
-  $('#rosterTitle').innerHTML = state.missions.map((m, i) => {
-    const on = i === state.missionIdx, done = on ? doneCount() : m.checked.filter(n => n <= N && !isEmptySeat(n) && !isAbsent(n)).length, all = done >= A;
+  ensureMissions(); const A = presentN(), vis = state.missions.map((m, i) => i).filter(i => !state.missions[i].bc || state.settings.bcShow);
+  $('#roster').classList.toggle('multi', vis.length > 1); $('#roster').classList.toggle('bcmode', isBcCur());
+  const bcSum = bcSummary();
+  $('#rosterTitle').innerHTML = [...vis.filter(i => !state.missions[i].bc), ...vis.filter(i => state.missions[i].bc)].map(i => {
+    const m = state.missions[i], on = i === state.missionIdx;
+    if (m.bc) return `<button class="m-tab bc-tab ${on ? 'on' : ''} ${bcSum && !bcSum.people ? 'all' : ''}" data-mi="${i}" title="${on ? 'Bubble Check 的訂正：點座號＝訂正好了' : '切換到訂正'}"><span class="mt-name">訂正</span><span class="mt-ct">${bcSum ? (bcSum.people ? bcSum.people + ' 人' : '✓') : '…'}</span></button>`;
+    const done = on ? doneCount() : m.checked.filter(n => n <= N && !isEmptySeat(n) && !isAbsent(n)).length, all = done >= A;
     return `<button class="m-tab ${on ? 'on' : ''} ${all ? 'all' : ''}" data-mi="${i}" title="${on ? '再點一次可以改名或刪除' : '切換到這個任務'}"><span class="mt-name">${escapeHTML(on ? state.homework.title || m.title : m.title)}</span><span class="mt-ct">${done}/${A}</span>${on ? '<span class="mt-ed">✎</span>' : ''}</button>`;
-  }).join('') + (state.missions.length < 3 ? `<button class="m-add" data-madd="1" title="新增任務（最多 3 個）">＋ 任務</button>` : '');
+  }).join('') + (state.missions.filter(m => !m.bc).length < 3 ? `<button class="m-add" data-madd="1" title="新增任務（最多 3 個）">＋ 任務</button>` : '');
 }
 // 小視窗：輸入文字（可選刪除）
 /* ---------- 個人點數兌換：每完成一次任務 1 點；兌換扣「可用點數」，累計完成次數不變 ---------- */
@@ -4625,7 +4659,7 @@ function toggleEmptySeat(n) {
     state.emptySeats.push(n); state.emptySeats.sort((a, b) => a - b);
   }
   const newA = activeN();
-  state.missions.forEach((m, i) => { const f = i === state.missionIdx ? state.homework.fish : m.fish; if (!f.evolved && f.target === oldA) f.target = newA; });
+  state.missions.forEach((m, i) => { if (m.bc) return; const f = i === state.missionIdx ? state.homework.fish : m.fish; if (!f.evolved && f.target === oldA) f.target = newA; });
   const hf = state.homework.fish; if (!hf.evolved && hf.food > 0 && hf.food >= hf.target) { rollHwSpecies(); hwRevealPending = true; Shows.push(playHwEvolution); }
   save(); renderRoster(); renderHwTank(); updatePicker(); updateTimeViews(); if (drawerOpen) renderDrawer();
   toast(isEmptySeat(n) ? `${pad(n)} 號設為空號，不列入人數（現在 ${newA} 人）` : `${pad(n)} 號已恢復（現在 ${newA} 人）`);
@@ -4636,7 +4670,7 @@ function buildRoster() {
     const b = document.createElement('button'); b.className = 'seat'; b.dataset.seat = i + 1;
     b.innerHTML = `<svg class="ring" viewBox="0 0 90 90"><circle cx="45" cy="45" r="43" stroke="rgba(255,255,255,.06)"/><circle class="rp" cx="45" cy="45" r="43" stroke="rgba(112,214,189,.75)" stroke-dasharray="0 999" stroke-linecap="round"/></svg>
       <span>${pad(i + 1)}</span><span class="chk"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.8" stroke="#1d6f78" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="evo-dot"></span>`;
-    b.insertAdjacentHTML('beforeend', '<span class="abs-tag">假</span>');
+    b.insertAdjacentHTML('beforeend', '<span class="abs-tag">假</span><span class="bc-n"></span>');
     b.addEventListener('click', () => { if (b._lp) { b._lp = false; return; } onSeatClick(i + 1, b); });
     let lpT = 0; const lpEnd = () => { clearTimeout(lpT); b.classList.remove('holding'); };
     b.addEventListener('pointerdown', e => { if (addMode || isEmptySeat(i + 1) || (e.button && e.button !== 0)) return; b._lp = false; b.classList.add('holding');
@@ -4652,8 +4686,10 @@ function renderRoster() {
     const b = btns[i]; b.classList.toggle('done', s.checked); b.classList.toggle('empty', isEmptySeat(i + 1)); const ab = isAbsent(i + 1); b.classList.toggle('absent', ab);
     b.title = `座號 ${pad(i + 1)}｜${ab ? '今天請假（長按 1 秒取消）' : s.checked ? '已完成' : '未完成（長按 1 秒標示請假）'}`;
   });
-  const c = doneCount(), pct = Math.round(c / presentN() * 100), hw = state.mode === 'homework';
-  $('#countText').innerHTML = `${c} / ${presentN()}<small>人完成</small>`;
+  if (isBcCur()) bcRosterMarks(btns);
+  else for (const b of btns) { b.classList.remove('owe', 'a0', 'a1', 'a2', 'a3'); }
+  const c = doneCount(), pct = Math.round(c / presentN() * 100), hw = state.mode === 'homework', bs = isBcCur() ? bcSummary() : null;
+  $('#countText').innerHTML = bs ? `${bs.people}<small>人還沒訂正完${bs.items ? `・${bs.items} 份` : ''}</small>` : isBcCur() ? `…<small>連線到 Bubble Check</small>` : `${c} / ${presentN()}<small>人完成</small>`;
   $('#countBar').style.width = pct + '%'; $('#pctText').textContent = pct + '%';
   renderMissionTabs();
   renderFeedHead(); renderStats(); refreshSheets();
@@ -4669,6 +4705,7 @@ function onSeatClick(seat, btn) {
   if (addMode) { if (!isEmptySeat(seat)) addPoint(seat, btn); return; }
   if (isEmptySeat(seat)) { toast(`${pad(seat)} 號是空號（可在教師控制台的「學生」分頁恢復）`); return; }
   if (isAbsent(seat)) { toast(`${pad(seat)} 號今天請假，長按 1 秒可以取消請假`); return; }
+  if (isBcCur()) { bcSeatClick(seat, btn); return; }
   // 已打卡的座號再點一次＝取消（按錯時可以改回來），任務魚也會退回一份飼料
   if (state.students[seat - 1].checked) {
     if (hwRevealPending || state.homework.fish.evolved) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); toast('任務魚正在進化，請稍候再修改'); return; }
@@ -5240,7 +5277,7 @@ function renderDrawer() {
       <button class="btn w-full ${se.bcShow ? 'on' : ''}" data-act="bcToggle">右欄「訂正」分頁：${se.bcShow ? '顯示中' : '未開啟'}</button>
       ${se.bcShow ? `<div class="flex gap-2 mt-2"><input class="field" id="bcCodeIn" maxlength="40" placeholder="${bcCode() && !se.bcCode ? '已自動帶入這台電腦的邀請碼' : 'Bubble Check 的邀請碼'}" value="${escapeHTML(se.bcCode || '')}" autocomplete="off" spellcheck="false" style="flex:1;text-transform:uppercase;letter-spacing:.1em"><button class="btn primary" data-act="bcCodeSave">連線</button></div>
       <div class="info-box mt-2">雲端同步：<b>${BC_ST[bcCloud.status]}</b>${bcCloud.code ? `　·　邀請碼 ${escapeHTML(bcCloud.code)}` : ''}</div>` : ''}
-      <p class="note mt-2">開啟後，首頁右欄的環境音旁邊會多一個「訂正」分頁，列出 Bubble Check 裡還沒訂正完的座號（只顯示，不會改動 Bubble Check 的資料）。輸入和 Bubble Check 一樣的邀請碼，手機登記後這裡會跟著更新；這台電腦的瀏覽器如果已經在 Bubble Check 輸入過邀請碼，會自動帶入。</p></div>
+      <p class="note mt-2">開啟後，首頁右欄的環境音旁邊會多一個「訂正」分頁，列出 Bubble Check 裡還沒訂正完的座號；「任務打卡」也會多一個「訂正」任務，點座號＝訂正好了，訂正魚吃一口，Bubble Check 那邊會自動戳掉。輸入和 Bubble Check 一樣的邀請碼，手機登記後這裡會跟著更新；這台電腦的瀏覽器如果已經在 Bubble Check 輸入過邀請碼，會自動帶入。</p></div>
       <div class="sec"><h3>SHORTCUTS · 快捷鍵</h3><p class="note"><span class="kbd">1</span> 現在時間　<span class="kbd">2</span> 倒數　<span class="kbd">3</span> 番茄鐘　<span class="kbd">4</span> 任務　<span class="kbd">5</span> 抽號　<span class="kbd">Space</span> 開始／暫停　<span class="kbd">H</span> 觀賞模式　<span class="kbd">Z</span> 放大中央畫面　<span class="kbd">F</span> 全螢幕　<span class="kbd">T</span> 控制台　<span class="kbd">Esc</span> 返回首頁</p></div>
       <div class="sec"><h3>BACKUP · 資料備份</h3>
       <div class="info-box">打卡紀錄、魚群、圖鑑、聯絡簿、倒數日都存在這台電腦的瀏覽器裡。清除瀏覽器資料或 Cookie 會一起清掉，建議定期下載備份。<br>上次備份：<b>${state.lastBackup ? fmtStamp(state.lastBackup) : '尚未備份'}</b></div>
@@ -5431,40 +5468,184 @@ const bcCloud = { status: 'off', code: null, data: null, unsub: null, at: 0 };
 const BC_ST = { off: '未連線', connecting: '連線中…', live: '已同步', denied: '邀請碼不對，或沒有權限', error: '連不上雲端' };
 function bcCode() { const c = (state.settings.bcCode || '').trim(); if (c) return c; try { const e = JSON.parse(localStorage.getItem(BC_SYNC_KEY) || 'null'); return e && typeof e.code === 'string' && e.code ? e.code : null; } catch (e) { return null; } }
 function bcDocsToData(docs) {
-  const cls = {}; let order = [];
+  const cls = {}, logs = {}, lim = Date.now() - 45 * 864e5; let order = [];
   docs.forEach(({ id, data }) => { data = data || {};
-    if (id === 'meta') { try { order = JSON.parse(data.order || '[]'); } catch (e) {} }
+    if (id.startsWith('l_')) { let c = null, e = []; try { c = JSON.parse(data.c || 'null'); e = JSON.parse(data.e || '[]'); } catch (x) {}
+      if (c && Array.isArray(e)) (logs[c] = logs[c] || []).push(...e.filter(x => x && x.k === 'ok' && x.id && x.t > lim).map(x => ({ id: x.id, t: x.t, k: 'ok' }))); }
+    else if (id === 'meta') { try { order = JSON.parse(data.order || '[]'); } catch (e) {} }
     else if (id.startsWith('c_')) { const cid = id.slice(2); let name = ''; try { name = JSON.parse(data.name || '""'); } catch (e) {}
       const students = []; Object.entries(data.seats || {}).forEach(([k, v]) => { if (typeof v !== 'string') return; try { students.push({ ...JSON.parse(v), id: Number(k) }); } catch (e) {} });
       cls[cid] = { id: cid, name, students }; } });
   const ids = [...order.filter(i => cls[i]), ...Object.keys(cls).filter(i => !order.includes(i))];
+  ids.forEach(i => { cls[i].log = logs[i] || []; });
   return ids.length ? { classes: ids.map(i => cls[i]), currentId: null } : { classes: [], currentId: null };
 }
-function bcAfter() { renderBc(); try { if ($('#drawer').classList.contains('open') && drawerTab === 'special' && document.activeElement !== $('#bcCodeIn')) renderDrawer(); } catch (e) {} }
+function bcAfter() { try { bcTick(); } catch (e) { console.warn(e); } renderBc(); if (isBcCur() || state.settings.bcShow) { try { renderRoster(); } catch (e) {} } try { if ($('#drawer').classList.contains('open') && drawerTab === 'special' && document.activeElement !== $('#bcCodeIn')) renderDrawer(); } catch (e) {} }
 async function bcConnect() {
   if (bcCloud.unsub) { try { bcCloud.unsub(); } catch (e) {} bcCloud.unsub = null; }
+  if (bcCloud.unsubIb) { try { bcCloud.unsubIb(); } catch (e) {} bcCloud.unsubIb = null; } bcCloud.api = null; bcCloud.inbox = null;
   const code = state.settings.bcShow ? bcCode() : null; bcCloud.code = code; bcCloud.data = null;
   if (!code) { bcCloud.status = 'off'; bcAfter(); return; }
   bcCloud.status = 'connecting'; bcAfter();
   try {
-    let listen;
-    if (window.__BC_SYNC_MOCK__) listen = (await window.__BC_SYNC_MOCK__(code)).listen;
+    let listen, api = {};
+    if (window.__BC_SYNC_MOCK__) { api = await window.__BC_SYNC_MOCK__(code); listen = api.listen; }
     else { const base = `https://www.gstatic.com/firebasejs/${BC_FB_VER}/`, [a, f] = await Promise.all([import(base + 'firebase-app.js'), import(base + 'firebase-firestore.js')]);
-      const app = a.getApps().find(x => x.name === 'cd-bc') || a.initializeApp(BC_FB, 'cd-bc'), col = f.collection(f.getFirestore(app), 'spaces', code, 'bc');
-      listen = (next, err) => f.onSnapshot(col, s => next(s.docs.map(d => ({ id: d.id, data: d.data() }))), err); }
+      const app = a.getApps().find(x => x.name === 'cd-bc') || a.initializeApp(BC_FB, 'cd-bc'), db = f.getFirestore(app), col = f.collection(db, 'spaces', code, 'bc'), ib = f.collection(db, 'spaces', code, 'inbox');
+      listen = (next, err) => f.onSnapshot(col, s => next(s.docs.map(d => ({ id: d.id, data: d.data() }))), err);
+      // 投信箱：只投「訂正好了」的紙條，真正改資料的是 Bubble Check
+      api = { addNote: n => f.setDoc(f.doc(ib, n.id), n), delNote: id => f.deleteDoc(f.doc(ib, id)), listenInbox: (next, err) => f.onSnapshot(ib, s => next(s.docs.map(d => d.id)), err) }; }
     if (bcCloud.code !== code) return;
+    bcCloud.api = api;
+    if (api.listenInbox) bcCloud.unsubIb = api.listenInbox(ids => { if (bcCloud.code !== code) return; bcCloud.inbox = new Set(ids); bcAfter(); }, () => {});
     bcCloud.unsub = listen(docs => { if (bcCloud.code !== code) return; bcCloud.data = bcDocsToData(docs); bcCloud.status = 'live'; bcCloud.at = Date.now(); bcAfter(); },
       e => { if (bcCloud.code !== code) return; bcCloud.status = e && e.code === 'permission-denied' ? 'denied' : 'error'; bcAfter(); });
   } catch (e) { if (bcCloud.code === code) { bcCloud.status = 'error'; bcAfter(); } }
 }
 function bcData() { return bcCloud.status === 'live' && bcCloud.data ? bcCloud.data : readBc(); }
 function bcPickClass(d) { const want = state.settings.bcClass, loc = readBc(); return d.classes.find(c => c.id === want) || d.classes.find(c => loc && c.id === loc.currentId) || d.classes[0] || null; }
+/* ---------- 訂正任務：任務打卡裡的「訂正」分頁＋訂正魚 ----------
+   點座號＝投一張「訂正好了」的紙條（雲端 spaces/{碼}/inbox；沒開雲端就放這台電腦的 rcl-bc-inbox）。
+   Bubble Check 收到才真正戳掉；這裡先顯示完成、先餵魚。Bubble Check 那邊戳掉（記錄 'ok'）也會餵訂正魚，同一個 id 不重複餵 */
+const BC_INBOX_KEY = 'rcl-bc-inbox';
+function readInbox() { try { const a = JSON.parse(localStorage.getItem(BC_INBOX_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function writeInbox(a) { try { localStorage.setItem(BC_INBOX_KEY, JSON.stringify(a)); } catch (e) {} }
+const bcMission = () => (state.missions || []).find(m => m.bc) || null;
+const isBcCur = () => !!(state.missions && state.missions[state.missionIdx] && state.missions[state.missionIdx].bc);
+function bcCur() { const d = bcData(); return d && d.classes.length ? bcPickClass(d) : null; }
+const bcLive = t => t && (t.status === 'pending' || t.status === 'reviewing');
+const bcLabel = t => String(t.subject || '作業') + (t.page != null && t.page !== '' ? ` p.${t.page}` : '');
+function bcFilt(cls) {   // 已經投出紙條的那幾份，先當作訂正好了
+  if (!cls) return null; const out = new Set((state.bcOut || []).filter(n => n.c === cls.id).map(n => n.s + '|' + n.t)); if (!out.size) return cls;
+  return { ...cls, students: (cls.students || []).map(st => ({ ...st, tasks: (st.tasks || []).filter(t => !out.has(st.id + '|' + t.id)) })) };
+}
+function bcPend(cls, seat) { const st = cls && (cls.students || []).find(x => x.id === seat); return st ? (st.tasks || []).filter(bcLive).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0)) : []; }
+function bcSummary() {
+  const raw = bcCur(); if (!raw) return null; const cls = bcFilt(raw); let people = 0, items = 0;
+  for (let n = 1; n <= N; n++) { if (isEmptySeat(n)) continue; const k = bcPend(cls, n).length; if (k) { people++; items += k; } }
+  return { people, items };
+}
+function bcRosterMarks(btns) {
+  const raw = bcCur(), cls = bcFilt(raw);
+  for (let i = 0; i < btns.length; i++) {
+    const b = btns[i], n = i + 1, ts = cls ? bcPend(cls, n) : [], age = ts.length ? Math.max(...ts.map(t => t.createdAt ? bcAge(t.createdAt) : 0)) : 0;
+    b.classList.remove('a0', 'a1', 'a2', 'a3'); b.classList.toggle('owe', ts.length > 0);
+    b.classList.toggle('done', !!cls && !ts.length && !isEmptySeat(n) && !isAbsent(n));
+    if (ts.length) b.classList.add(bcAgeCls(age));
+    const nb = b.querySelector('.bc-n'); if (nb) nb.textContent = ts.length || '';
+    if (!isAbsent(n) && !isEmptySeat(n)) b.title = `座號 ${pad(n)}｜${ts.length ? `還要訂正：${ts.map(bcLabel).join('、')}` : '沒有要訂正的作業'}`;
+  }
+}
+function bcSubLine(short) {
+  const s = bcSummary(), out = (state.bcOut || []).length;
+  if (!s) return bcCloud.code && bcCloud.status !== 'live' ? `訂正　·　${BC_ST[bcCloud.status] || '連線中…'}` : '訂正　·　還沒連上 Bubble Check';
+  const head = s.people ? `還有 <b>${s.people}</b> 人、<b>${s.items}</b> 份還沒訂正` : '全班都訂正完了 🎉';
+  if (short) return head;
+  return `訂正魚　·　${head}　·　<span class="bc-mail">${out ? `📮 ${out} 張紙條等 Bubble Check 處理` : '✓ 都已記到 Bubble Check'}</span>`;
+}
+function bcEnsureMission() {
+  ensureMissions(); if (bcMission()) return;
+  syncMission(); state.missions.push({ id: 'bc', bc: true, title: '訂正', fish: freshHwFish(activeN()), checked: [] }); save();
+}
+function bcFeed(n) {
+  if (n <= 0) return;
+  if (isBcCur()) { feedHwFish(n); return; }
+  const m = bcMission(); if (!m) return; state.totalFood += n; if (!m.fish.evolved) m.fish.food = Math.min(m.fish.food + n, m.fish.target); save(); checkWhale();
+}
+function bcUnfeed(n) {
+  for (let i = 0; i < n; i++) { if (isBcCur()) unfeedHwFish(); else { const m = bcMission(); if (!m) return; state.totalFood = Math.max(0, state.totalFood - 1); if (!m.fish.evolved && m.fish.food > 0) m.fish.food--; } }
+  save();
+}
+const bcOkList = cls => (cls.log || []).filter(e => e && e.k === 'ok' && e.id);
+function bcTick() {
+  if (!state.settings.bcShow) { if (isBcCur() && !missionBusy()) { const k = state.missions.findIndex(m => !m.bc); if (k >= 0) switchMission(k); } return; }
+  const raw = bcCur(); if (!raw) return;
+  bcEnsureMission();
+  if (!state.bcOut) state.bcOut = []; if (!state.bcFed) state.bcFed = {}; if (!state.bcBase) state.bcBase = {};
+  const ok = bcOkList(raw), okIds = new Set(ok.map(e => e.id)), fed = state.bcFed, now = Date.now(); let dirty = false;
+  // 1) 紙條處理好了沒：記錄裡有這個 id，或那份已經不在、信箱裡也沒有了
+  const out = state.bcOut, keep = out.filter(n => {
+    if (n.c !== raw.id) return now - n.at < 3 * 864e5;
+    if (okIds.has(n.id)) return false;
+    const still = bcPend(raw, n.s).some(t => t.id === n.t), box = n.via === 'cloud' ? bcCloud.inbox : new Set(readInbox().map(x => x.id));
+    if (!still && box && !box.has(n.id)) return false;
+    return now - n.at < 3 * 864e5;
+  });
+  if (keep.length !== out.length) { state.bcOut = keep; dirty = true; }
+  // 2) Bubble Check 那邊戳掉的：新的 'ok' 記錄＝訂正魚吃一口（第一次看到這個班，只記下來不餵）
+  if (!state.bcBase[raw.id]) { ok.forEach(e => { if (!fed[e.id]) fed[e.id] = { at: e.t || now, seen: 1, c: raw.id }; }); state.bcBase[raw.id] = 1; dirty = true; }
+  else {
+    let add = 0, back = 0;
+    ok.forEach(e => { const f = fed[e.id]; if (!f) { fed[e.id] = { at: now, seen: 1, c: raw.id }; if (now - (e.t || now) < 2 * 864e5) add++; dirty = true; } else if (!f.seen) { f.seen = 1; dirty = true; } });
+    // Bubble Check 按「復原」：剛剛餵過的記錄不見了，退回一口
+    for (const id in fed) { const f = fed[id]; if (f.c === raw.id && f.seen && !okIds.has(id)) { if (now - f.at < 30 * 60e3) back++; if (now - f.at < 30 * 60e3 || now - f.at > 60 * 864e5) { delete fed[id]; dirty = true; } } }
+    if (add) bcFeed(add); if (back) bcUnfeed(back);
+  }
+  if (dirty) save();
+}
+function bcSend(raw, seat, task) {
+  if (bcCloud.code && bcCloud.status !== 'live') { toast('Bubble Check 的雲端還沒連上，等一下再點'); return false; }
+  const now = Date.now(), id = 'cd' + now.toString(36) + Math.random().toString(36).slice(2, 6), note = { id, k: 'done', c: raw.id, s: seat, t: task.id, at: now };
+  const via = bcCloud.status === 'live' && bcCloud.api && bcCloud.api.addNote ? 'cloud' : 'local';
+  if (!state.bcOut) state.bcOut = []; if (!state.bcFed) state.bcFed = {};
+  state.bcOut.push({ ...note, via, label: bcLabel(task) }); state.bcFed[id] = { at: now, seen: 0, c: raw.id };
+  if (via === 'cloud') Promise.resolve(bcCloud.api.addNote(note)).catch(() => {
+    state.bcOut = (state.bcOut || []).filter(x => x.id !== id); if (state.bcFed[id]) { delete state.bcFed[id]; bcUnfeed(1); }
+    save(); renderBc(); renderRoster(); toast('紙條送不出去，請檢查網路後再點一次');
+  });
+  else writeInbox([...readInbox(), note]);
+  bcFeed(1); save(); Sound.pop();
+  const b = $('#seatGrid').children[seat - 1]; if (b) { b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+  renderRoster(); renderBc(); return true;
+}
+function bcUndo(id) {
+  const n = (state.bcOut || []).find(x => x.id === id); if (!n) return;
+  if (n.via === 'cloud') {
+    if (!(bcCloud.status === 'live' && bcCloud.api && bcCloud.api.delNote)) { toast('目前連不上雲端，等一下再收回'); return; }
+    if (bcCloud.inbox && !bcCloud.inbox.has(id)) { toast('這張已經記到 Bubble Check 了，要改請到 Bubble Check 按「復原」'); return; }
+    Promise.resolve(bcCloud.api.delNote(id)).catch(() => {});
+  } else {
+    const box = readInbox(); if (!box.some(x => x.id === id)) { toast('這張已經記到 Bubble Check 了，要改請到 Bubble Check 按「復原」'); return; }
+    writeInbox(box.filter(x => x.id !== id));
+  }
+  state.bcOut = state.bcOut.filter(x => x.id !== id); if (state.bcFed && state.bcFed[id]) { delete state.bcFed[id]; bcUnfeed(1); }
+  save(); renderRoster(); renderBc(); Sound.note && Sound.note(440, 0, .15, .06); toast(`已收回 ${pad(n.s)} 號「${n.label || '作業'}」`);
+}
+let bcpSeat = 0;
+function bcSeatClick(seat, btn) {
+  const raw = bcCur(); if (!raw) { toast(bcCloud.code ? 'Bubble Check 還沒連上，等一下再點' : '還沒連上 Bubble Check'); return; }
+  const pend = bcPend(bcFilt(raw), seat), mine = (state.bcOut || []).filter(n => n.c === raw.id && n.s === seat);
+  if (!pend.length && !mine.length) { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); toast(`${pad(seat)} 號沒有要訂正的作業`); return; }
+  if (pend.length === 1 && !mine.length) { if (bcSend(raw, seat, pend[0])) toast(`${pad(seat)} 號「${bcLabel(pend[0])}」訂正好了，訂正魚吃一口（再點座號可以收回）`); return; }
+  bcPick(seat);
+}
+function bcPick(seat) {
+  const raw = bcCur(); if (!raw) { $('#bcpModal').classList.remove('show'); return; }
+  bcpSeat = seat; const pend = bcPend(bcFilt(raw), seat), mine = (state.bcOut || []).filter(n => n.c === raw.id && n.s === seat);
+  if (!pend.length && !mine.length) { $('#bcpModal').classList.remove('show'); return; }
+  $('#bcpTitle').textContent = `${pad(seat)} 號訂正好了哪一份？`;
+  $('#bcpInfo').textContent = pend.length ? '點一下＝訂正好了，訂正魚吃一口。Bubble Check 那邊會自動戳掉。' : '這位同學的都訂正好了。';
+  $('#bcpList').innerHTML = pend.map(t => { const a = t.createdAt ? bcAge(t.createdAt) : null;
+      return `<button class="btn bcp-it" data-tid="${escapeHTML(String(t.id))}"><span>${escapeHTML(bcLabel(t))}</span>${a == null ? '' : `<i class="bc-age ${bcAgeCls(a)}">${a ? `${a} 天` : '今天'}</i>`}</button>`; }).join('')
+    + (pend.length > 1 ? `<button class="btn primary bcp-all" data-all="1">全部訂正好了（${pend.length} 份）</button>` : '')
+    + (mine.length ? `<div class="bcp-sub">剛剛送出，還可以收回</div>` + mine.map(n => `<button class="btn bcp-undo" data-undo="${escapeHTML(n.id)}">↩ 收回「${escapeHTML(n.label || '作業')}」</button>`).join('') : '');
+  $('#bcpModal').classList.add('show');
+}
+function bcpClick(e) {
+  const raw = bcCur(), seat = bcpSeat; if (!raw) return;
+  const u = e.target.closest('[data-undo]'); if (u) { bcUndo(u.dataset.undo); bcPick(seat); return; }
+  const pend = bcPend(bcFilt(raw), seat);
+  if (e.target.closest('[data-all]')) { let k = 0; pend.forEach(t => { if (bcSend(raw, seat, t)) k++; }); if (k) toast(`${pad(seat)} 號 ${k} 份都訂正好了，訂正魚吃 ${k} 口`); $('#bcpModal').classList.remove('show'); return; }
+  const it = e.target.closest('[data-tid]'); if (!it) return; const t = pend.find(x => String(x.id) === it.dataset.tid); if (!t) return;
+  if (bcSend(raw, seat, t)) toast(`${pad(seat)} 號「${bcLabel(t)}」訂正好了，訂正魚吃一口`);
+  const left = bcPend(bcFilt(raw), seat).length; if (!left) $('#bcpModal').classList.remove('show'); else bcPick(seat);
+}
 function renderBc() {
   const P = $('#ambPanel'); if (!P) return; const on = !!state.settings.bcShow;
   P.classList.toggle('has-bc', on); P.classList.toggle('show-bc', on && state.settings.rightTab === 'bc');
   document.querySelectorAll('.rp-tab').forEach(b => b.classList.toggle('on', b.dataset.rp === state.settings.rightTab));
   if (!on) return;
-  const d = bcData(), cls = d && d.classes.length ? bcPickClass(d) : null, gs = cls ? bcGroups(cls) : [], n = new Set(gs.flatMap(g => g.seats)).size, live = bcCloud.status === 'live';
+  const d = bcData(), cls = d && d.classes.length ? bcFilt(bcPickClass(d)) : null, gs = cls ? bcGroups(cls) : [], n = new Set(gs.flatMap(g => g.seats)).size, live = bcCloud.status === 'live';
   const vw = bcView(); document.querySelectorAll('#bcSeg button').forEach(b => { b.classList.toggle('on', b.dataset.v === vw); b.setAttribute('aria-checked', b.dataset.v === vw); });
   const bd = $('#bcBadge'); bd.textContent = n; bd.classList.toggle('on', n > 0 && state.settings.rightTab !== 'bc');
   $('#bcClass').textContent = cls ? (cls.name || '待訂正') + (d.classes.length > 1 ? ' ▾' : '') : '作業訂正';
@@ -5714,7 +5895,7 @@ function init() {
   $('#bcClass').addEventListener('click', bcNextClass);
   $('#bcSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { state.settings.bcView = b.dataset.v; save(); renderBc(); } });
   $('#bcOpen').href = /github\.io$/.test(location.hostname) ? '/bubblecheck/' : 'https://ckj1022-art.github.io/bubblecheck/';
-  window.addEventListener('storage', e => { if (e.key === BC_KEY || e.key === BC_VIEW_KEY) renderBc(); else if (e.key === BC_SYNC_KEY && !state.settings.bcCode) bcConnect(); });
+  window.addEventListener('storage', e => { if (e.key === BC_KEY || e.key === BC_INBOX_KEY) bcAfter(); else if (e.key === BC_VIEW_KEY) renderBc(); else if (e.key === BC_SYNC_KEY && !state.settings.bcCode) bcConnect(); });
   bcConnect();
   $('#drBody').addEventListener('change', e => {
     if (e.target.id === 'skinSelect') {
@@ -5734,6 +5915,9 @@ function init() {
   $('#rdOk').addEventListener('click', () => doRedeem($('#rdItem').value, $('#rdPts').value));
   $('#rdPts').addEventListener('keydown', e => { if (e.key === 'Enter') doRedeem($('#rdItem').value, $('#rdPts').value); });
   $('#rdCancel').addEventListener('click', () => $('#rdModal').classList.remove('show'));
+  $('#bcpList').addEventListener('click', e => { Sound.init(); bcpClick(e); });
+  $('#bcpClose').addEventListener('click', () => $('#bcpModal').classList.remove('show'));
+  $('#bcpModal').addEventListener('click', e => { if (e.target.id === 'bcpModal') $('#bcpModal').classList.remove('show'); });
   $('#rdModal').addEventListener('click', e => { if (e.target.id === 'rdModal') $('#rdModal').classList.remove('show'); });
   $('#rosterTitle').addEventListener('click', e => {
     const t = e.target.closest('[data-mi]'); if (t) { const k = +t.dataset.mi; if (k === state.missionIdx) editMission(k); else switchMission(k); return; }
