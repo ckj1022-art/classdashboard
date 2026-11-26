@@ -1033,8 +1033,9 @@ body.bpmf #nbbList.vt li span.upr,body.bpmf #nbbList.vt li span.tcy{font-family:
 html.t-pastel .bc-hw{background:rgba(255,255,255,.35);border-color:rgba(255,255,255,.55);color:#4b4060}
 html.t-pastel .bc-hw.on{background:#fff4cf;border-color:#e9c45a;color:#5a4300}
 #ui.portrait .bc-legend{display:none}
-.m-tab.bc-tab{border-style:dashed}
+.m-tab.bc-tab{border-style:dashed;flex:none}
 .m-tab.bc-tab.on{border-style:solid}
+.m-add.bc-add{border-color:rgba(242,207,91,.55);color:#F2CF5B}
 .bc-mail{white-space:nowrap}
 .bc-row[data-hwk]{cursor:pointer}.bc-row[data-hwk]:hover{filter:brightness(1.08)}
 .rd-card{width:min(520px,94vw)}
@@ -4595,7 +4596,7 @@ async function addMission() {
 }
 async function editMission(k) {
   ensureMissions(); const m = state.missions[k]; if (!m) return;
-  if (m.bc) { toast('「訂正」跟著 Bubble Check：點座號就是訂正好了，不用改名'); return; }
+  if (m.bc) { bcTaskSet(false); return; }
   const r = await promptBox('任務名稱', k === state.missionIdx ? state.homework.title : m.title, state.missions.length > 1); if (!r) return;
   if (r.del) {
     if (missionBusy()) { toast('任務魚正在進化，請稍候'); return; }
@@ -4610,15 +4611,15 @@ async function editMission(k) {
   save(); renderRoster(); updateTimeViews(); if (drawerOpen) renderDrawer();
 }
 function renderMissionTabs() {
-  ensureMissions(); const A = presentN(), vis = state.missions.map((m, i) => i).filter(i => !state.missions[i].bc || state.settings.bcShow);
+  ensureMissions(); const A = presentN(), vis = state.missions.map((m, i) => i).filter(i => !state.missions[i].bc || bcTaskOn());
   $('#roster').classList.toggle('multi', vis.length > 1); $('#roster').classList.toggle('bcmode', isBcCur());
-  const bcRaw = state.settings.bcShow ? bcCur() : null, bcN = bcRaw ? bcHwList(bcRaw.id).length : -1;
+  const bcRaw = bcTaskOn() ? bcCur() : null, bcN = bcRaw ? bcHwList(bcRaw.id).length : -1;
   $('#rosterTitle').innerHTML = [...vis.filter(i => !state.missions[i].bc), ...vis.filter(i => state.missions[i].bc)].map(i => {
     const m = state.missions[i], on = i === state.missionIdx;
-    if (m.bc) return `<button class="m-tab bc-tab ${on ? 'on' : ''} ${bcN === 0 ? 'all' : ''}" data-mi="${i}" title="${on ? 'Bubble Check 的訂正：點座號＝訂正好了' : '切換到訂正'}"><span class="mt-name">訂正</span><span class="mt-ct">${bcN < 0 ? '…' : bcN ? bcN + ' 份' : '✓'}</span></button>`;
+    if (m.bc) return `<button class="m-tab bc-tab ${on ? 'on' : ''} ${bcN === 0 ? 'all' : ''}" data-mi="${i}" title="${on ? '再點一次可以關掉訂正打卡' : '切換到訂正'}"><span class="mt-name">訂正</span><span class="mt-ct">${bcN < 0 ? '…' : bcN ? bcN + ' 份' : '✓'}</span>${on ? '<span class="mt-ed">✕</span>' : ''}</button>`;
     const done = on ? doneCount() : m.checked.filter(n => n <= N && !isEmptySeat(n) && !isAbsent(n)).length, all = done >= A;
     return `<button class="m-tab ${on ? 'on' : ''} ${all ? 'all' : ''}" data-mi="${i}" title="${on ? '再點一次可以改名或刪除' : '切換到這個任務'}"><span class="mt-name">${escapeHTML(on ? state.homework.title || m.title : m.title)}</span><span class="mt-ct">${done}/${A}</span>${on ? '<span class="mt-ed">✎</span>' : ''}</button>`;
-  }).join('') + (state.missions.filter(m => !m.bc).length < 3 ? `<button class="m-add" data-madd="1" title="新增任務（最多 3 個）">＋ 任務</button>` : '');
+  }).join('') + (state.missions.filter(m => !m.bc).length < 3 ? `<button class="m-add" data-madd="1" title="新增任務（最多 3 個）">＋ 任務</button>` : '') + (state.settings.bcShow && !bcTaskOn() ? '<button class="m-add bc-add" data-bcadd="1" title="打開 Bubble Check 的訂正打卡">＋ 訂正</button>' : '');
 }
 // 小視窗：輸入文字（可選刪除）
 /* ---------- 個人點數兌換：每完成一次任務 1 點；兌換扣「可用點數」，累計完成次數不變 ---------- */
@@ -5286,9 +5287,10 @@ function renderDrawer() {
       <p class="note mt-2">輸入正確的禮物碼就能開啟禮物箱。每個禮物碼每班只能使用一次${state.giftUsed.length ? `，已兌換 ${state.giftUsed.length} 個` : ''}。</p></div>
       <div class="sec"><h3>BUBBLE CHECK · 作業訂正串連</h3>
       <button class="btn w-full ${se.bcShow ? 'on' : ''}" data-act="bcToggle">右欄「訂正」分頁：${se.bcShow ? '顯示中' : '未開啟'}</button>
+      ${se.bcShow ? `<button class="btn w-full mt-2 ${se.bcTask !== false ? 'on' : ''}" data-act="bcTaskToggle">任務打卡的「訂正」打卡：${se.bcTask !== false ? '開啟中' : '已關閉'}</button><p class="note mt-1">也可以在任務打卡直接開關：選中「訂正」再點一次就關掉，按「＋ 訂正」就打開。關掉後右欄的訂正名單照常顯示。</p>` : ''}
       ${se.bcShow ? `<div class="flex gap-2 mt-2"><input class="field" id="bcCodeIn" maxlength="40" placeholder="${bcCode() && !se.bcCode ? '已自動帶入這台電腦的邀請碼' : 'Bubble Check 的邀請碼'}" value="${escapeHTML(se.bcCode || '')}" autocomplete="off" spellcheck="false" style="flex:1;text-transform:uppercase;letter-spacing:.1em"><button class="btn primary" data-act="bcCodeSave">連線</button></div>
       <div class="info-box mt-2">雲端同步：<b>${BC_ST[bcCloud.status]}</b>${bcCloud.code ? `　·　邀請碼 ${escapeHTML(bcCloud.code)}` : ''}</div>` : ''}
-      <p class="note mt-2">開啟後，首頁右欄的環境音旁邊會多一個「訂正」分頁，列出 Bubble Check 裡還沒訂正完的座號；「任務打卡」也會多一個「訂正」任務，點座號＝訂正好了，訂正魚吃一口，Bubble Check 那邊會自動戳掉。輸入和 Bubble Check 一樣的邀請碼，手機登記後這裡會跟著更新；這台電腦的瀏覽器如果已經在 Bubble Check 輸入過邀請碼，會自動帶入。</p></div>
+      <p class="note mt-2">開啟後，首頁右欄的環境音旁邊會多一個「訂正」分頁，列出 Bubble Check 裡還沒訂正完的座號；「任務打卡」也會多一個「訂正」打卡（可以在下面單獨關掉）：全對的、訂正完的都點一下餵訂正魚，Bubble Check 那邊會自動戳掉。輸入和 Bubble Check 一樣的邀請碼，手機登記後這裡會跟著更新；這台電腦的瀏覽器如果已經在 Bubble Check 輸入過邀請碼，會自動帶入。</p></div>
       <div class="sec"><h3>SHORTCUTS · 快捷鍵</h3><p class="note"><span class="kbd">1</span> 現在時間　<span class="kbd">2</span> 倒數　<span class="kbd">3</span> 番茄鐘　<span class="kbd">4</span> 任務　<span class="kbd">5</span> 抽號　<span class="kbd">Space</span> 開始／暫停　<span class="kbd">H</span> 觀賞模式　<span class="kbd">Z</span> 放大中央畫面　<span class="kbd">F</span> 全螢幕　<span class="kbd">T</span> 控制台　<span class="kbd">Esc</span> 返回首頁</p></div>
       <div class="sec"><h3>BACKUP · 資料備份</h3>
       <div class="info-box">打卡紀錄、魚群、圖鑑、聯絡簿、倒數日都存在這台電腦的瀏覽器裡。清除瀏覽器資料或 Cookie 會一起清掉，建議定期下載備份。<br>上次備份：<b>${state.lastBackup ? fmtStamp(state.lastBackup) : '尚未備份'}</b></div>
@@ -5421,6 +5423,7 @@ async function onDrawerAction(act, v, el) {
     case 'mqToggle': state.settings.mqHide = !state.settings.mqHide; save(); renderMarquee(); renderDrawer(); toast(state.settings.mqHide ? '公告欄已隱藏' : '公告欄已顯示'); break;
     case 'mqDefault': state.settings.marquee = MARQUEE_DEFAULT; save(); renderMarquee(); renderDrawer(); toast('已恢復預設跑馬燈'); break;
     case 'toggleBg': state.settings.bgPaused = !state.settings.bgPaused; applySettings(); save(); renderDrawer(); break;
+    case 'bcTaskToggle': bcTaskSet(state.settings.bcTask === false); break;
     case 'bcToggle': state.settings.bcShow = !state.settings.bcShow; if (!state.settings.bcShow) state.settings.rightTab = 'amb'; save(); renderBc(); renderDrawer(); bcConnect(); break;
     case 'bcCodeSave': state.settings.bcCode = ($('#bcCodeIn').value || '').toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 40); save(); renderDrawer(); bcConnect(); break;
     case 'theme': state.settings.theme = state.settings.theme === 'jungle' ? 'ocean' : 'jungle'; save(); applyTheme(); renderDrawer(); break;
@@ -5521,6 +5524,7 @@ function bcPickClass(d) { const want = state.settings.bcClass, loc = readBc(); r
    要訂正的那一下會投一張「訂正好了」紙條（雲端 spaces/{碼}/inbox；沒開雲端放這台的 rcl-bc-inbox），Bubble Check 收到才真正戳掉。
    再點一次＝收回：紙條還在就抽回；已處理就投「收回」紙條，Bubble Check 把那份作業放回去。 */
 const BC_INBOX_KEY = 'rcl-bc-inbox';
+const bcTaskOn = () => !!state.settings.bcShow && state.settings.bcTask !== false;   // 任務打卡的「訂正」分頁：跟著 Bubble Check 串連，可以單獨關掉
 function readInbox() { try { const a = JSON.parse(localStorage.getItem(BC_INBOX_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
 function writeInbox(a) { try { localStorage.setItem(BC_INBOX_KEY, JSON.stringify(a)); } catch (e) {} }
 const bcMission = () => (state.missions || []).find(m => m.bc) || null;
@@ -5576,7 +5580,7 @@ function bcRoundDone() {
 }
 const bcOkList = cls => (cls.log || []).filter(e => e && e.k === 'ok' && e.id);
 function bcTick() {
-  if (!state.settings.bcShow) { if (isBcCur() && !missionBusy()) { const k = state.missions.findIndex(m => !m.bc); if (k >= 0) switchMission(k); } return; }
+  if (!bcTaskOn()) { if (isBcCur() && !missionBusy()) { const k = state.missions.findIndex(m => !m.bc); if (k >= 0) switchMission(k); } return; }
   const raw = bcCur(); if (!raw) return;
   bcEnsureMission();
   if (!state.bcOut) state.bcOut = []; if (!state.bcHw) state.bcHw = {};
@@ -5696,6 +5700,17 @@ function bcGoHw(key) {
   const b = document.querySelector('[data-nav="feed"]'); if (b) b.click();
   const k = (state.missions || []).findIndex(m => m.bc); if (k >= 0 && k !== state.missionIdx) switchMission(k);
   if (state.bcHw && state.bcHw[key] && !state.bcHw[key].done) bcSelect(key);
+}
+// 任務打卡頁直接開關：選中的「訂正」再點一次＝關掉；「＋ 訂正」＝打開
+async function bcTaskSet(on) {
+  if (!on) {
+    if (missionBusy()) { toast('訂正魚正在進化，請稍候'); return; }
+    if (!(await confirmBox('關掉「訂正」打卡？', '任務打卡不再顯示訂正分頁，打卡紀錄和訂正魚都會保留。之後按「＋ 訂正」就能再打開。', '關掉'))) return;
+    state.settings.bcTask = false; save(); bcAfter(); renderRoster(); if (drawerOpen) renderDrawer(); toast('已關掉訂正打卡'); return;
+  }
+  state.settings.bcTask = true; save(); bcAfter();
+  const k = (state.missions || []).findIndex(m => m.bc); if (k >= 0 && k !== state.missionIdx) switchMission(k);
+  renderRoster(); if (drawerOpen) renderDrawer(); toast('任務打卡多了「訂正」分頁');
 }
 function bcSubLine(short) {
   const raw = bcCur(), h = raw ? bcSelHw() : null;
@@ -5981,11 +5996,12 @@ function init() {
   $('#rdPts').addEventListener('keydown', e => { if (e.key === 'Enter') doRedeem($('#rdItem').value, $('#rdPts').value); });
   $('#rdCancel').addEventListener('click', () => $('#rdModal').classList.remove('show'));
   $('#bcHwBar').addEventListener('click', e => { const b = e.target.closest('[data-hw]'); if (b) { Sound.init(); bcSelect(b.dataset.hw); } });
-  $('#bcList').addEventListener('click', e => { const r = e.target.closest('[data-hwk]'); if (!r || !state.settings.bcShow) return; Sound.init(); bcGoHw(r.dataset.hwk); });
+  $('#bcList').addEventListener('click', e => { const r = e.target.closest('[data-hwk]'); if (!r || !bcTaskOn()) return; Sound.init(); bcGoHw(r.dataset.hwk); });
   $('#rdModal').addEventListener('click', e => { if (e.target.id === 'rdModal') $('#rdModal').classList.remove('show'); });
   $('#rosterTitle').addEventListener('click', e => {
     const t = e.target.closest('[data-mi]'); if (t) { const k = +t.dataset.mi; if (k === state.missionIdx) editMission(k); else switchMission(k); return; }
     if (e.target.closest('[data-madd]')) addMission();
+    if (e.target.closest('[data-bcadd]')) { Sound.init(); bcTaskSet(true); }
   });
   $('#schedList').addEventListener('click', e => { const r = e.target.closest('.srow'); if (r) { Sound.init(); focusFromSchedule(+r.dataset.i); } });
   $('#ambList').addEventListener('click', e => { const a = e.target.closest('[data-amb]'); if (!a) return; Sound.init(); state.ambient.id = a.dataset.amb; save(); if (Noise.on) { Noise.ambWas = a.dataset.amb !== 'none'; if (Noise.ambWas) toast('音量偵測中，停止偵測後才會播放環境音'); } else Ambient.play(a.dataset.amb); renderAmbient(); });
