@@ -291,12 +291,12 @@ body.bpmf .dc .dn{display:none}
 #notesList li span{flex:1;min-width:0}
 #notesList li.done span{color:rgba(241,245,244,.4);text-decoration:line-through}
 #notesList li.done::before{background:rgba(112,214,189,.35)}
-#notesList li button{flex:none;opacity:0;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(241,245,244,.6);font-size:14px;transition:opacity .2s}
+#notesList li button{flex:none;opacity:.45;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(241,245,244,.6);font-size:14px;transition:opacity .2s}
 #notesList li:hover button{opacity:1}
 #notesList li button + button{margin-left:-6px}
 #notesList li.editing{background:rgba(242,182,93,.12);border-radius:10px;outline:1px solid rgba(242,182,93,.5)}
 #notesList li.editing button{opacity:1}
-@media (hover:none){#notesList li button{opacity:.55}}   /* 觸控螢幕沒有滑鼠移上去的效果，按鈕直接顯示 */
+@media (hover:none){#notesList li button{opacity:.6}}   /* 觸控螢幕沒有滑鼠移上去的效果，按鈕直接顯示 */
 .nb-add.editing input{border-color:rgba(242,182,93,.7);background:rgba(242,182,93,.08)}
 .nb-add .nb-cancel{border-color:rgba(255,255,255,.2);background:transparent;color:rgba(241,245,244,.7);font-size:18px}
 #notesList .nb-empty{display:block;border:none;color:rgba(241,245,244,.45);font-size:17px;line-height:1.7;padding:24px 6px}
@@ -1526,6 +1526,11 @@ html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) .nb-orient button.on{color:
 html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) .cd.first .cd-num{color:#A86E12}
 html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) :is(.nb-clear,.nb-orient,.nbd-btn,.cbtn,.nz-chip,.lay-btn,.cd-chips button,.mq-ed){border-color:rgba(21,77,82,.22);background-color:rgba(255,255,255,.55)}
 html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) :is(#notesList li,.srow,.cd,.task){border-color:rgba(21,77,82,.12)}
+/* 馬卡龍：聯絡簿每一項的 ✎ ✕ 和空白提示原本是白字，淺底上看不到 */
+html.t-pastel #notesList li button{color:#1F6E6A;border-color:rgba(21,77,82,.28);background:rgba(255,255,255,.55);opacity:.7}
+html.t-pastel #notesList li:hover button,html.t-pastel #notesList li.editing button{opacity:1}
+html.t-pastel #notesList li button:hover{background:#fff;border-color:rgba(21,77,82,.5)}
+html.t-pastel #notesList .nb-empty{color:rgba(21,60,64,.55)!important}
 html.t-pastel #marquee .mq-ed{color:var(--tx);border-color:rgba(21,77,82,.22);background-color:rgba(255,255,255,.55)}
 html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) .nb-orient button.on,html.t-pastel .lp-tab.on{color:#fff!important}
 html.t-pastel :is(#taskPanel,#centerPanel,#ambPanel) :is(.wx-sel,.wx-select,.wx-r,.wx-r b){color:var(--tx)}
@@ -1837,7 +1842,7 @@ html.t-pastel .bc-open{background:#55A596;border-color:#3B8375;color:#fff}
   <ol class="news-list">
     <li><b>新的版面風格「馬卡龍・夢幻海洋」</b><span>教師控制台 → 特殊 →「版面風格」下拉選單切換。淺色卡片、柔彩按鈕，100 種魚也換成幾何切面的新畫風；隨時可以換回深海經典。</span></li>
     <li><b>連動 Bubble Check 作業訂正</b><span>教師控制台 → 特殊 → 開啟右欄「訂正」分頁，輸入 Bubble Check 的邀請碼。手機登記誰要訂正，教室大螢幕就會列出座號。</span></li>
-    <li><b>聯絡簿可以單筆修改</b><span>每一項右邊的 ✎ 可以直接改字，不用整筆刪掉重打。抄寫模式也能顯示注音；直書時「~ - |」會自動轉成直式符號。</span></li>
+    <li><b>聯絡簿可以單筆修改</b><span>每一項右邊的 ✎（或雙擊、按住那一項）可以直接改字，不用整筆刪掉重打。抄寫模式也能顯示注音；直書時「~ - |」會自動轉成直式符號。</span></li>
     <li><b>魚屋：魚太多不用賣掉</b><span>在「全班魚群」讓魚回魚屋休息，水族箱就不擁擠；想看的時候再叫出來。</span></li>
   </ol>
   <p class="news-note">原本的資料、魚群和圖鑑都會保留，換版面不會不見。</p>
@@ -3648,7 +3653,7 @@ function renderNotes() {
   $('#notesDate').textContent = '聯絡簿';
   $('#nbDay').innerHTML = keyLabel(k) + (diff === 0 ? '<em>今天</em>' : diff === 1 ? '<em class="fut">明天</em>' : diff > 1 ? `<em class="fut">${diff} 天後</em>` : `<em class="past">${-diff} 天前</em>`);
   $('#notesList').innerHTML = notes.length
-    ? notes.map((n, i) => `<li class="${n.done ? 'done' : ''}${nbEdit && nbEdit.i === i ? ' editing' : ''}" data-i="${i}" title="點一下標示完成"><span>${nbText(n.t, state.settings.nbVert)}</span><button data-edit="${i}" title="修改這一項">✎</button><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
+    ? notes.map((n, i) => `<li class="${n.done ? 'done' : ''}${nbEdit && nbEdit.i === i ? ' editing' : ''}" data-i="${i}" title="點一下標示完成；雙擊或按住可以修改"><span>${nbText(n.t, state.settings.nbVert)}</span><button data-edit="${i}" title="修改這一項">✎</button><button data-del="${i}" title="刪除這一項">✕</button></li>`).join('')
     : `<li class="nb-empty">${diff === 0 ? '今天還沒有聯絡簿事項。' : `${keyLabel(k)} 還沒有事項。`}<br>在下方輸入一項，按 Enter 加入；<br>要排好幾天，按右上「多天輸入」。</li>`;
   $('#notesClear').style.visibility = notes.length ? 'visible' : 'hidden';
   const v = !!state.settings.nbVert; $('#notesList').classList.toggle('vt', v);
@@ -5930,8 +5935,16 @@ function init() {
   $('#notesList').addEventListener('click', e => {
     const ed = e.target.closest('[data-edit]'); if (ed) { nbEditStart(+ed.dataset.edit); return; }
     const del = e.target.closest('[data-del]'); if (del) { if (nbEdit) nbEditEnd(); NB().splice(+del.dataset.del, 1); save(); renderNotes(); return; }
-    const li = e.target.closest('li[data-i]'); if (li) { const n = NB()[+li.dataset.i]; n.done = !n.done; save(); renderNotes(); }
+    const li = e.target.closest('li[data-i]'); if (!li) return;
+    if (nbLp) { nbLp = false; return; }   // 剛剛是按住修改
+    const i = +li.dataset.i, n = NB()[i], now = Date.now();
+    if (nbTap.i === i && now - nbTap.t < 400) { nbTap = { i: -1, t: 0 }; n.done = !n.done; nbEditStart(i); return; }   // 連點兩下：取消剛剛的完成，改成修改
+    nbTap = { i, t: now }; n.done = !n.done; save(); renderNotes();
   });
+  // 另一種修改方式：連點兩下那一項，或按住 0.6 秒
+  let nbLpT = 0, nbLp = false, nbTap = { i: -1, t: 0 };
+  $('#notesList').addEventListener('pointerdown', e => { const li = e.target.closest('li[data-i]'); nbLp = false; clearTimeout(nbLpT); if (!li || e.target.closest('button')) return; nbLpT = setTimeout(() => { nbLp = true; nbEditStart(+li.dataset.i); }, 600); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => $('#notesList').addEventListener(ev, () => clearTimeout(nbLpT)));
   $('#notesBig').addEventListener('click', () => setNbZoom(true));
   window.addEventListener('resize', () => { if (nbZoomed) setTimeout(renderNbBoard, 80); });
   $('#nbbClose').addEventListener('click', () => setNbZoom(false));
