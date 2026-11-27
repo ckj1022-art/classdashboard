@@ -4584,7 +4584,7 @@ function loadMission() {
   state.homework.title = m.title; state.homework.fish = m.fish; state.round.achieved = false;
   state.students.forEach((x, i) => x.checked = set.has(i + 1));
 }
-const missionBusy = () => hwRevealPending || Shows.running || state.homework.fish.evolved;
+const missionBusy = () => hwRevealPending || Shows.running || (state.homework.fish.evolved && !isBcCur());
 function switchMission(k) {
   ensureMissions(); if (k === state.missionIdx || !state.missions[k]) return;
   if (missionBusy()) { toast('任務魚正在進化，請稍候再切換任務'); return; }
@@ -5571,7 +5571,7 @@ function bcLink(force) {
 // 魚吃的份數＝這份作業點過的人數（請假、空號不算）
 function bcSyncFish(h) {
   const f = h.fish, want = bcHwDone(h), cur = isBcCur() && state.homework.fish === f;
-  if (f.evolved) { if (!cur && want >= presentN()) h.done = true; return; }
+  if (f.evolved) { if (want >= presentN() && !hwRevealPending && !Shows.running) { h.done = true; h.doneAt = Date.now(); if (state.bcSel === h.key) { state.bcSel = null; setTimeout(() => { bcLink(true); renderRoster(); }, 0); } } return; }
   f.target = presentN();
   const d = want - f.food;
   if (d > 0) { if (cur) feedHwFish(d); else { f.food = Math.min(f.food + d, f.target); state.totalFood += d; } }
@@ -5660,7 +5660,7 @@ const bcNoteId = () => 'cd' + Date.now().toString(36) + Math.random().toString(3
 function bcSeatClick(seat, btn) {
   const raw = bcCur(); if (!raw) { toast(bcCloud.code ? 'Bubble Check 還沒連上，等一下再點' : '還沒連上 Bubble Check'); return; }
   const h = bcSelHw(); if (!h) { toast('目前沒有要訂正的作業 🎉'); return; }
-  if (hwRevealPending || Shows.running || state.homework.fish.evolved) { toast('訂正魚正在進化，請稍候'); return; }
+  if (hwRevealPending || Shows.running) { toast('訂正魚正在進化，請稍候'); return; }
   const now = Date.now(), tap = h.taps[seat], ts = bcPendOf(raw, h.key).get(seat);
   const shake = () => { btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); };
   if (tap) {   // 再點一次＝收回
@@ -5688,7 +5688,7 @@ function bcSeatClick(seat, btn) {
 }
 async function bcAllGold() {
   const raw = bcCur(), h = bcSelHw(); if (!raw || !h) { toast('目前沒有要訂正的作業'); return; }
-  if (hwRevealPending || Shows.running || state.homework.fish.evolved) { toast('訂正魚正在進化，請稍候'); return; }
+  if (hwRevealPending || Shows.running) { toast('訂正魚正在進化，請稍候'); return; }
   const pm = bcPendOf(raw, h.key), list = []; for (let n = 1; n <= N; n++) if (bcCounted(n) && !h.taps[n] && !pm.has(n)) list.push(n);
   if (!list.length) { toast('全對的同學都已經點過了'); return; }
   if (!(await confirmBox('全對的一起餵？', `「${h.label}」全對的 ${list.length} 位同學一起打勾、一起餵訂正魚。點錯的話，點座號可以個別收回。`, '一起餵'))) return;
@@ -5698,11 +5698,11 @@ async function bcAllGold() {
 async function bcSelect(key) {
   if (key === state.bcSel) {   // 選中的作業再點一次：收起這份打卡（Bubble Check 的資料不受影響）
     const h = state.bcHw && state.bcHw[key]; if (!h) return;
-    if (hwRevealPending || Shows.running || state.homework.fish.evolved) { toast('訂正魚正在進化，請稍候'); return; }
+    if (hwRevealPending || Shows.running) { toast('訂正魚正在進化，請稍候'); return; }
     if (!(await confirmBox(`收起「${h.label}」？`, '這份作業的打卡會從訂正分頁拿掉，Bubble Check 的資料不受影響。之後 Bubble Check 又登記這份作業，會再出現。', '收起'))) return;
     h.done = true; h.closed = true; h.doneAt = Date.now(); state.bcSel = null; bcLink(true); save(); renderRoster(); renderBc(); toast(`已收起「${h.label}」`); return;
   }
-  if (hwRevealPending || Shows.running || state.homework.fish.evolved) { toast('訂正魚正在進化，請稍候'); return; }
+  if (hwRevealPending || Shows.running) { toast('訂正魚正在進化，請稍候'); return; }
   state.bcSel = key; bcLink(); save(); renderRoster(); const sg = $('#seatGrid'); sg.classList.remove('m-swap'); void sg.offsetWidth; sg.classList.add('m-swap');
 }
 function bcRosterMarks(btns) {
