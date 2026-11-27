@@ -1024,6 +1024,7 @@ body.bpmf #nbbList.vt li span.upr,body.bpmf #nbbList.vt li span.tcy{font-family:
 #roster.bcmode .bc-hw-bar{display:flex}
 .bc-hw{flex:none;display:flex;align-items:center;gap:8px;height:42px;padding:0 14px;border-radius:12px;border:1px solid rgba(170,220,230,.22);background:rgba(255,255,255,.05);color:rgba(241,245,244,.8);font:500 17px var(--sans);cursor:pointer}
 .bc-hw b{font-weight:700;letter-spacing:.04em}
+.bc-hw .bc-x{font-size:13px;opacity:.6;margin-left:2px}
 .bc-hw em{font-style:normal;font-size:14px;opacity:.75}
 .bc-hw .bc-age{font-style:normal}
 .bc-hw.on{background:rgba(242,207,91,.16);border-color:rgba(242,207,91,.7);color:#fff6d8}
@@ -1990,7 +1991,7 @@ function sanitize(d) {
   s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = parseInt(s.weather.place) || 0;   // 地點清單的對應在 init 時處理（migrateWxPlace）
   s.missions = d.missions; s.missionIdx = d.missionIdx;
   s.bcOut = Array.isArray(d.bcOut) ? d.bcOut.filter(n => n && typeof n.id === 'string').slice(-200) : [];
-  s.bcHw = d.bcHw && typeof d.bcHw === 'object' ? d.bcHw : {}; delete s.bcFed; delete s.bcBase;
+  s.bcHw = d.bcHw && typeof d.bcHw === 'object' ? d.bcHw : {}; s.bcSeenOk = d.bcSeenOk && typeof d.bcSeenOk === 'object' ? d.bcSeenOk : {}; delete s.bcFed; delete s.bcBase;
   s.emptySeats = Array.isArray(d.emptySeats) ? [...new Set(d.emptySeats.filter(n => Number.isInteger(n) && n >= 1 && n <= 50))].sort((a, b) => a - b) : [];
   s.rewards = Array.isArray(d.rewards) ? d.rewards.filter(r => r && typeof r.name === 'string' && r.name.trim() && r.cost > 0).slice(0, 20).map(r => ({ name: r.name.slice(0, 20), cost: Math.min(999, r.cost | 0) })) : DEFAULT_REWARDS.map(r => ({ ...r }));
   s.picker = Object.assign({ noRepeat: true, drawn: [] }, d.picker || {}); if (!Array.isArray(s.picker.drawn)) s.picker.drawn = [];
@@ -5490,7 +5491,7 @@ function bcDocsToData(docs) {
   const cls = {}, logs = {}, lim = Date.now() - 45 * 864e5; let order = [];
   docs.forEach(({ id, data }) => { data = data || {};
     if (id.startsWith('l_')) { let c = null, e = []; try { c = JSON.parse(data.c || 'null'); e = JSON.parse(data.e || '[]'); } catch (x) {}
-      if (c && Array.isArray(e)) (logs[c] = logs[c] || []).push(...e.filter(x => x && x.k === 'ok' && x.id && x.t > lim).map(x => ({ id: x.id, t: x.t, k: 'ok' }))); }
+      if (c && Array.isArray(e)) (logs[c] = logs[c] || []).push(...e.filter(x => x && x.k === 'ok' && x.id && x.t > lim).map(x => ({ id: x.id, t: x.t, k: 'ok', n: x.n || 1 }))); }
     else if (id === 'meta') { try { order = JSON.parse(data.order || '[]'); } catch (e) {} }
     else if (id.startsWith('c_')) { const cid = id.slice(2); let name = ''; try { name = JSON.parse(data.name || '""'); } catch (e) {}
       const students = []; Object.entries(data.seats || {}).forEach(([k, v]) => { if (typeof v !== 'string') return; try { students.push({ ...JSON.parse(v), id: Number(k) }); } catch (e) {} });
@@ -5608,18 +5609,39 @@ function bcTick() {
   pend.forEach((m, k) => {
     let h = state.bcHw[k]; const ts = [...m.values()].flat(), oldest = Math.min(...ts.map(t => t.createdAt || now));
     if (!h) { h = state.bcHw[k] = { key: k, c: raw.id, label: bcLabel(ts[0]), at: oldest, seen: now, last: now, owe: {}, taps: {}, fish: freshHwFish(presentN()) }; dirty = true; }
-    if (h.done) { h.done = false; dirty = true; }   // 結束後又有人被登記：重新打開（魚已經進化就不會再進化一次）
+    if (h.done) {   // 結束後又有人被登記：重新打開（魚已經進化就不會再進化一次）；老師手動收起的，要有新的人被登記才打開
+      if (h.closed && ![...m.keys()].some(seat => !h.owe[seat])) return;
+      h.done = false; h.closed = false; dirty = true;
+    }
     if (oldest < h.at) h.at = oldest; h.last = now;
     m.forEach((list, seat) => { const o = h.owe[seat]; if (!o || o.tasks.length !== list.length || o.tasks.some((t, i) => t.id !== list[i].id)) { h.owe[seat] = { tasks: list.map(t => ({ ...t })) }; dirty = true; } });
   });
-  // 3) 每份作業：又變成要訂正的 → 取消打勾；在 Bubble Check 戳掉的 → 自動打勾
+  // 3) 每份作業：又變成要訂正的 → 取消打勾；不見的那幾筆，要分「戳掉（訂正好了）」還是「刪掉（登記錯了）」
+  //    Bubble Check 戳掉一定會多一筆 'ok' 紀錄，刪掉不會：這次新出現的 'ok' 份數 ≥ 不見的筆數 → 當作戳掉；一筆都沒有 → 當作刪掉
+  if (!state.bcSeenOk) state.bcSeenOk = {};
+  const mineIds = new Set(); Object.values(state.bcHw).forEach(h => Object.values(h.taps || {}).forEach(t => t && t.notes && Object.values(t.notes).forEach(id => mineIds.add(id))));
+  const seen = state.bcSeenOk[raw.id], seenSet = new Set(seen || []);
+  const newOk = seen ? bcOkList(raw).filter(e => !seenSet.has(e.id) && !mineIds.has(e.id)).reduce((a, e) => a + (e.n || 1), 0) : Infinity;   // 第一次看到這個班：當作都是戳掉
+  const gone = [];
   bcHwList(raw.id).forEach(h => {
     const m = pend.get(h.key) || new Map();
     for (const s in h.taps) if (m.has(+s)) { delete h.taps[s]; dirty = true; }
     for (const s in h.owe) {
       const n = +s; if (m.has(n) || h.taps[s]) continue;
       if (state.bcOut.some(x => x.c === raw.id && x.s === n && x.k === 'undo' && x.b === h.key)) continue;   // 正在收回
-      h.taps[s] = { at: now, kind: 'fix', via: 'bc' }; dirty = true;
+      gone.push([h, s]);
+    }
+  });
+  const asPop = newOk > 0;
+  gone.forEach(([h, s]) => { if (asPop) h.taps[s] = { at: now, kind: 'fix', via: 'bc' }; else delete h.owe[s]; dirty = true; });
+  state.bcSeenOk[raw.id] = bcOkList(raw).map(e => e.id);
+  bcHwList(raw.id).forEach(h => {
+    const m = pend.get(h.key) || new Map();
+    // 整份作業在 Bubble Check 被刪掉（沒人要訂正、也沒有人訂正好過）：這份打卡跟著拿掉，魚吃的也退回
+    if (!m.size && !Object.keys(h.owe).length && !Object.values(h.taps).some(t => t.kind !== 'ok')) {
+      if (!h.fish.evolved) state.totalFood = Math.max(0, state.totalFood - (h.fish.food || 0));
+      if (state.bcSel === h.key) state.bcSel = null;
+      delete state.bcHw[h.key]; dirty = true; return;
     }
     if (!m.size && now - (h.last || h.seen) > 3 * 864e5) { h.done = true; dirty = true; }   // 沒人欠、三天沒動：收起來
     bcSyncFish(h);
@@ -5673,8 +5695,13 @@ async function bcAllGold() {
   const now = Date.now(); list.forEach(n => { h.taps[n] = { at: now, kind: 'ok' }; }); h.last = now;
   bcSyncFish(h); save(); Sound.pop(); renderRoster(); renderBc(); toast(`全對的 ${list.length} 位同學一起餵了訂正魚 ⭐`);
 }
-function bcSelect(key) {
-  if (key === state.bcSel) return;
+async function bcSelect(key) {
+  if (key === state.bcSel) {   // 選中的作業再點一次：收起這份打卡（Bubble Check 的資料不受影響）
+    const h = state.bcHw && state.bcHw[key]; if (!h) return;
+    if (hwRevealPending || Shows.running || state.homework.fish.evolved) { toast('訂正魚正在進化，請稍候'); return; }
+    if (!(await confirmBox(`收起「${h.label}」？`, '這份作業的打卡會從訂正分頁拿掉，Bubble Check 的資料不受影響。之後 Bubble Check 又登記這份作業，會再出現。', '收起'))) return;
+    h.done = true; h.closed = true; h.doneAt = Date.now(); state.bcSel = null; bcLink(true); save(); renderRoster(); renderBc(); toast(`已收起「${h.label}」`); return;
+  }
   if (hwRevealPending || Shows.running || state.homework.fish.evolved) { toast('訂正魚正在進化，請稍候'); return; }
   state.bcSel = key; bcLink(); save(); renderRoster(); const sg = $('#seatGrid'); sg.classList.remove('m-swap'); void sg.offsetWidth; sg.classList.add('m-swap');
 }
@@ -5695,7 +5722,7 @@ function renderBcBar() {
   const bar = $('#bcHwBar'); if (!bar) return; if (!isBcCur()) { if (bar.innerHTML) bar.innerHTML = ''; return; }
   const raw = bcCur(), list = raw ? bcHwList(raw.id) : [], sel = raw ? bcSelHw() : null;
   bar.innerHTML = list.length ? list.map(h => { const left = presentN() - bcHwDone(h), a = bcAge(h.at);
-      return `<button class="bc-hw ${h === sel ? 'on' : ''}" data-hw="${escapeHTML(h.key)}"><b>${escapeHTML(h.label)}</b><i class="bc-age ${bcAgeCls(a)}">${a ? a + ' 天' : '今天'}</i><em>${left > 0 ? `還有 ${left} 人` : '✓'}</em></button>`; }).join('')
+      return `<button class="bc-hw ${h === sel ? 'on' : ''}" data-hw="${escapeHTML(h.key)}" title="${h === sel ? '再點一次可以收起這份' : '切換到這份作業'}"><b>${escapeHTML(h.label)}</b><i class="bc-age ${bcAgeCls(a)}">${a ? a + ' 天' : '今天'}</i><em>${left > 0 ? `還有 ${left} 人` : '✓'}</em>${h === sel ? '<span class="bc-x">✕</span>' : ''}</button>`; }).join('')
       + '<span class="bc-legend"><i class="lg g"></i>全對<i class="lg o"></i>要訂正<i class="lg d"></i>已完成</span>'
     : `<span class="bc-legend">${raw ? '目前沒有要訂正的作業 🎉 在 Bubble Check 登記後會出現在這裡' : bcCloud.code && bcCloud.status !== 'live' ? 'Bubble Check ' + (BC_ST[bcCloud.status] || '連線中…') : '還沒連上 Bubble Check'}</span>`;
 }
