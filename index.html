@@ -331,6 +331,8 @@ body.bpmf .dc .dn{display:none}
 .nb-clear{height:32px;padding:0 14px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(241,245,244,.6);font-size:14px;letter-spacing:.1em}
 .sched-top{display:flex;align-items:center;justify-content:space-between;padding:0 24px 0 26px}
 .sched-top .p-head{padding:0}
+.sched-top{gap:8px;padding:0 18px 0 26px}.sched-top .p-head{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:clip;letter-spacing:.16em}.sched-top>.flex{gap:6px!important;flex:none}
+.sched-top .day-tag,.sched-top .nb-clear{white-space:nowrap;flex:none}.sched-top .nb-clear{padding:0 10px;letter-spacing:.06em}.sched-top .day-tag{padding:3px 8px;letter-spacing:.08em}
 .day-tag{font:500 13px var(--sans);letter-spacing:.14em;padding:3px 11px;border-radius:99px;border:1px solid rgba(112,214,189,.4);color:var(--energy)}
 .day-tag.off{border-color:rgba(242,182,93,.5);color:var(--gold)}
 .daybar{margin:14px 24px 12px 26px}
@@ -599,6 +601,13 @@ img.px{image-rendering:pixelated;image-rendering:crisp-edges;width:100%;height:1
 .meta-line{font:400 22px var(--sans);color:rgba(241,245,244,.62);letter-spacing:.06em}
 .clock-foot{margin-top:auto;width:100%;display:flex;align-items:center;justify-content:space-between}
 .clock-foot .task-chip{align-self:center}
+.clock-foot{gap:18px}.clock-foot .task-chip{min-width:0}
+.next-chip{display:flex;align-items:center;gap:10px;padding:5px 24px 5px 16px;border-radius:40px;border:2px solid rgba(124,220,197,.55);background:rgba(124,220,197,.08);color:rgba(241,245,244,.92);font:500 22px var(--sans);letter-spacing:.06em;max-width:100%;min-width:0}
+.next-chip small{display:flex;flex-direction:column;align-items:flex-end;font-size:13px;letter-spacing:.14em;color:rgba(124,220,197,.9);line-height:1.15;flex:none}
+.next-chip small i{font-style:normal;font-family:var(--mono);letter-spacing:.04em;font-size:14px;color:rgba(241,245,244,.6)}
+.next-chip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.t-pastel .next-chip{border-color:rgba(21,90,92,.3);background:rgba(255,255,255,.45);color:var(--tx)}
+html.t-pastel .next-chip small{color:#2C7D74}html.t-pastel .next-chip small i{color:rgba(21,60,64,.55)}
 .cf-stat{font:500 42px var(--mono)}.cf-stat small{font:400 17px var(--sans);letter-spacing:.14em;color:rgba(241,245,244,.6)}
 #hwTitleView{font:500 27px var(--sans);letter-spacing:.06em;color:var(--ink);max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pill{font:500 16px var(--sans);letter-spacing:.1em;padding:5px 16px;border-radius:99px;border:1px solid rgba(170,220,230,.25);color:rgba(241,245,244,.75)}
@@ -1089,6 +1098,28 @@ html.t-pastel .bc-hw.on{background:#fff4cf;border-color:#e9c45a;color:#5a4300}
 #nbDay em.fut{background:rgba(242,182,93,.18);color:var(--gold)}
 #nbDay em.past{background:rgba(255,255,255,.08);color:rgba(241,245,244,.6)}
 .se-card{width:min(620px,94vw)}
+#ttEd{position:fixed;inset:0;z-index:58;display:none;place-items:center;background:rgba(2,8,14,.6);overflow-y:auto;padding:12px}
+#ttEd.show{display:grid}
+.modal-card.tt-card{width:min(860px,96vw);padding:22px 24px}
+.tt-chips{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 10px}
+.tt-chips button{padding:5px 12px;border-radius:16px;border:1px solid rgba(170,220,230,.28);background:rgba(255,255,255,.06);color:#eef6f6;font:500 15px var(--sans);cursor:pointer}
+.tt-chips button.on{background:var(--energy);color:#05282c;border-color:var(--energy)}
+.tt-chips button.del{color:#ffb4a8;border-color:rgba(255,140,120,.4)}
+.tt-chips button.del.on{background:#ff8f7d;color:#3a0a00}
+.tt-wrap{max-height:min(52vh,460px);overflow:auto;border-radius:14px;border:1px solid rgba(170,220,230,.2)}
+.tt-tbl{border-collapse:collapse;width:100%}
+.tt-tbl th{position:sticky;top:0;z-index:1;background:#0d2a35;color:rgba(241,245,244,.8);font:500 15px var(--sans);padding:8px 6px;letter-spacing:.1em}
+.tt-tbl th.today{color:var(--energy)}
+.tt-tbl td{padding:4px;border-top:1px solid rgba(170,220,230,.1)}
+.tt-tbl td.tm{white-space:nowrap;padding:4px 10px;color:rgba(241,245,244,.7);font:14px var(--mono)}
+.tt-tbl td.tm b{display:block;font:500 14px var(--sans);color:#eef6f6;letter-spacing:.04em}
+.tt-tbl tr.np td.tm{opacity:.55}
+.tt-tbl input{width:100%;min-width:0;padding:8px 2px;border-radius:10px;border:1px solid rgba(170,220,230,.2);background:rgba(2,14,24,.6);color:#eef6f6;font:500 16px var(--sans);text-align:center;outline:none}
+.tt-tbl input:focus{border-color:rgba(112,214,189,.7)}
+.tt-tbl input.has{background:rgba(112,214,189,.14);border-color:rgba(112,214,189,.4)}
+.tt-tbl.arm input{cursor:pointer}
+@media (max-width:520px){.modal-card.tt-card{padding:16px 12px}.tt-tbl th{font-size:13px;letter-spacing:0;padding:6px 2px}.tt-tbl td{padding:3px 2px}.tt-tbl td.tm{padding:3px 4px;font-size:11px}.tt-tbl td.tm b{font-size:12px}.tt-tbl input{font-size:14px;padding:7px 0}.tt-chips button{font-size:14px;padding:4px 10px}}
+.sname .sper{margin-left:8px;font-size:.72em;opacity:.55;letter-spacing:.04em}
 .se-hint{font-size:15px}
 .se-hint code{font-family:var(--mono);color:var(--energy);background:rgba(112,214,189,.1);padding:1px 6px;border-radius:6px}
 #seText{width:100%;height:min(46vh,380px);resize:vertical;padding:14px 16px;border-radius:14px;border:1px solid rgba(170,220,230,.25);background:rgba(2,14,24,.7);color:#eef6f6;font:16px/1.7 var(--mono);outline:none}
@@ -1679,7 +1710,7 @@ html.t-pastel .bc-open{background:#55A596;border-color:#3B8375;color:#fff}
     <div id="taskPanel" class="panel pe">
       <div class="lp-tabs"><button class="lp-tab" data-lp="sched">作息表</button><button class="lp-tab" data-lp="notes">聯絡簿</button><button class="lp-tab" data-lp="days">倒數日</button></div>
       <div class="lp-view" id="lpSched">
-        <div class="sched-top"><div class="p-head">SCHEDULE<span>今日作息</span></div><div class="flex items-center gap-2"><span class="day-tag" id="dayTag">上課日</span><button class="nb-clear" id="schedEdit" title="改成自己學校的作息">編輯</button></div></div>
+        <div class="sched-top"><div class="p-head">SCHEDULE<span>今日作息</span></div><div class="flex items-center gap-2"><span class="day-tag" id="dayTag">上課日</span><button class="nb-clear" id="ttEdit" title="星期一到五，每節上什麼">課表</button><button class="nb-clear" id="schedEdit" title="改成自己學校的作息">編輯</button></div></div>
         <div class="daybar"><div class="lbls"><span id="dayS">07:10</span><b id="dayLbl">今日進度 <em>0%</em></b><span id="dayE">16:00</span></div><div class="track"><i id="dayFill"></i><s id="dayKnob"></s></div></div>
         <div id="schedList"></div>
       </div>
@@ -1822,6 +1853,13 @@ html.t-pastel .bc-open{background:#55A596;border-color:#3B8375;color:#fff}
   <textarea id="seText" spellcheck="false"></textarea>
   <div id="seInfo"></div>
   <div class="se-btns"><button class="btn" id="seDefault">換回範例</button><span style="flex:1"></span><button class="btn" id="seCancel">取消</button><button class="btn primary" id="seSave">儲存</button></div>
+</div></div>
+<div id="ttEd"><div class="modal-card tt-card">
+  <h3>週課表</h3>
+  <p class="se-hint">填上星期一到五每節的科目，作息表、時間主畫面的「現在／下一節」就會顯示科目。沒填的格子照作息表的名稱。<br>先點下面的科目，再點格子就能一格一格填；也可以直接在格子裡打字。</p>
+  <div class="tt-chips" id="ttChips"></div>
+  <div class="tt-wrap"><table class="tt-tbl" id="ttTbl"></table></div>
+  <div class="se-btns" style="margin-top:14px"><button class="btn" id="ttClear">全部清空</button><span style="flex:1"></span><button class="btn" id="ttCancel">取消</button><button class="btn primary" id="ttSave">儲存</button></div>
 </div></div>
 <div id="nbBatch"><div class="modal-card se-card">
   <h3>一次輸入多天聯絡簿</h3>
@@ -1990,6 +2028,7 @@ function sanitize(d) {
   if (d.notesBook && typeof d.notesBook === 'object') for (const k in d.notesBook) if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(d.notesBook[k])) s.notesBook[k] = d.notesBook[k].filter(n => n && typeof n.t === 'string').slice(0, 30);
   s.weather = Object.assign({ place: 0, data: null, at: 0, dataPlace: -1, err: false }, d.weather || {}); s.weather.place = parseInt(s.weather.place) || 0;   // 地點清單的對應在 init 時處理（migrateWxPlace）
   s.missions = d.missions; s.missionIdx = d.missionIdx;
+  s.weekTT = d.weekTT && typeof d.weekTT === 'object' ? d.weekTT : {};
   s.bcOut = Array.isArray(d.bcOut) ? d.bcOut.filter(n => n && typeof n.id === 'string').slice(-200) : [];
   s.bcHw = d.bcHw && typeof d.bcHw === 'object' ? d.bcHw : {}; s.bcSeenOk = d.bcSeenOk && typeof d.bcSeenOk === 'object' ? d.bcSeenOk : {}; delete s.bcFed; delete s.bcBase;
   s.emptySeats = Array.isArray(d.emptySeats) ? [...new Set(d.emptySeats.filter(n => Number.isInteger(n) && n >= 1 && n <= 50))].sort((a, b) => a - b) : [];
@@ -2991,6 +3030,12 @@ function parseSchedule(text) {
   return { list, bad };
 }
 let SCHEDULE = [], DAY_S = 0, DAY_E = 1;
+/* ---------- 週課表：星期一到五每個時段上什麼（用開始時間對應作息，改作息時間後對不到的格子不會亂跑） ---------- */
+const TT_DAYS = [1, 2, 3, 4, 5], TT_SUBJ = ['國語', '數學', '英語', '自然', '社會', '生活', '健康', '體育', '音樂', '美勞', '綜合', '本土語', '閩南語', '資訊', '彈性', '閱讀'];
+const todayWd = () => '日一二三四五六'.indexOf(String(nowParts().wd).slice(-1));
+function ttSubj(it, wd = todayWd()) { const d = state.weekTT && state.weekTT[wd]; return (d && it && d[it.ss]) || ''; }
+// 今天這個時段要顯示的樣子：有填課表就用科目（圖示跟著科目），沒有就用作息原本的名稱
+function slotView(it) { const sj = ttSubj(it); return sj ? { ...it, name: sj, per: it.name, icon: guessIcon(sj) } : it; }
 function applySchedule(text) {
   let { list } = parseSchedule(text || DEFAULT_SCHED);
   if (!list.length) list = parseSchedule(DEFAULT_SCHED).list;
@@ -3006,7 +3051,7 @@ function schedNow() {
 // 目前時段（中央面板的任務標籤也跟著作息走）
 function curTask() {
   const { cur, next } = schedNow();
-  if (cur >= 0) return SCHEDULE[cur];
+  if (cur >= 0) return slotView(SCHEDULE[cur]);
   if (next > 0) return { id: 'brk' + next, name: '下課', icon: 'clock', brk: true };
   if (next === 0) return { id: 'pre', name: '上學前', icon: 'sun', brk: true };
   return { id: 'after', name: '放學後', icon: 'home', brk: true };
@@ -3558,6 +3603,9 @@ function renderDays() {
 }
 function updateClockCountdown() {
   const el = document.getElementById('cfRight'); if (!el) return;
+  // 上課日：右邊顯示「下一節」要上什麼（跟左邊的「現在」成對）；假日、放學後才顯示倒數日或完成人數
+  const st = schedNow(), nx = !st.weekend && st.next >= 0 ? slotView(SCHEDULE[st.next]) : null;
+  if (nx) { el.innerHTML = `<div class="next-chip" title="下一節 ${nx.ss}–${nx.ee}"><small>下一節<i>${nx.ss}</i></small>${taskIcon(nx.icon, 40)}<span>${escapeHTML(nx.name)}</span></div>`; return; }
   const up = sortedCountdowns().find(c => c.n >= 0);
   el.innerHTML = up ? `<div class="cf-cd">${up.n === 0 ? `今天就是<b style="font-size:34px">${escapeHTML(up.name)}</b>` : `距離${escapeHTML(up.name)}<b>${up.n}</b>天`}</div>` : `<div class="cf-stat"><span id="cDone">${doneCount()}</span><small>　/ <span id="cTotal">${activeN()}</span> 已完成</small></div>`;
 }
@@ -3708,10 +3756,10 @@ function renderSchedule(force) {
     let h = '', part = '';
     SCHEDULE.forEach((it, i) => {
       if (it.part !== part) { part = it.part; h += `<div class="spart">${part}</div>`; }
-      if (st.cur < 0 && st.next === i && i > 0) h += `<div class="sbreak" id="sNow"><span class="sdot"></span>下課中　還有 <b id="sBrkLeft"></b>，接著「${it.name}」</div>`;
+      if (st.cur < 0 && st.next === i && i > 0) h += `<div class="sbreak" id="sNow"><span class="sdot"></span>下課中　還有 <b id="sBrkLeft"></b>，接著「${escapeHTML(slotView(it).name)}」</div>`;
       const past = st.cur >= 0 ? i < st.cur : (st.next < 0 ? true : i < st.next);
       const cls = st.cur === i ? 'cur' : past ? 'past' : st.next === i ? 'next' : '';
-      h += `<div class="srow ${cls}" data-i="${i}" ${st.cur === i ? 'id="sNow"' : ''} title="點一下：以「${it.name}」的時間設定專注計時">${st.cur === i ? '<i class="sfill" id="sFill"></i>' : ''}<span class="sdot"></span><span class="stime">${it.ss}–${it.ee}</span><span class="sname">${it.name}</span><span class="sstat" ${st.cur === i ? 'id="sLeft"' : ''}>${past ? '✓' : (it.e - it.s) + ' 分'}</span></div>`;
+      h += `<div class="srow ${cls}" data-i="${i}" ${st.cur === i ? 'id="sNow"' : ''} title="點一下：以「${it.name}」的時間設定專注計時">${st.cur === i ? '<i class="sfill" id="sFill"></i>' : ''}<span class="sdot"></span><span class="stime">${it.ss}–${it.ee}</span><span class="sname">${ttSubj(it) ? `${escapeHTML(ttSubj(it))}<small class="sper">${it.name}</small>` : it.name}</span><span class="sstat" ${st.cur === i ? 'id="sLeft"' : ''}>${past ? '✓' : (it.e - it.s) + ' 分'}</span></div>`;
     });
     if (!state.schedText) h += `<div class="sched-demo">這是開瑄國小的範例作息。<br>按右上角「編輯」，貼上自己學校的作息。</div>`;
     $('#schedList').innerHTML = h;
@@ -3720,7 +3768,7 @@ function renderSchedule(force) {
     const tag = $('#dayTag'); tag.textContent = st.weekend ? '假日' : '上課日'; tag.classList.toggle('off', st.weekend);
     const nowEl = document.getElementById('sNow'), list = $('#schedList');
     requestAnimationFrame(() => { list.scrollTop = nowEl ? Math.max(0, nowEl.offsetTop - list.offsetTop - list.clientHeight / 2 + nowEl.offsetHeight / 2) : (st.next === 0 ? 0 : list.scrollHeight); });
-    if (changed) { renderCenter(); if (curScreen === 'feed') renderFeedHead(); if (st.cur >= 0) toast(`現在是「${SCHEDULE[st.cur].name}」`); }
+    if (changed) { renderCenter(); if (curScreen === 'feed') renderFeedHead(); if (st.cur >= 0) toast(`現在是「${slotView(SCHEDULE[st.cur]).name}」`); }
   }
   // 每秒更新：目前時段的進度與剩餘時間、今日總進度
   if (st.cur >= 0) {
@@ -6079,6 +6127,31 @@ function init() {
     state.schedText = txt === DEFAULT_SCHED.trim() ? '' : txt; applySchedule(state.schedText); save();
     schedKey = ''; renderSchedule(true); renderCenter(); seClose(); toast(`作息表已更新，共 ${list.length} 個時段`);
   });
+  // 週課表
+  let ttArm = null;
+  const ttClose = () => $('#ttEd').classList.remove('show');
+  const ttRender = () => {
+    const wd = todayWd(), tt = state.weekTT || {};
+    $('#ttChips').innerHTML = TT_SUBJ.map(x => `<button type="button" data-tts="${x}" class="${ttArm === x ? 'on' : ''}">${x}</button>`).join('') + `<button type="button" data-tts="" class="del ${ttArm === '' ? 'on' : ''}">✕ 清除格子</button>`;
+    $('#ttTbl').classList.toggle('arm', ttArm !== null);
+    $('#ttTbl').innerHTML = `<thead><tr><th>時段</th>${TT_DAYS.map(d => `<th class="${d === wd ? 'today' : ''}">星期${'日一二三四五六'[d]}</th>`).join('')}</tr></thead><tbody>`
+      + SCHEDULE.map(it => `<tr class="${/節/.test(it.name) ? '' : 'np'}"><td class="tm"><b>${escapeHTML(it.name)}</b>${it.ss}</td>${TT_DAYS.map(d => { const v = (tt[d] && tt[d][it.ss]) || ''; return `<td><input data-d="${d}" data-ss="${it.ss}" value="${escapeHTML(v)}" maxlength="8" class="${v ? 'has' : ''}" placeholder="·"></td>`; }).join('')}</tr>`).join('') + '</tbody>';
+  };
+  $('#ttEdit').addEventListener('click', () => { ttArm = null; ttRender(); $('#ttEd').classList.add('show'); });
+  $('#ttChips').addEventListener('click', e => { const b = e.target.closest('[data-tts]'); if (!b) return; ttArm = ttArm === b.dataset.tts ? null : b.dataset.tts; [...$('#ttChips').children].forEach(x => x.classList.toggle('on', ttArm !== null && x.dataset.tts === ttArm)); $('#ttTbl').classList.toggle('arm', ttArm !== null); });
+  $('#ttTbl').addEventListener('pointerdown', e => { const i = e.target.closest('input'); if (!i || ttArm === null) return; e.preventDefault(); i.value = ttArm; i.classList.toggle('has', !!ttArm); });
+  $('#ttTbl').addEventListener('input', e => { const i = e.target.closest('input'); if (i) i.classList.toggle('has', !!i.value.trim()); });
+  $('#ttTbl').addEventListener('keydown', e => { const i = e.target.closest('input'); if (!i || e.key !== 'Enter') return; e.preventDefault(); const all = [...$('#ttTbl').querySelectorAll(`input[data-d="${i.dataset.d}"]`)], k = all.indexOf(i); if (all[k + 1]) all[k + 1].focus(); });
+  $('#ttClear').addEventListener('click', () => { $('#ttTbl').querySelectorAll('input').forEach(i => { i.value = ''; i.classList.remove('has'); }); });
+  $('#ttCancel').addEventListener('click', ttClose);
+  $('#ttEd').addEventListener('click', e => { if (e.target.id === 'ttEd') ttClose(); });
+  $('#ttSave').addEventListener('click', () => {
+    const tt = {}; let n = 0;
+    // 作息表目前沒有的時段（之前改過作息）先保留，免得改回來就不見
+    Object.entries(state.weekTT || {}).forEach(([d, m]) => Object.entries(m || {}).forEach(([ss, v]) => { if (!SCHEDULE.some(it => it.ss === ss) && v) (tt[d] = tt[d] || {})[ss] = v; }));
+    $('#ttTbl').querySelectorAll('input').forEach(i => { const v = i.value.trim().slice(0, 8); if (v) { (tt[i.dataset.d] = tt[i.dataset.d] || {})[i.dataset.ss] = v; n++; } });
+    state.weekTT = tt; save(); schedKey = ''; renderSchedule(true); renderCenter(); ttClose(); toast(n ? `週課表已更新，共填了 ${n} 格` : '週課表已清空，照作息表的名稱顯示');
+  });
   $('#hourBtn').addEventListener('click', () => setZoom(!zoomed));
   document.addEventListener('click', e => { if (uiHidden && !e.target.closest('.fish') && !e.target.closest('#btnEye')) setHidden(false); });
   // 教師控制台
@@ -6092,7 +6165,7 @@ function init() {
   window.addEventListener('beforeunload', saveNow);
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveNow(); else updateTimeViews(); });
   document.addEventListener('keydown', e => {
-    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#pModal').classList.contains('show') || $('#rdModal').classList.contains('show') || $('#setup').classList.contains('show') || $('#news').classList.contains('show') || $('#paint').classList.contains('show')) return;
+    if (e.target.matches('input,textarea') || $('#modal').classList.contains('show') || $('#schedEd').classList.contains('show') || $('#ttEd').classList.contains('show') || $('#pModal').classList.contains('show') || $('#rdModal').classList.contains('show') || $('#setup').classList.contains('show') || $('#news').classList.contains('show') || $('#paint').classList.contains('show')) return;
     const k = e.key.toLowerCase();
     if (k >= '1' && k <= '6') setMode(TAB_IDS[+k - 1]);
     else if (k === ' ' && state.mode === 'picker') { e.preventDefault(); Sound.init(); drawNumber(); }
